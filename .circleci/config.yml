@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-cache-key: &cache-key v1-dependencies-{{ checksum "pom.xml" }}
+cache-key: &cache-key v2-dependencies-{{ checksum "pom.xml" }}
 
 version: 2
 jobs:
@@ -45,13 +45,15 @@ jobs:
         name: Resolve dependencies
         command: mvn dependency:go-offline
 
+    - run:
+        name: Test & Build
+        command: mvn clean install cobertura:cobertura
+
+    - run:
+        name: Report Code Coverage to CodeCov
+        command: bash <(curl -s https://codecov.io/bash)
+
     - save_cache:
         paths:
         - ~/.m2
         key: *cache-key
-
-    - run:
-        name: Test & Build
-        command: mvn clean install
-
-

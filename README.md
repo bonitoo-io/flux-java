@@ -1,7 +1,10 @@
 # flux-java
 
-[![Build Status](https://circleci.com/gh/bonitoo-io/flux-java/tree/master.svg?style=svg)](https://circleci.com/gh/bonitoo-io/flux-java/tree/master)
-
+[![Build Status](https://img.shields.io/circleci/project/github/bonitoo-io/flux-java/master.svg)](https://circleci.com/gh/bonitoo-io/flux-java/tree/master)
+[![codecov](https://codecov.io/gh/bonitoo-io/flux-java/branch/master/graph/badge.svg)](https://codecov.io/gh/bonitoo-io/flux-java)
+[![License](https://img.shields.io/github/license/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues-raw/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/pulls)
 
 ## Flux - Data Scripting Language
 Java client for the Flux. The [Flux](https://github.com/influxdata/platform/tree/master/query#flux---influx-data-language) is centered on querying and manipulating time series data.

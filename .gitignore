@@ -4,3 +4,5 @@ target/**
 # IntelliJ
 .idea/**
 *.iml
+
+.java-version
