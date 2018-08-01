@@ -48,8 +48,8 @@ jobs:
         command: mvn dependency:go-offline
 
     - run:
-        name: Test & Build
-        command: mvn clean install cobertura:cobertura -s config/deploy-settings.xml
+        name: Test & Build & Deploy
+        command: mvn clean install cobertura:cobertura-integration-test -s config/deploy-settings.xml
 
     - run:
         name: Report Code Coverage to CodeCov
