@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # The MIT License
 # Copyright © 2018
@@ -21,41 +22,46 @@
 # THE SOFTWARE.
 #
 
-cache-key: &cache-key v2-dependencies-{{ checksum "pom.xml" }}
+#
+# script to start influxdb and compile influxdb-java with all tests.
+#
+set -e
 
-version: 2
-jobs:
-  build:
-    docker:
-    - image: maven:3-jdk-8-slim
-    - image: influxdb:1.6-alpine
-    - image: quay.io/influxdb/flux:nightly
+INFLUXDB_VERSION="1.6"
+FLUX_VERSION="nightly"
 
-    working_directory: ~/repo
+echo "Run tests on InfluxDB-${INFLUXDB_VERSION} with Flux-${FLUX_VERSION}"
 
-    environment:
-      MAVEN_OPTS: -Xmx3200m
+#
+# InfluxDB
+#
+docker kill influxdb || true
+docker rm influxdb || true
+docker pull influxdb:${INFLUXDB_VERSION}-alpine || true
+docker run \
+          --detach \
+          --name influxdb \
+          --publish 8086:8086 \
+          --publish 8082:8082 \
+          --publish 8089:8089/udp \
+          --volume ${PWD}/config/influxdb.conf:/etc/influxdb/influxdb.conf \
+      influxdb:${INFLUXDB_VERSION}-alpine
 
-    steps:
-    - checkout
+#
+# Flux
+#
+docker kill flux || true
+docker rm flux || true
 
-    - restore_cache:
-        keys:
-        - *cache-key
+docker pull quay.io/influxdb/flux:${FLUX_VERSION}
 
-    - run:
-        name: Resolve dependencies
-        command: mvn dependency:go-offline
+# wait for InfluxDB
+sleep 3
+docker run --detach --name flux --publish 8093:8093 quay.io/influxdb/flux:${FLUX_VERSION}
 
-    - run:
-        name: Test & Build
-        command: mvn clean install cobertura:cobertura
+test -t 1 && USE_TTY="-t"
 
-    - run:
-        name: Report Code Coverage to CodeCov
-        command: bash <(curl -s https://codecov.io/bash)
+mvn clean install
 
-    - save_cache:
-        paths:
-        - ~/.m2
-        key: *cache-key
+docker kill influxdb || true
+docker kill flux || true

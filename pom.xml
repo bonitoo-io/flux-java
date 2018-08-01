@@ -220,11 +220,6 @@
                         <cnf>SCRIPT_STYLE</cnf>
                         <toml>SCRIPT_STYLE</toml>
                         <yml>SCRIPT_STYLE</yml>
-                        <run-demo>SCRIPT_STYLE</run-demo>
-                        <stop-demo>SCRIPT_STYLE</stop-demo>
-                        <compile-and-test>SCRIPT_STYLE</compile-and-test>
-                        <ControllerService>SCRIPT_STYLE</ControllerService>
-                        <Processor>SCRIPT_STYLE</Processor>
                     </mapping>
                     <useDefaultExcludes>false</useDefaultExcludes>
                     <includes>**, **/META-INF/services/**</includes>

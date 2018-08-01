@@ -44,7 +44,6 @@ import org.junit.runner.RunWith;
 /**
  * @author Jakub Bednar (bednar@github) (31/07/2018 09:30)
  */
-@DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
 @RunWith(JUnitPlatform.class)
 class ITFluxClient extends AbstractITFluxClient {
 
@@ -94,6 +93,7 @@ class ITFluxClient extends AbstractITFluxClient {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void query() {
 
         Restrictions restriction = Restrictions
@@ -110,6 +110,7 @@ class ITFluxClient extends AbstractITFluxClient {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void callback() {
 
         Restrictions restriction = Restrictions

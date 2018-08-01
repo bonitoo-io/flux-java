@@ -215,7 +215,7 @@ $ export INFLUXDB_IP=192.168.99.100
 $ mvn test
 ```
 
-For convenience we provide a small shell script which starts a InfluxDB and Flux server  locally and executes `mvn clean install` with all tests inside docker containers.
+For convenience we provide a small shell script which starts a InfluxDB and Flux server inside Docker containers and executes `mvn clean install` with all tests locally.
 
 ```bash
 $ ./compile-and-test.sh
