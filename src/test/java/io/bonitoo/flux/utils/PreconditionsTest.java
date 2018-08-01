@@ -63,6 +63,14 @@ class PreconditionsTest {
     }
 
     @Test
+    void checkPositiveNumberNull() {
+
+        Assertions.assertThatThrownBy(() -> Preconditions.checkPositiveNumber(null, "property"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a positive number for property");
+    }
+
+    @Test
     void checkPositiveNumberZero() {
 
         Assertions.assertThatThrownBy(() -> Preconditions.checkPositiveNumber(0, "property"))
@@ -82,6 +90,14 @@ class PreconditionsTest {
     void checkNotNegativeNumber() {
 
         Preconditions.checkNotNegativeNumber(0, "valid");
+    }
+
+    @Test
+    void checkNotNegativeNumberNull() {
+
+        Assertions.assertThatThrownBy(() -> Preconditions.checkNotNegativeNumber(null, "property"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a positive or zero number for property");
     }
 
     @Test

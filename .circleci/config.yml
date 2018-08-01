@@ -49,7 +49,7 @@ jobs:
 
     - run:
         name: Test & Build
-        command: mvn clean install cobertura:cobertura
+        command: mvn clean install cobertura:cobertura -s config/deploy-settings.xml
 
     - run:
         name: Report Code Coverage to CodeCov

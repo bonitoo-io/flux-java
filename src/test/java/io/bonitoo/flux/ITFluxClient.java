@@ -137,6 +137,15 @@ class ITFluxClient extends AbstractITFluxClient {
         Assertions.assertThat(fluxClient.ping()).isTrue();
     }
 
+    @Test
+    void pingGZIP() {
+
+        fluxClient.enableGzip();
+        Assertions.assertThat(fluxClient.isGzipEnabled()).isTrue();
+
+        Assertions.assertThat(fluxClient.ping()).isTrue();
+    }
+
     private void assertFluxResult(@Nonnull final FluxResult fluxResult) {
 
         Assertions.assertThat(fluxResult).isNotNull();
