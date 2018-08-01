@@ -1,0 +1,46 @@
+package io.bonitoo.flux.operators;
+
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import io.bonitoo.flux.Flux;
+import io.bonitoo.flux.FluxChain;
+
+/**
+ * Abstract base class for operators that take an upstream source of {@link Flux}.
+ *
+ * @author Jakub Bednar (bednar@github) (25/06/2018 07:29)
+ */
+abstract class AbstractFluxWithUpstream extends Flux {
+
+    @Nullable
+    Flux source;
+
+    AbstractFluxWithUpstream() {
+    }
+
+    AbstractFluxWithUpstream(@Nonnull final Flux source) {
+
+        Objects.requireNonNull(source, "Source is required");
+
+        this.source = source;
+    }
+
+    @Override
+    protected final void appendActual(@Nonnull final FluxChain fluxChain) {
+
+        if (source != null) {
+            fluxChain.append(source);
+        }
+
+        appendAfterUpstream(fluxChain);
+    }
+
+    /**
+     * Append the actual operator to {@link FluxChain}.
+     *
+     * @param fluxChain the incoming {@link FluxChain}, never null
+     */
+    abstract void appendAfterUpstream(@Nonnull final FluxChain fluxChain);
+}

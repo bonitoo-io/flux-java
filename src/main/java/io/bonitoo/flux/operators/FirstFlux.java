@@ -1,0 +1,49 @@
+package io.bonitoo.flux.operators;
+
+import javax.annotation.Nonnull;
+
+import io.bonitoo.flux.Flux;
+
+/**
+ * <a href="https://github.com/influxdata/platform/tree/master/query#first">first</a> - Returns the first result of
+ * the query.
+ *
+ * <h3>Options</h3>
+ * <ul>
+ * <li><b>useStartTime</b> - Use the start time as the timestamp of the resulting aggregate [boolean]
+ * </ul>
+ *
+ * <h3>Example</h3>
+ * <pre>
+ * Flux flux = Flux
+ *     .from("telegraf")
+ *     .first();
+ * </pre>
+ *
+ * @author Jakub Bednar (bednar@github) (25/06/2018 09:28)
+ * @since 3.0.0
+ */
+public final class FirstFlux extends AbstractParametrizedFlux {
+
+    public FirstFlux(@Nonnull final Flux source) {
+        super(source);
+    }
+
+    @Nonnull
+    @Override
+    protected String operatorName() {
+        return "first";
+    }
+
+    /**
+     * @param useStartTime Use the start time as the timestamp of the resulting aggregate
+     * @return this
+     */
+    @Nonnull
+    public FirstFlux withUseStartTime(final boolean useStartTime) {
+
+        this.withPropertyValue("useStartTime", useStartTime);
+
+        return this;
+    }
+}
