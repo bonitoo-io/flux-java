@@ -1,8 +1,10 @@
 # flux-java
-Java client for Flux
+
+[![Build Status](https://circleci.com/gh/bonitoo-io/flux-java/tree/master.svg?style=svg)](https://circleci.com/gh/bonitoo-io/flux-java/tree/master)
+
 
 ## Flux - Data Scripting Language
-The [Flux](https://github.com/influxdata/platform/tree/master/query#flux---influx-data-language) is centered on querying and manipulating time series data.
+Java client for the Flux. The [Flux](https://github.com/influxdata/platform/tree/master/query#flux---influx-data-language) is centered on querying and manipulating time series data.
 
 ### Factory
 
