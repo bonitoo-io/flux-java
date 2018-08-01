@@ -76,8 +76,8 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>bonitoo-snapshot</id>
+            <url>https://apitea.com/nexus/content/repositories/bonitoo-snapshot/</url>
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
@@ -337,5 +337,19 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>bonitoo-snapshot</id>
+            <name>Bonitoo.io snapshot repository</name>
+            <url>https://apitea.com/nexus/content/repositories/bonitoo-snapshot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

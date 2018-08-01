@@ -39,7 +39,7 @@ There are two possibilities how to create Flux query:
 1. directly write Flux query
 2. use build-in operators
 
-##### Flux query
+#### Flux query
 
 ```java
 String query = "from(db:\"telegraf\") |> filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
@@ -47,7 +47,7 @@ String query = "from(db:\"telegraf\") |> filter(fn: (r) => r[\"_measurement\"] =
 FluxResult results = fluxClient.flux(query);
 ```
 
-##### Build-in operators
+#### Build-in operators
 
 For all supported operators have a look at [Operators](OPERATORS.md) and for instructions how to write own operator have a look at [Custom operator](OPERATORS.md#custom-operator).
 
@@ -184,6 +184,30 @@ dependencies {
 }
 ```
 
+### Snapshot repository
+The snapshot repository is temporally located [here](https://apitea.com/nexus/content/repositories/bonitoo-snapshot/).
+
+#### Maven
+```xml
+<repository>
+    <id>bonitoo-snapshot</id>
+    <name>Bonitoo.io snapshot repository</name>
+    <url>https://apitea.com/nexus/content/repositories/bonitoo-snapshot/</url>
+    <releases>
+        <enabled>false</enabled>
+    </releases>
+    <snapshots>
+        <enabled>true</enabled>
+    </snapshots>
+</repository>
+```
+#### Gradle
+```
+repositories {
+
+    maven { url "https://apitea.com/nexus/content/repositories/bonitoo-snapshot" }
+}
+```
 
 ### Build Requirements
 
