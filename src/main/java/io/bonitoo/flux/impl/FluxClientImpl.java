@@ -46,6 +46,7 @@ import io.bonitoo.flux.events.UnhandledErrorEvent;
 import io.bonitoo.flux.mapper.FluxResult;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxOptions;
+import io.bonitoo.flux.utils.Preconditions;
 
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -176,8 +177,6 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         Objects.requireNonNull(async, "Async configuration is required");
         Objects.requireNonNull(callback, "Callback consumer is required");
 
-        //TODO test chunked
-
         String orgID = this.fluxConnectionOptions.getOrgID();
         String query = toFluxString(flux, properties, options);
 
@@ -188,10 +187,17 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 public void onResponse(@Nonnull final Call<ResponseBody> call,
                                        @Nonnull final Response<ResponseBody> response) {
 
+                    if (!response.isSuccessful()) {
+                        errorResponse(query, response);
+                        callback.accept(FluxResult.empty());
+                        return;
+                    }
+
                     ResponseBody body = response.body();
                     if (body == null) {
                         return;
                     }
+
                     try {
                         BufferedSource source = body.source();
 
@@ -252,16 +258,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                     return fluxResult;
                 } else {
 
-                    String error = FluxException.getErrorMessage(response);
-
-                    FluxException exception;
-                    if (error != null) {
-                        exception = new FluxException(error);
-                    } else {
-                        exception = new FluxException("Unsuccessful request " + request);
-                    }
-
-                    publish(new FluxErrorEvent(fluxConnectionOptions, query, exception));
+                    errorResponse(query, response);
                 }
 
             } catch (Exception e) {
@@ -360,6 +357,23 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         subscribers.clear();
 
         return this;
+    }
+
+    private void errorResponse(@Nonnull final String query, @Nonnull final Response<ResponseBody> response) {
+
+        Preconditions.checkNonEmptyString(query, "Query");
+        Objects.requireNonNull(response, "Response is required");
+
+        String error = FluxException.getErrorMessage(response);
+
+        FluxException exception;
+        if (error != null) {
+            exception = new FluxException(error);
+        } else {
+            exception = new FluxException("Unsuccessful response: " + response);
+        }
+
+        publish(new FluxErrorEvent(fluxConnectionOptions, query, exception));
     }
 
     private void publish(@Nonnull final AbstractFluxEvent event) {

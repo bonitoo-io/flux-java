@@ -45,7 +45,7 @@ jobs:
 
     - run:
         name: Resolve dependencies
-        command: mvn dependency:go-offline
+        command: mvn dependency:resolve-plugins dependency:go-offline
 
     - run:
         name: Test 
@@ -57,7 +57,7 @@ jobs:
 
     - run:
         name: Build & Deploy
-        command: mvn -version -s config/deploy-settings.xml
+        command: mvn clean deploy -s config/deploy-settings.xml
 
     - save_cache:
         paths:

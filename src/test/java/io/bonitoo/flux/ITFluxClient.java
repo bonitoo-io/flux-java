@@ -92,6 +92,8 @@ class ITFluxClient extends AbstractITFluxClient {
         influxDB.write(point6);
     }
 
+    //TODO test chunked, GZIP
+
     @Test
     @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void query() {

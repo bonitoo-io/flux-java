@@ -48,12 +48,39 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     }
 
     @Test
+    void queryError() {
+
+        fluxServer.enqueue(createErrorResponse("Flux query is not valid"));
+
+        FluxResult result = fluxClient.flux(Flux.from("flux_database"));
+
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.getTables()).hasSize(0);
+    }
+
+    @Test
     void queryCallback() {
 
         fluxServer.enqueue(createResponse());
 
         fluxClient.flux(Flux.from("flux_database"), result -> {
             assertSuccessResult(result);
+
+            countDownLatch.countDown();
+        });
+
+        waitToCallback();
+    }
+
+    @Test
+    void queryCallbackError() {
+
+        fluxServer.enqueue(createErrorResponse("Flux query is not valid", true));
+
+        fluxClient.flux(Flux.from("flux_database"), result -> {
+
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getTables()).hasSize(0);
 
             countDownLatch.countDown();
         });

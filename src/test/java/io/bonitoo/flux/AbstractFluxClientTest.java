@@ -61,8 +61,9 @@ public abstract class AbstractFluxClientTest extends AbstractTest {
     }
 
     @AfterEach
-    protected void after() {
+    protected void after() throws IOException {
         fluxClient.close();
+        fluxServer.shutdown();
     }
 
     @Nonnull
@@ -92,12 +93,22 @@ public abstract class AbstractFluxClientTest extends AbstractTest {
 
     @Nonnull
     protected MockResponse createErrorResponse(@Nullable final String influxDBError) {
+        return createErrorResponse(influxDBError, false);
+    }
+
+    @Nonnull
+    protected MockResponse createErrorResponse(@Nullable final String influxDBError, final boolean chunked) {
 
         String body = String.format("{\"error\":\"%s\"}", influxDBError);
 
-        return new MockResponse()
+        MockResponse mockResponse = new MockResponse()
                 .setResponseCode(500)
-                .addHeader("X-Influx-Error", influxDBError)
-                .setBody(body);
+                .addHeader("X-Influx-Error", influxDBError);
+
+        if (chunked) {
+            return mockResponse.setChunkedBody(body, body.length());
+        }
+
+        return mockResponse.setBody(body);
     }
 }

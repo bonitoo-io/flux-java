@@ -22,6 +22,8 @@
  */
 package io.bonitoo.flux;
 
+import java.io.IOException;
+
 import okhttp3.mockwebserver.MockResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,14 @@ import org.junit.runner.RunWith;
 class FluxClientPingTest extends AbstractFluxClientTest {
 
     @Test
+    void healthy() {
+
+        fluxServer.enqueue(new MockResponse().setResponseCode(204));
+
+        Assertions.assertThat(fluxClient.ping()).isTrue();
+    }
+
+    @Test
     void serverError() {
 
         fluxServer.enqueue(createErrorResponse(""));
@@ -43,10 +53,10 @@ class FluxClientPingTest extends AbstractFluxClientTest {
     }
 
     @Test
-    void healthy() {
+    void notRunningServer() throws IOException {
 
-        fluxServer.enqueue(new MockResponse().setResponseCode(204));
+        fluxServer.shutdown();
 
-        Assertions.assertThat(fluxClient.ping()).isTrue();
+        Assertions.assertThat(fluxClient.ping()).isFalse();
     }
 }

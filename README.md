@@ -3,6 +3,7 @@
 [![Build Status](https://img.shields.io/circleci/project/github/bonitoo-io/flux-java/master.svg)](https://circleci.com/gh/bonitoo-io/flux-java/tree/master)
 [![codecov](https://codecov.io/gh/bonitoo-io/flux-java/branch/master/graph/badge.svg)](https://codecov.io/gh/bonitoo-io/flux-java)
 [![License](https://img.shields.io/github/license/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/blob/master/LICENSE)
+[![Snapshot Version](https://img.shields.io/nexus/s/https/apitea.com/nexus/io.bonitoo.flux/flux-java.svg)](https://apitea.com/nexus/content/repositories/bonitoo-snapshot/)
 [![GitHub issues](https://img.shields.io/github/issues-raw/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/pulls)
 
