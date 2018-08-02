@@ -88,6 +88,49 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         waitToCallback();
     }
 
+    @Test
+    void queryString() {
+
+        fluxServer.enqueue(createResponse());
+
+        String query = "from(db:\"telegraf\") |> " +
+                "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
+
+        FluxResult result = fluxClient.flux(query);
+
+        assertSuccessResult(result);
+    }
+
+    @Test
+    void queryStringCallback() {
+
+        fluxServer.enqueue(createResponse());
+
+        String query = "from(db:\"telegraf\") |> " +
+                "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
+
+        fluxClient.flux(query, result -> {
+            assertSuccessResult(result);
+
+            countDownLatch.countDown();
+        });
+
+        waitToCallback();
+    }
+
+    @Test
+    void queryStringRequestQueryParameter() throws InterruptedException {
+
+        fluxServer.enqueue(createResponse());
+
+        String query = "from(db:\"telegraf\") |> " +
+                "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
+
+        fluxClient.flux(query);
+
+        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("q")).isEqualTo(query);
+    }
+
     private void assertSuccessResult(@Nonnull final FluxResult result) {
 
         Assertions.assertThat(result).isNotNull();

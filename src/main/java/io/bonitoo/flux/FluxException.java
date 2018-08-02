@@ -22,6 +22,7 @@
  */
 package io.bonitoo.flux;
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -48,6 +49,7 @@ public class FluxException extends RuntimeException {
 
     @Nonnull
     public static FluxException fromCause(@Nullable final Throwable cause) {
+
         if (cause instanceof HttpException) {
             Response<?> response = ((HttpException) cause).response();
 
@@ -62,11 +64,9 @@ public class FluxException extends RuntimeException {
     }
 
     @Nullable
-    public static String getErrorMessage(@Nullable final Response<?> response) {
+    public static String getErrorMessage(@Nonnull final Response<?> response) {
 
-        if (response == null) {
-            return null;
-        }
+        Objects.requireNonNull(response, "Response is required");
 
         return response.headers().get("X-Influx-Error");
     }

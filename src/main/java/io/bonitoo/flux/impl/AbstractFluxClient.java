@@ -33,6 +33,7 @@ import io.bonitoo.flux.mapper.FluxResultMapper;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.utils.GzipRequestInterceptor;
+import io.bonitoo.flux.utils.Preconditions;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -100,5 +101,22 @@ public abstract class AbstractFluxClient<T> {
         Objects.requireNonNull(options, "FluxOptions are required");
 
         return flux.print(new FluxChain().addParameters(properties).addOptions(options.getQueryOptions()));
+    }
+
+    class StringFlux extends Flux {
+
+        private final String fluxQuery;
+
+        StringFlux(@Nonnull final String fluxQuery) {
+
+            Preconditions.checkNonEmptyString(fluxQuery, "Flux query");
+
+            this.fluxQuery = fluxQuery;
+        }
+
+        @Override
+        protected void appendActual(@Nonnull final FluxChain fluxChain) {
+            fluxChain.append(fluxQuery);
+        }
     }
 }

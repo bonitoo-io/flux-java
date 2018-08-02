@@ -49,6 +49,23 @@ public interface FluxClient {
      * @return {@link FluxResult}  which are matched the query
      */
     @Nonnull
+    FluxResult flux(@Nonnull final String query);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query    the flux query to execute
+     * @param callback callback to consume result which are matched the query
+     */
+    void flux(@Nonnull final String query, @Nonnull final Consumer<FluxResult> callback);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query the flux query to execute
+     * @return {@link FluxResult}  which are matched the query
+     */
+    @Nonnull
     FluxResult flux(@Nonnull final Flux query);
 
     /**
