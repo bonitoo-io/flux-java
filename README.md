@@ -102,7 +102,7 @@ FluxResult results = fluxClient.flux(Flux.from("telegraf"), options);
 ```
 
 ### Events
-The Flux clients produces events that allow user to be notified and react to this events:
+The Flux client produces events that allow user to be notified and react to this events:
 
 - `FluxSuccessEvent` - published when arrived the success response from Flux server
 - `FluxErrorEvent` - published when arrived the error response from Flux server
@@ -155,14 +155,6 @@ to check the status of your Flux instance:
 ```java
 boolean running = fluxClient.ping()
 System.out.println("Flux service running: " + runnning);
-
-// Reactive client
-fluxClient
-    .ping()
-    .subscribe(running -> {
-        
-        System.out.println("Flux service running: " + runnning);
-    });
 ```
 
 
