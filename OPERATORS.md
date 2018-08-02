@@ -278,6 +278,25 @@ Flux flux = Flux.join()
     .withFunction("tables.cpu[\"_value\"] + tables.mem[\"_value\"]");
 ```
 
+### keep
+Keep is the inverse of drop. It will return a table containing only columns that are specified, ignoring all others. 
+Only columns in the group key that are also specified in `keep` will be kept in the resulting group key [[doc](https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#keep)].
+- `columns` -  The list of columns that should be included in the resulting table. Cannot be used with `fn`. [array of strings]
+- `fn` - The function which takes a column name as a parameter and returns a boolean indicating whether or not the column should be included in the resulting table. Cannot be used with `columns`. [function(column)]
+
+```java
+Flux flux = Flux
+    .from("telegraf")
+    .keep(new String[]{"_time", "_value"});
+```
+
+```java
+Flux flux = Flux
+    .from("telegraf")
+    .keep()
+        .withFunction("col =~ /inodes*/");
+```
+
 ### last
 Returns the last result of the query [[doc](https://github.com/influxdata/platform/tree/master/query#last)].
 - `useStartTime` - Use the start time as the timestamp of the resulting aggregate. [boolean]

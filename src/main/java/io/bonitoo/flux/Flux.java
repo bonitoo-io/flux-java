@@ -43,6 +43,7 @@ import io.bonitoo.flux.operators.FromFlux;
 import io.bonitoo.flux.operators.GroupFlux;
 import io.bonitoo.flux.operators.IntegralFlux;
 import io.bonitoo.flux.operators.JoinFlux;
+import io.bonitoo.flux.operators.KeepFlux;
 import io.bonitoo.flux.operators.LastFlux;
 import io.bonitoo.flux.operators.LimitFlux;
 import io.bonitoo.flux.operators.MapFlux;
@@ -76,7 +77,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <br>
  * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md">Flux Specification</a>
  * <p>
- * TODO Rename, Drop, Keep
+ * TODO Rename
  *
  * <h3>The operators:</h3>
  * <ul>
@@ -93,6 +94,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>{@link GroupFlux}</li>
  * <li>{@link IntegralFlux}</li>
  * <li>{@link JoinFlux}</li>
+ * <li>{@link KeepFlux}</li>
  * <li>{@link LastFlux}</li>
  * <li>{@link LimitFlux}</li>
  * <li>{@link MapFlux}</li>
@@ -220,6 +222,59 @@ public abstract class Flux {
                 .withTable(name2, table2)
                 .withOn(tag)
                 .withFunction(function);
+    }
+
+    /**
+     * It will return a table containing only columns that are specified.
+     *
+     * <h3>The parameters had to be defined by:</h3>
+     * <ul>
+     * <li>{@link KeepFlux#withColumns(String[])}</li>
+     * <li>{@link KeepFlux#withFunction(String)}</li>
+     * <li>{@link KeepFlux#withPropertyNamed(String)}</li>
+     * <li>{@link KeepFlux#withPropertyNamed(String, String)}</li>
+     * <li>{@link KeepFlux#withPropertyValueEscaped(String, String)}</li>
+     * </ul>
+     *
+     * @return {@link KeepFlux}
+     */
+    @Nonnull
+    public final KeepFlux keep() {
+        return new KeepFlux(this);
+    }
+
+    /**
+     * It will return a table containing only columns that are specified.
+     *
+     * @param columns The list of columns that should be included in the resulting table.
+     * @return {@link KeepFlux}
+     */
+    @Nonnull
+    public final KeepFlux keep(@Nonnull final Collection<String> columns) {
+        return new KeepFlux(this).withColumns(columns);
+    }
+
+    /**
+     * It will return a table containing only columns that are specified.
+     *
+     * @param columns The list of columns that should be included in the resulting table.
+     * @return {@link DropFlux}
+     */
+    @Nonnull
+    public final KeepFlux keep(@Nonnull final String[] columns) {
+        return new KeepFlux(this).withColumns(columns);
+    }
+
+    /**
+     * It will return a table containing only columns that are specified.
+     *
+     * @param function The function which takes a column name as a parameter and returns a boolean indicating whether
+     *                 or not the column should be included in the resulting table.
+     * @return {@link DropFlux}
+     */
+    @Nonnull
+    public final KeepFlux keep(@Nonnull final String function) {
+        return new KeepFlux(this).withFunction(function);
     }
 
     /**
@@ -550,7 +605,7 @@ public abstract class Flux {
     /**
      * Drop will exclude specified columns from a table.
      *
-     * @param function he function which takes a column name as a parameter and returns a boolean indicating whether
+     * @param function The function which takes a column name as a parameter and returns a boolean indicating whether
      *                 or not the column should be excluded from the resulting table.
      * @return {@link DropFlux}
      */
