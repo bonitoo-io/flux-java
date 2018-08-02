@@ -25,6 +25,7 @@ package io.bonitoo.flux;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,6 +52,7 @@ import io.bonitoo.flux.operators.MaxFlux;
 import io.bonitoo.flux.operators.MeanFlux;
 import io.bonitoo.flux.operators.MinFlux;
 import io.bonitoo.flux.operators.RangeFlux;
+import io.bonitoo.flux.operators.RenameFlux;
 import io.bonitoo.flux.operators.SampleFlux;
 import io.bonitoo.flux.operators.SetFlux;
 import io.bonitoo.flux.operators.ShiftFlux;
@@ -77,7 +79,6 @@ import io.bonitoo.flux.utils.Preconditions;
  * <br>
  * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md">Flux Specification</a>
  * <p>
- * TODO Rename
  *
  * <h3>The operators:</h3>
  * <ul>
@@ -103,6 +104,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>{@link MinFlux}</li>
  * <li>percentile - Not defined in documentation or SPEC</li>
  * <li>{@link RangeFlux}</li>
+ * <li>{@link RenameFlux}</li>
  * <li>{@link SampleFlux}</li>
  * <li>{@link SetFlux}</li>
  * <li>{@link ShiftFlux}</li>
@@ -129,6 +131,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * @author Jakub Bednar (bednar@github) (22/06/2018 10:16)
  * @since 3.0.0
  */
+@SuppressWarnings({"FileLength"})
 public abstract class Flux {
 
     protected OperatorProperties operatorProperties = OperatorProperties.of();
@@ -1078,6 +1081,48 @@ public abstract class Flux {
         Objects.requireNonNull(unit, "ChronoUnit is required");
 
         return new RangeFlux(this).withStart(start, unit).withStop(stop, unit);
+    }
+
+    /**
+     * Rename will rename specified columns in a table.
+     *
+     * <h3>The parameters had to be defined by:</h3>
+     * <ul>
+     * <li>{@link RenameFlux#withColumns(Map)} </li>
+     * <li>{@link RenameFlux#withFunction(String)}</li>
+     * <li>{@link RenameFlux#withPropertyNamed(String)}</li>
+     * <li>{@link RenameFlux#withPropertyNamed(String, String)}</li>
+     * <li>{@link RenameFlux#withPropertyValueEscaped(String, String)}</li>
+     * </ul>
+     *
+     * @return {@link RenameFlux}
+     */
+    @Nonnull
+    public final RenameFlux rename() {
+        return new RenameFlux(this);
+    }
+
+    /**
+     * Rename will rename specified columns in a table.
+     *
+     * @param columns The map of columns to rename and their corresponding new names.
+     * @return {@link RenameFlux}
+     */
+    @Nonnull
+    public final RenameFlux rename(@Nonnull final Map<String, String> columns) {
+        return new RenameFlux(this).withColumns(columns);
+    }
+
+    /**
+     * Rename will rename specified columns in a table.
+     *
+     * @param function The function which takes a single string parameter (the old column name) and
+     *                 returns a string representing the new column name.
+     * @return {@link RenameFlux}
+     */
+    @Nonnull
+    public final RenameFlux rename(@Nonnull final String function) {
+        return new RenameFlux(this).withFunction(function);
     }
 
     /**

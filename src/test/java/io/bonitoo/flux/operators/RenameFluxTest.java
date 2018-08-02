@@ -22,8 +22,8 @@
  */
 package io.bonitoo.flux.operators;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.bonitoo.flux.Flux;
 
@@ -33,53 +33,44 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
 /**
- * @author Jakub Bednar (bednar@github) (02/08/2018 11:43)
+ * @author Jakub Bednar (bednar@github) (02/08/2018 12:01)
  */
 @RunWith(JUnitPlatform.class)
-class KeepFluxTest {
+class RenameFluxTest {
 
     @Test
-    void keepByArray() {
+    void renameByMap() {
+
+        Map<String, String> map = new HashMap<>();
+        map.put("host", "server");
+        map.put("_value", "val");
 
         Flux flux = Flux
                 .from("telegraf")
-                .keep(new String[]{"host", "_measurement"});
+                .rename(map);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(columns: [\"host\", \"_measurement\"])");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> rename(columns: {host: \"server\", _value: \"val\"})");
+    }
+
+
+    @Test
+    void renameByFunction() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .rename("{col}_new");
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> rename(fn: (col) => \"{col}_new\")");
     }
 
     @Test
-    void keepByCollectionArray() {
-
-        Collection<String> columns = new ArrayList<>();
-        columns.add("host");
-        columns.add("_value");
+    void renameByParameters() {
 
         Flux flux = Flux
                 .from("telegraf")
-                .keep(columns);
+                .rename()
+                .withFunction("{col}_new");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(columns: [\"host\", \"_value\"])");
-    }
-
-    @Test
-    void keepByFunction() {
-
-        Flux flux = Flux
-                .from("telegraf")
-                .keep("col =~ /usage*/");
-
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(fn: (col) => col =~ /usage*/)");
-    }
-
-    @Test
-    void keepByParameters() {
-
-        Flux flux = Flux
-                .from("telegraf")
-                .keep()
-                .withFunction("col =~ /inodes*/");
-
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(fn: (col) => col =~ /inodes*/)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> rename(fn: (col) => \"{col}_new\")");
     }
 }

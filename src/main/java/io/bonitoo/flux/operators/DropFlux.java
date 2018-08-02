@@ -42,7 +42,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * </li>
  * <li>
  * <b>fn</b> - The function which takes a column name as a parameter and returns a boolean indicating whether
- * or not the column should be excluded from the resulting table. Cannot be used with `columns`. [function(column)]
+ * or not the column should be excluded from the resulting table. Cannot be used with <i>columns</i>. [function(column)]
  * </li>
  * </ul>
  *

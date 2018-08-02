@@ -22,7 +22,7 @@
  */
 package io.bonitoo.flux.operators;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
@@ -30,69 +30,46 @@ import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.utils.Preconditions;
 
 /**
- * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#keep">keep</a> -
- * Keep is the inverse of drop. It will return a table containing only columns that are specified, ignoring all others.
- * Only columns in the group key that are also specified in keep will be kept in the resulting group key.
+ * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#rename">rename</a> -
+ * Rename will rename specified columns in a table. If a column is renamed and is part of the group key,
+ * the column name in the group key will be updated
  *
  * <h3>Options</h3>
  * <ul>
  * <li>
- * <b>columns</b> - The list of columns that should be included in the resulting table.
- * Cannot be used with <i>fn</i>. [array of strings]
+ * <b>columns</b> - The map of columns to rename and their corresponding new names. Cannot be used with <i>fn</i>.
+ * [map of columns]
  * </li>
  * <li>
- * <b>fn</b> - The function which takes a column name as a parameter and returns a boolean indicating whether
- * or not the column should be included in the resulting table. Cannot be used with <i>columns</i>. [function(column)]
+ * <b>fn</b> - The function which takes a single string parameter (the old column name) and
+ * returns a string representing the new column name. Cannot be used with <i>columns</i>. [function(column)]
  * </li>
  * </ul>
  *
  * <h3>Example</h3>
  * <pre>
- * Flux flux = Flux
- *     .from("telegraf")
- *     .keep(new String[]{"_time", "_value"});
- *
- * Flux flux = Flux
- *     .from("telegraf")
- *     .keep()
- *         .withFunction("col =~ /*inodes/");
  * </pre>
  *
- * @author Jakub Bednar (bednar@github) (02/08/2018 11:22)
- * @since 3.0.0
+ * @author Jakub Bednar (bednar@github) (02/08/2018 11:48)
  */
-public final class KeepFlux extends AbstractParametrizedFlux {
+public final class RenameFlux extends AbstractParametrizedFlux {
 
-    public KeepFlux(@Nonnull final Flux source) {
+    public RenameFlux(@Nonnull final Flux source) {
         super(source);
     }
 
     @Nonnull
     @Override
     protected String operatorName() {
-        return "keep";
+        return "rename";
     }
 
     /**
-     * @param columns The list of columns that should be included in the resulting table.
+     * @param columns The map of columns to rename and their corresponding new names.
      * @return this
      */
     @Nonnull
-    public KeepFlux withColumns(@Nonnull final String[] columns) {
-
-        Objects.requireNonNull(columns, "Columns are required");
-
-        this.withPropertyValue("columns", columns);
-
-        return this;
-    }
-
-    /**
-     * @param columns The list of columns that should be included in the resulting table.
-     * @return this
-     */
-    @Nonnull
-    public KeepFlux withColumns(@Nonnull final Collection<String> columns) {
+    public RenameFlux withColumns(@Nonnull final Map<String, String> columns) {
 
         Objects.requireNonNull(columns, "Columns are required");
 
@@ -103,16 +80,16 @@ public final class KeepFlux extends AbstractParametrizedFlux {
 
 
     /**
-     * @param function The function which takes a column name as a parameter and returns a boolean indicating whether
-     *                 or not the column should be included in the resulting table.
+     * @param function The function which takes a single string parameter (the old column name) and
+     *                 returns a string representing the new column name.
      * @return this
      */
     @Nonnull
-    public KeepFlux withFunction(@Nonnull final String function) {
+    public RenameFlux withFunction(@Nonnull final String function) {
 
         Preconditions.checkNonEmptyString(function, "Function");
 
-        this.withPropertyValue("fn: (col)", function);
+        this.withPropertyValueEscaped("fn: (col)", function);
 
         return this;
     }

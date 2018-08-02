@@ -407,6 +407,11 @@ Flux flux = Flux
     );
 ```
 
+### rename
+Rename will rename specified columns in a table. If a column is renamed and is part of the group key, the column name in the group key will be updated [[doc](https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#range)].
+- `columns` -  The map of columns to rename and their corresponding new names. Cannot be used with `fn`. [map of columns]
+- `fn` - The function which takes a single string parameter (the old column name) and returns a string representing the new column name. Cannot be used with `columns`. [function(column)]
+
 ### sample
 Sample values from a table [[doc](https://github.com/influxdata/platform/tree/master/query#sample)].
 - `n` - Sample every Nth element. [int]

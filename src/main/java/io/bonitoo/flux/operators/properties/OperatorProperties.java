@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -84,6 +85,19 @@ public final class OperatorProperties {
             serializedValue = collection.stream()
                     .map(host -> "\"" + host + "\"")
                     .collect(Collectors.joining(", ", "[", "]"));
+        }
+
+        if (serializedValue instanceof Map) {
+
+            StringJoiner joiner = new StringJoiner(", ", "{", "}");
+
+            Map map = (Map) serializedValue;
+            //noinspection unchecked
+            map.keySet().forEach(key -> {
+                joiner.add(String.format("%s: \"%s\"", key, map.get(key)));
+            });
+
+            serializedValue = joiner;
         }
 
         if (serializedValue instanceof Instant) {
