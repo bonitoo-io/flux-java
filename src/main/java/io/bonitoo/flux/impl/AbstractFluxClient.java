@@ -25,7 +25,6 @@ package io.bonitoo.flux.impl;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
@@ -52,7 +51,7 @@ public abstract class AbstractFluxClient<T> {
     final GzipRequestInterceptor gzipRequestInterceptor;
 
     AbstractFluxClient(@Nonnull final FluxConnectionOptions options,
-                       @Nonnull final Class<T> serviceType, @Nullable final T service) {
+                       @Nonnull final Class<T> serviceType) {
 
         Objects.requireNonNull(options, "FluxConnectionOptions are required");
         Objects.requireNonNull(serviceType, "Flux service type are required");
@@ -62,11 +61,7 @@ public abstract class AbstractFluxClient<T> {
         this.loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
         this.gzipRequestInterceptor = new GzipRequestInterceptor();
 
-        if (service != null) {
-            this.fluxService = service;
-        } else {
-
-            OkHttpClient okHttpClient = fluxConnectionOptions.getOkHttpClient()
+        OkHttpClient okHttpClient = fluxConnectionOptions.getOkHttpClient()
                     .addInterceptor(loggingInterceptor)
                     .addInterceptor(gzipRequestInterceptor)
                     .build();
@@ -80,7 +75,6 @@ public abstract class AbstractFluxClient<T> {
             this.fluxService = serviceBuilder
                     .build()
                     .create(serviceType);
-        }
     }
 
     /**

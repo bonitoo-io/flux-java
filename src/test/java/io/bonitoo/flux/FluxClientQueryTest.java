@@ -22,6 +22,7 @@
  */
 package io.bonitoo.flux;
 
+import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.mapper.FluxResult;
@@ -48,6 +49,20 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     }
 
     @Test
+    void queryParameters() throws InterruptedException {
+
+        fluxServer.enqueue(createResponse());
+
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("n", 5);
+
+        fluxClient.flux(Flux.from("flux_database").limit().withPropertyNamed("n"), properties);
+
+        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("q"))
+                .isEqualTo("from(db:\"flux_database\")|> limit(n: 5)");
+    }
+
+    @Test
     void queryError() {
 
         fluxServer.enqueue(createErrorResponse("Flux query is not valid"));
@@ -70,6 +85,23 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         });
 
         waitToCallback();
+    }
+
+    @Test
+    void queryCallbackParameters() throws InterruptedException {
+
+        fluxServer.enqueue(createResponse());
+
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("n", 5);
+
+        Flux query = Flux.from("flux_database").limit().withPropertyNamed("n");
+        fluxClient.flux(query, properties, result -> countDownLatch.countDown());
+
+        waitToCallback();
+
+        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("q"))
+                .isEqualTo("from(db:\"flux_database\")|> limit(n: 5)");
     }
 
     @Test
