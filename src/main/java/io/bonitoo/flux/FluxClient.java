@@ -35,7 +35,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 /**
  * The client for the Flux service.
  * <p>
- * TODO simple string, pojo, generate flux result
+ * TODO pojo, generate flux result
  *
  * @author Jakub Bednar (bednar@github) (30/07/2018 10:55)
  * @since 3.0.0

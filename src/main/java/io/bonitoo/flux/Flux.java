@@ -35,6 +35,7 @@ import io.bonitoo.flux.operators.CovarianceFlux;
 import io.bonitoo.flux.operators.DerivativeFlux;
 import io.bonitoo.flux.operators.DifferenceFlux;
 import io.bonitoo.flux.operators.DistinctFlux;
+import io.bonitoo.flux.operators.DropFlux;
 import io.bonitoo.flux.operators.ExpressionFlux;
 import io.bonitoo.flux.operators.FilterFlux;
 import io.bonitoo.flux.operators.FirstFlux;
@@ -86,6 +87,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>{@link DerivativeFlux}</li>
  * <li>{@link DifferenceFlux}</li>
  * <li>{@link DistinctFlux}</li>
+ * <li>{@link DropFlux}</li>
  * <li>{@link FilterFlux}</li>
  * <li>{@link FirstFlux}</li>
  * <li>{@link GroupFlux}</li>
@@ -502,6 +504,59 @@ public abstract class Flux {
     @Nonnull
     public final DistinctFlux distinct(@Nonnull final String column) {
         return new DistinctFlux(this).withColumn(column);
+    }
+
+    /**
+     * Drop will exclude specified columns from a table.
+     *
+     * <h3>The parameters had to be defined by:</h3>
+     * <ul>
+     * <li>{@link DropFlux#withColumns(String[])}</li>
+     * <li>{@link DropFlux#withFunction(String)}</li>
+     * <li>{@link DropFlux#withPropertyNamed(String)}</li>
+     * <li>{@link DropFlux#withPropertyNamed(String, String)}</li>
+     * <li>{@link DropFlux#withPropertyValueEscaped(String, String)}</li>
+     * </ul>
+     *
+     * @return {@link DropFlux}
+     */
+    @Nonnull
+    public final DropFlux drop() {
+        return new DropFlux(this);
+    }
+
+    /**
+     * Drop will exclude specified columns from a table.
+     *
+     * @param columns The list of columns which should be excluded from the resulting table.
+     * @return {@link DropFlux}
+     */
+    @Nonnull
+    public final DropFlux drop(@Nonnull final Collection<String> columns) {
+        return new DropFlux(this).withColumns(columns);
+    }
+
+    /**
+     * Drop will exclude specified columns from a table.
+     *
+     * @param columns The list of columns which should be excluded from the resulting table.
+     * @return {@link DropFlux}
+     */
+    @Nonnull
+    public final DropFlux drop(@Nonnull final String[] columns) {
+        return new DropFlux(this).withColumns(columns);
+    }
+
+    /**
+     * Drop will exclude specified columns from a table.
+     *
+     * @param function he function which takes a column name as a parameter and returns a boolean indicating whether
+     *                 or not the column should be excluded from the resulting table.
+     * @return {@link DropFlux}
+     */
+    @Nonnull
+    public final DropFlux drop(@Nonnull final String function) {
+        return new DropFlux(this).withFunction(function);
     }
 
     /**

@@ -143,6 +143,24 @@ Flux flux = Flux
     .distinct("_measurement");
 ```
 
+### drop
+Drop will exclude specified columns from a table. Columns to exclude can be specified either through a list, or a predicate function. 
+When a dropped column is part of the group key it will also be dropped from the key [[doc](https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#drop)].
+- `columns` -  The list of columns which should be excluded from the resulting table. Cannot be used with `fn`. [array of strings]
+- `fn` - The function which takes a column name as a parameter and returns a boolean indicating whether or not the column should be excluded from the resulting table. Cannot be used with `columns`. [function(column)]
+
+```java
+Flux flux = Flux
+    .from("telegraf")
+    .drop(new String[]{"host", "_measurement"});
+```
+
+```java
+Flux flux = Flux
+    .from("telegraf")
+    .drop()
+        .withFunction("col =~ /free*/");
+```
 ### filter
 
 Filters the results using an expression [[doc](https://github.com/influxdata/platform/tree/master/query#filter)].
