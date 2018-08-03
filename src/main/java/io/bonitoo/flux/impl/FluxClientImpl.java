@@ -74,7 +74,17 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
         Objects.requireNonNull(query, "Flux query is required");
 
-        return flux(new StringFlux(query));
+        return flux(query, FluxOptions.DEFAULTS);
+    }
+
+    @Nonnull
+    @Override
+    public FluxResult flux(@Nonnull final String query, @Nonnull final FluxOptions options) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+
+        return flux(new StringFlux(query), options);
     }
 
     @Override
@@ -83,7 +93,19 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(callback, "Callback consumer is required");
 
-        flux(new StringFlux(query), callback);
+        flux(query, FluxOptions.DEFAULTS, callback);
+    }
+
+    @Override
+    public void flux(@Nonnull final String query,
+                     @Nonnull final FluxOptions options,
+                     @Nonnull final Consumer<FluxResult> callback) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        flux(new StringFlux(query), options, callback);
     }
 
     @Nonnull

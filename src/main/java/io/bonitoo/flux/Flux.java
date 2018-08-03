@@ -78,7 +78,6 @@ import io.bonitoo.flux.utils.Preconditions;
  * <a href="https://github.com/influxdata/platform/tree/master/query#basic-syntax">Flux</a> - Data Scripting Language.
  * <br>
  * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md">Flux Specification</a>
- * <p>
  *
  * <h3>The operators:</h3>
  * <ul>
@@ -1948,8 +1947,9 @@ public abstract class Flux {
      * @return a current operator
      */
     @Nonnull
-    public final Flux withPropertyValue(@Nonnull final String property, final long amount,
-                                        @Nonnull final ChronoUnit unit) {
+    public final Flux withPropertyValue(@Nonnull final String property,
+                                        @Nullable final Long amount,
+                                        @Nullable final ChronoUnit unit) {
 
         Preconditions.checkNonEmptyString(property, "Flux property name");
 

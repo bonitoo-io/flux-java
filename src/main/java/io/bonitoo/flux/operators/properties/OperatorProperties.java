@@ -144,7 +144,7 @@ public final class OperatorProperties {
      * @param fluxName name of property in Flux query
      * @param amount   the amount of the duration, measured in terms of the unit, positive or negative
      * @param unit     the unit that the duration is measured in, must have an exact duration.  If null than ignored.
-     * @see Flux#withPropertyValue(String, long, ChronoUnit)
+     * @see Flux#withPropertyValue(String, Long, ChronoUnit)
      */
     public void putPropertyValue(@Nonnull final String fluxName,
                                  @Nullable final Long amount,
@@ -229,6 +229,7 @@ public final class OperatorProperties {
 
         @Nonnull
         @Override
+        @SuppressWarnings("unchecked")
         public T value(@Nonnull final Map<String, Object> namedProperties) {
 
             Object parameterValue = namedProperties.get(parameterName);
@@ -239,7 +240,6 @@ public final class OperatorProperties {
                 throw new IllegalStateException(message);
             }
 
-            //noinspection unchecked
             return (T) parameterValue;
         }
     }

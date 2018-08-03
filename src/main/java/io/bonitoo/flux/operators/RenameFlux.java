@@ -48,6 +48,17 @@ import io.bonitoo.flux.utils.Preconditions;
  *
  * <h3>Example</h3>
  * <pre>
+ * Map&lt;String, String&gt; map = new HashMap&lt;&gt;();
+ * map.put("host", "server");
+ * map.put("_value", "val");
+ *
+ * Flux flux = Flux
+ *     .from("telegraf")
+ *     .rename(map);
+ *
+ * Flux flux = Flux
+ *     .from("telegraf")
+ *     .rename("{col}_new");
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (02/08/2018 11:48)

@@ -56,6 +56,17 @@ class SortFluxTest {
     }
 
     @Test
+    void sortByColumnsCollectionEmpty() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .sort(new ArrayList<>(), false);
+
+        Assertions.assertThat(flux.print())
+                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sort(desc: false)");
+    }
+
+    @Test
     void sortByColumnsArray() {
 
         Flux flux = Flux

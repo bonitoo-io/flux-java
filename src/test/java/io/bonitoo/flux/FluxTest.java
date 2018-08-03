@@ -99,4 +99,48 @@ class FluxTest {
 
         Assertions.assertThat(flux).isEqualToIgnoringWhitespace(expected);
     }
+
+    @Test
+    void propertyValueEscapedNull() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .count()
+                    .withPropertyValueEscaped("unused", null);
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+    }
+
+    @Test
+    void propertyValueNull() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .count()
+                    .withPropertyValue("unused", null);
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+    }
+
+    @Test
+    void propertyValueAmountNull() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .count()
+                    .withPropertyValue("unused", null, ChronoUnit.HOURS);
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+    }
+
+    @Test
+    void propertyValueUnitNull() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .count()
+                    .withPropertyValue("unused", 10L, null);
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+    }
 }

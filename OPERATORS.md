@@ -412,6 +412,22 @@ Rename will rename specified columns in a table. If a column is renamed and is p
 - `columns` -  The map of columns to rename and their corresponding new names. Cannot be used with `fn`. [map of columns]
 - `fn` - The function which takes a single string parameter (the old column name) and returns a string representing the new column name. Cannot be used with `columns`. [function(column)]
 
+```java
+Map<String, String> map = new HashMap<>();
+map.put("host", "server");
+map.put("_value", "val");
+
+Flux flux = Flux
+    .from("telegraf")
+    .rename(map);
+```
+
+```java
+Flux flux = Flux
+    .from("telegraf")
+    .rename("{col}_new");
+```
+
 ### sample
 Sample values from a table [[doc](https://github.com/influxdata/platform/tree/master/query#sample)].
 - `n` - Sample every Nth element. [int]
