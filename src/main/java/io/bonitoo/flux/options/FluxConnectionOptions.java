@@ -156,11 +156,11 @@ public final class FluxConnectionOptions {
         @Nonnull
         public FluxConnectionOptions build() {
 
-            if (url == null || url.isEmpty()) {
+            if (url == null) {
                 throw new IllegalStateException("The url to connect to Flux has to be defined.");
             }
 
-            if (orgID == null || orgID.isEmpty()) {
+            if (orgID == null) {
                 throw new IllegalStateException("The organization id required by Flux has to be defined.");
             }
 

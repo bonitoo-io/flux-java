@@ -110,6 +110,46 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     @Nonnull
     @Override
+    public Response<ResponseBody> fluxRaw(@Nonnull final String query) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+
+        return fluxRaw(query, FluxOptions.DEFAULTS);
+    }
+
+    @Nonnull
+    @Override
+    public Response<ResponseBody> fluxRaw(@Nonnull final String query, @Nonnull final FluxOptions options) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+
+        return fluxRaw(new StringFlux(query), options);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final String query, @Nonnull final Consumer<Response<ResponseBody>> callback) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        fluxRaw(query, FluxOptions.DEFAULTS, callback);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final String query,
+                        @Nonnull final FluxOptions options,
+                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        fluxRaw(new StringFlux(query), options, callback);
+    }
+
+    @Nonnull
+    @Override
     public FluxResult flux(@Nonnull final Flux query) {
 
         Objects.requireNonNull(query, "Flux query is required");
@@ -204,110 +244,105 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         flux(query, properties, options, true, callback);
     }
 
-    @Nullable
-    private FluxResult flux(@Nonnull final Flux flux,
-                            @Nonnull final Map<String, Object> properties,
-                            @Nonnull final FluxOptions options,
-                            @Nonnull final Boolean async,
-                            @Nonnull final Consumer<FluxResult> callback) {
+    @Nonnull
+    @Override
+    public Response<ResponseBody> fluxRaw(@Nonnull final Flux query) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+
+        return fluxRaw(query, FluxOptions.DEFAULTS);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> callback) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        fluxRaw(query, FluxOptions.DEFAULTS, callback);
+    }
+
+    @Nonnull
+    @Override
+    public Response<ResponseBody> fluxRaw(@Nonnull final Flux query, @Nonnull final FluxOptions options) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+
+        return fluxRaw(query, new HashMap<>(), options);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final Flux query,
+                        @Nonnull final FluxOptions options,
+                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        fluxRaw(query, new HashMap<>(), options, callback);
+    }
+
+    @Nonnull
+    @Override
+    public Response<ResponseBody> fluxRaw(@Nonnull final Flux query,
+                                          @Nonnull final Map<String, Object> properties) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+
+        return fluxRaw(query, properties, FluxOptions.DEFAULTS);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final Flux query,
+                        @Nonnull final Map<String, Object> properties,
+                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        fluxRaw(query, properties, FluxOptions.DEFAULTS, callback);
+    }
+
+    @Nonnull
+    @Override
+    public Response<ResponseBody> fluxRaw(@Nonnull final Flux flux,
+                                          @Nonnull final Map<String, Object> properties,
+                                          @Nonnull final FluxOptions options) {
 
         Objects.requireNonNull(flux, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
-        Objects.requireNonNull(async, "Async configuration is required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
 
-        String orgID = this.fluxConnectionOptions.getOrgID();
         String query = toFluxString(flux, properties, options);
 
-        Call<ResponseBody> request = fluxService.query(query, orgID);
-        if (async) {
-            request.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(@Nonnull final Call<ResponseBody> call,
-                                       @Nonnull final Response<ResponseBody> response) {
+        Response<ResponseBody> response = fluxRaw(query, properties, options, false, result -> {
+        });
 
-                    if (!response.isSuccessful()) {
-                        errorResponse(query, response);
-                        callback.accept(FluxResult.empty());
-                        return;
-                    }
-
-                    ResponseBody body = response.body();
-                    if (body == null) {
-                        return;
-                    }
-
-                    try {
-                        BufferedSource source = body.source();
-
-                        //
-                        // Source has data => parse
-                        //
-                        while (!source.exhausted()) {
-
-                            FluxResult fluxResult = mapper.toFluxResult(source, options.getParserOptions());
-                            if (fluxResult != null) {
-
-                                callback.accept(fluxResult);
-                            }
-                        }
-
-                        publish(new FluxSuccessEvent(fluxConnectionOptions, query));
-
-                    } catch (IOException e) {
-
-                        //
-                        // Socket closed by remote server or end of data
-                        //
-                        if (e.getMessage().equals("Socket closed") || e instanceof EOFException) {
-                            LOG.log(Level.FINEST, "Socket closed by remote server or end of data", e);
-                        } else {
-                            publish(new UnhandledErrorEvent(e));
-                        }
-                    }
-
-                    publish(new FluxSuccessEvent(fluxConnectionOptions, query));
-
-                    body.close();
-                }
-
-                @Override
-                public void onFailure(@Nonnull final Call<ResponseBody> call,
-                                      @Nonnull final Throwable t) {
-
-                    publish(new UnhandledErrorEvent(t));
-                }
-            });
-        } else {
-            try {
-
-                Response<ResponseBody> response = request.execute();
-                if (response.isSuccessful()) {
-
-                    ResponseBody body = response.body();
-                    if (body == null) {
-                        return FluxResult.empty();
-                    }
-
-                    BufferedSource source = body.source();
-                    FluxResult fluxResult = mapper.toFluxResult(source, options.getParserOptions());
-
-                    publish(new FluxSuccessEvent(fluxConnectionOptions, query));
-
-                    return fluxResult;
-                } else {
-
-                    errorResponse(query, response);
-                }
-
-            } catch (Exception e) {
-
-                publish(new UnhandledErrorEvent(FluxException.fromCause(e)));
-            }
+        if (response == null) {
+            throw new IllegalStateException("Response is null");
         }
 
-        return FluxResult.empty();
+        return response;
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final Flux flux,
+                        @Nonnull final Map<String, Object> properties,
+                        @Nonnull final FluxOptions options,
+                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+
+        Objects.requireNonNull(flux, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        String query = toFluxString(flux, properties, options);
+
+        fluxRaw(query, properties, options, true, callback);
     }
 
     @Override
@@ -397,6 +432,144 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         subscribers.clear();
 
         return this;
+    }
+
+    @Nullable
+    private FluxResult flux(@Nonnull final Flux flux,
+                            @Nonnull final Map<String, Object> properties,
+                            @Nonnull final FluxOptions options,
+                            @Nonnull final Boolean async,
+                            @Nonnull final Consumer<FluxResult> callback) {
+
+        Objects.requireNonNull(flux, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(async, "Async configuration is required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+
+        String query = toFluxString(flux, properties, options);
+        Response<ResponseBody> response = fluxRaw(query, properties, options, async, asyncResponse -> {
+
+            if (!asyncResponse.isSuccessful()) {
+                errorResponse(query, asyncResponse);
+                callback.accept(FluxResult.empty());
+                return;
+            }
+
+            ResponseBody body = asyncResponse.body();
+            if (body == null) {
+                return;
+            }
+
+            try {
+                BufferedSource source = body.source();
+
+                //
+                // Source has data => parse
+                //
+                while (!source.exhausted()) {
+
+                    FluxResult fluxResult = mapper.toFluxResult(source, options.getParserOptions());
+                    if (fluxResult != null) {
+
+                        callback.accept(fluxResult);
+                    }
+                }
+
+                publish(new FluxSuccessEvent(fluxConnectionOptions, query));
+
+            } catch (IOException e) {
+
+                //
+                // Socket closed by remote server or end of data
+                //
+                if (e.getMessage().equals("Socket closed") || e instanceof EOFException) {
+                    LOG.log(Level.FINEST, "Socket closed by remote server or end of data", e);
+                } else {
+                    publish(new UnhandledErrorEvent(e));
+                }
+            }
+
+            publish(new FluxSuccessEvent(fluxConnectionOptions, query));
+
+            body.close();
+        });
+
+        if (!async && response != null) {
+            try {
+
+                if (response.isSuccessful()) {
+
+                    ResponseBody body = response.body();
+                    if (body == null) {
+                        return FluxResult.empty();
+                    }
+
+                    BufferedSource source = body.source();
+                    FluxResult fluxResult = mapper.toFluxResult(source, options.getParserOptions());
+
+                    publish(new FluxSuccessEvent(fluxConnectionOptions, query));
+
+                    return fluxResult;
+                } else {
+
+                    errorResponse(query, response);
+                }
+
+            } catch (Exception e) {
+
+                publish(new UnhandledErrorEvent(FluxException.fromCause(e)));
+            }
+        }
+
+        return FluxResult.empty();
+    }
+
+    @Nullable
+    private Response<ResponseBody> fluxRaw(@Nonnull final String query,
+                                           @Nonnull final Map<String, Object> properties,
+                                           @Nonnull final FluxOptions options,
+                                           @Nonnull final Boolean async,
+                                           @Nonnull final Consumer<Response<ResponseBody>> callback) {
+
+        Preconditions.checkNonEmptyString(query, "Flux query");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(async, "Async configuration is required");
+        Objects.requireNonNull(callback, "Callback consumer is required");
+
+        String orgID = this.fluxConnectionOptions.getOrgID();
+
+        Call<ResponseBody> request = fluxService.query(query, orgID);
+        if (async) {
+            request.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(@Nonnull final Call<ResponseBody> call,
+                                       @Nonnull final Response<ResponseBody> response) {
+
+                    callback.accept(response);
+                }
+
+                @Override
+                public void onFailure(@Nonnull final Call<ResponseBody> call,
+                                      @Nonnull final Throwable t) {
+
+                    publish(new UnhandledErrorEvent(t));
+                }
+            });
+        } else {
+            try {
+
+                return request.execute();
+
+            } catch (Exception e) {
+
+                publish(new UnhandledErrorEvent(FluxException.fromCause(e)));
+            }
+        }
+
+        return null;
     }
 
     private void errorResponse(@Nonnull final String query, @Nonnull final Response<ResponseBody> response) {

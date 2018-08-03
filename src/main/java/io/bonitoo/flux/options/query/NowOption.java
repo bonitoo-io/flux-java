@@ -29,6 +29,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import io.bonitoo.flux.utils.Preconditions;
+
 /**
  * The now option is a function that returns a time value to be used as a proxy for the current system time.
  *
@@ -96,7 +98,7 @@ public final class NowOption extends AbstractOption {
         @Nonnull
         public NowOption.Builder function(@Nonnull final String function) {
 
-            Objects.requireNonNull(function, "Function is required");
+            Preconditions.checkNonEmptyString(function, "Function");
 
             this.function = function;
 
@@ -111,7 +113,7 @@ public final class NowOption extends AbstractOption {
         @Nonnull
         public NowOption build() {
 
-            if (function == null || function.isEmpty()) {
+            if (function == null) {
                 throw new IllegalStateException("function or time has to be defined");
             }
 

@@ -102,7 +102,7 @@ public final class CustomOption extends AbstractOption {
         @Nonnull
         public CustomOption build() {
 
-            if (optionValue == null || optionValue.isEmpty()) {
+            if (optionValue == null) {
                 throw new IllegalStateException("Option value has to be defined");
             }
 

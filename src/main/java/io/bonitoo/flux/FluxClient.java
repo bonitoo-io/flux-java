@@ -30,12 +30,14 @@ import io.bonitoo.flux.events.AbstractFluxEvent;
 import io.bonitoo.flux.mapper.FluxResult;
 import io.bonitoo.flux.options.FluxOptions;
 
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Response;
 
 /**
  * The client for the Flux service.
  * <p>
- * TODO pojo, generate flux result
+ * TODO pojo, generate flux result, improve test (chunked, GZIP)
  *
  * @author Jakub Bednar (bednar@github) (30/07/2018 10:55)
  * @since 3.0.0
@@ -79,6 +81,44 @@ public interface FluxClient {
     void flux(@Nonnull final String query,
               @Nonnull final FluxOptions options,
               @Nonnull final Consumer<FluxResult> callback);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query the flux query to execute
+     * @return {@code Response<ResponseBody>} raw response which are matched the query
+     */
+    @Nonnull
+    Response<ResponseBody> fluxRaw(@Nonnull final String query);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param options the options for the query
+     * @param query   the flux query to execute
+     * @return {@code Response<ResponseBody>} raw response which are matched the query
+     */
+    @Nonnull
+    Response<ResponseBody> fluxRaw(@Nonnull final String query, @Nonnull final FluxOptions options);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query    the flux query to execute
+     * @param callback callback to consume raw response which are matched the query
+     */
+    void fluxRaw(@Nonnull final String query, @Nonnull final Consumer<Response<ResponseBody>> callback);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query    the flux query to execute
+     * @param callback callback to consume raw response which are matched the query
+     * @param options  the options for the query
+     */
+    void fluxRaw(@Nonnull final String query,
+                 @Nonnull final FluxOptions options,
+                 @Nonnull final Consumer<Response<ResponseBody>> callback);
 
     /**
      * Execute a Flux against the Flux service.
@@ -164,6 +204,91 @@ public interface FluxClient {
               @Nonnull final Map<String, Object> properties,
               @Nonnull final FluxOptions options,
               @Nonnull final Consumer<FluxResult> callback);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query the flux query to execute
+     * @return {@code Response<ResponseBody>} raw response which are matched the query
+     */
+    @Nonnull
+    Response<ResponseBody> fluxRaw(@Nonnull final Flux query);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query    the flux query to execute
+     * @param callback callback to consume raw response which are matched the query
+     */
+    void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> callback);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query   the flux query to execute
+     * @param options the options for the query
+     * @return {@code Response<ResponseBody>} raw response which are matched the query
+     */
+    @Nonnull
+    Response<ResponseBody> fluxRaw(@Nonnull final Flux query, @Nonnull final FluxOptions options);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query    the flux query to execute
+     * @param options  the options for the query
+     * @param callback callback to consume raw response which are matched the query
+     */
+    void fluxRaw(@Nonnull final Flux query,
+                 @Nonnull final FluxOptions options,
+                 @Nonnull final Consumer<Response<ResponseBody>> callback);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @return {@code Response<ResponseBody>} raw response which are matched the query
+     */
+    @Nonnull
+    Response<ResponseBody> fluxRaw(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param callback   callback to consume raw response which are matched the query
+     */
+    void fluxRaw(@Nonnull final Flux query,
+                 @Nonnull final Map<String, Object> properties,
+                 @Nonnull final Consumer<Response<ResponseBody>> callback);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param options    the options for the query
+     * @return {@code Response<ResponseBody>} raw response which are matched the query
+     */
+    @Nonnull
+    Response<ResponseBody> fluxRaw(@Nonnull final Flux query,
+                                   @Nonnull final Map<String, Object> properties,
+                                   @Nonnull final FluxOptions options);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param options    the options for the query
+     * @param callback   callback to consume raw response which are matched the query
+     */
+    void fluxRaw(@Nonnull final Flux query,
+                 @Nonnull final Map<String, Object> properties,
+                 @Nonnull final FluxOptions options,
+                 @Nonnull final Consumer<Response<ResponseBody>> callback);
 
     /**
      * Listen the events produced by {@link FluxClient}.

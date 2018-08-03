@@ -37,8 +37,8 @@ fluxClient.close();
 ### Queries
 There are two possibilities how to create Flux query:
 
-1. directly write Flux query
-2. use build-in operators
+1. Directly write Flux query
+2. Use build-in operators
 
 #### Flux query
 
@@ -72,6 +72,18 @@ fluxClient.flux(query, fluxResult -> {
     logFluxResult(fluxResult);
 });
 ```
+
+#### Handling server response
+
+There are two possibilities how to handle server response:
+1. Mapping to the `FluxResult` POJO ([mentioned above](#flux-query))
+2. Use directly server response to the custom handling
+
+##### Custom Handling  
+```java
+Response<ResponseBody> result = fluxClient.fluxRaw(query);
+```
+
 
 #### Query configuration
 

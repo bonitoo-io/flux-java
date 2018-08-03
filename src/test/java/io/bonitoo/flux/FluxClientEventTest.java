@@ -54,6 +54,8 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
             Assertions.assertThat(event).isNotNull();
             Assertions.assertThat(event.getFluxQuery()).isEqualToIgnoringWhitespace(expected);
+            Assertions.assertThat(event.getOptions().getOrgID()).isEqualTo("0");
+            Assertions.assertThat(event.getOptions().getUrl()).isEqualTo(fluxServer.url("/").toString());
 
             countDownLatch.countDown();
         });
