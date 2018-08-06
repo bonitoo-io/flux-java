@@ -37,7 +37,8 @@ import retrofit2.Response;
 /**
  * The client for the Flux service.
  * <p>
- * TODO pojo, generate flux result, improve test (chunked, GZIP)
+ * TODO pojo, generate flux result (https://app.quicktype.io/?share=mJzwzhpX4Zb4wczEztfi),
+ * improve test (chunked, GZIP, raw)
  *
  * @author Jakub Bednar (bednar@github) (30/07/2018 10:55)
  * @since 3.0.0
