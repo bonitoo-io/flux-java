@@ -178,14 +178,14 @@ The latest version for Maven dependency:
 <dependency>
   <groupId>io.bonitoo.flux</groupId>
   <artifactId>flux-java</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
   
 Or when using with Gradle:
 ```groovy
 dependencies {
-    compile "io.bonitoo.flux:flux-java:0.0.1-SNAPSHOT"
+    compile "io.bonitoo.flux:flux-java:1.0.0-SNAPSHOT"
 }
 ```
 
