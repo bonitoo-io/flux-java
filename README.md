@@ -1,5 +1,8 @@
 # flux-java
 
+> This library is under development and no stable version has been released yet.  
+> The API can change at any moment.
+
 [![Build Status](https://img.shields.io/circleci/project/github/bonitoo-io/flux-java/master.svg)](https://circleci.com/gh/bonitoo-io/flux-java/tree/master)
 [![codecov](https://codecov.io/gh/bonitoo-io/flux-java/branch/master/graph/badge.svg)](https://codecov.io/gh/bonitoo-io/flux-java)
 [![License](https://img.shields.io/github/license/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/blob/master/LICENSE)

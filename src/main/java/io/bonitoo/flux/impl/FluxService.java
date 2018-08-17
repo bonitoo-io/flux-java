@@ -38,10 +38,10 @@ import retrofit2.http.Streaming;
 public interface FluxService {
 
     @Streaming
-    @POST("/v1/query")
+    @POST("/query")
     @Nonnull
-    Call<ResponseBody> query(@Query(value = "q", encoded = true) String query,
-                             @Query(value = "orgID", encoded = true) String orgID);
+    Call<ResponseBody> query(@Query(value = "query", encoded = true) String query,
+                             @Query(value = "organization", encoded = true) String orgID);
 
     @GET("/ping")
     Call<ResponseBody> ping();

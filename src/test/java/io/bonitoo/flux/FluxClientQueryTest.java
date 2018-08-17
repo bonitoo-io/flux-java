@@ -58,7 +58,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxClient.flux(Flux.from("flux_database").limit().withPropertyNamed("n"), properties);
 
-        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("q"))
+        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("query"))
                 .isEqualTo("from(db:\"flux_database\")|> limit(n: 5)");
     }
 
@@ -100,7 +100,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         waitToCallback();
 
-        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("q"))
+        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("query"))
                 .isEqualTo("from(db:\"flux_database\")|> limit(n: 5)");
     }
 
@@ -160,7 +160,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxClient.flux(query);
 
-        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("q")).isEqualTo(query);
+        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("query")).isEqualTo(query);
     }
 
     private void assertSuccessResult(@Nonnull final FluxResult result) {
