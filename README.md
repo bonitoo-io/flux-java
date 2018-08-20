@@ -94,7 +94,7 @@ The Flux query can be configured by `FluxOptions`:
 
 - `parserOptions` - the CSV parser options
     - `valueDestinations` - the column names of the record where result will be placed (see [map function](#map))
-- `queryOptions` - the options specify a context in which a Flux query is to be run. Currently supported options are `NowOption`, `TaskOption` and `CustomOption`.
+- `queryOptions` - the options specify a context in which a Flux query is to be run. Currently supported options are `NowOption`, `TaskOption`, `LocationOption` and `CustomOption`.
     
 ```java
 FluxCsvParserOptions parserOptions = FluxCsvParserOptions.builder()

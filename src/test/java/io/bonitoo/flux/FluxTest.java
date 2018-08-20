@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.bonitoo.flux.options.query.AbstractOption;
+import io.bonitoo.flux.options.query.LocationOption;
 import io.bonitoo.flux.options.query.NowOption;
 import io.bonitoo.flux.options.query.TaskOption;
 
@@ -98,6 +99,29 @@ class FluxTest {
                 + "from(db:\"telegraf\") |> count()";
 
         Assertions.assertThat(flux).isEqualToIgnoringWhitespace(expected);
+    }
+
+    @Test
+    void fluxWithLocationOptions() {
+
+        NowOption now = NowOption.builder()
+                .function("giveMeTime()")
+                .build();
+
+        LocationOption location = LocationOption.builder()
+                .offset("10d")
+                .build();
+
+        List<AbstractOption> options = new ArrayList<>();
+        options.add(now);
+        options.add(location);
+
+        String flux = Flux
+                .from("telegraf")
+                .count()
+                .print(new FluxChain().addOptions(options));
+
+        Assertions.assertThat(flux).isEqualToIgnoringWhitespace("option now = giveMeTime() option location = fixedZone(offset: 10d) from(db:\"telegraf\") |> count()");
     }
 
     @Test
