@@ -83,30 +83,30 @@ public final class JoinFlux extends AbstractParametrizedFlux {
         });
     }
 
-    public enum MethodType
-    {
+    public enum MethodType {
+
         /**
-         * inner join
+         * inner join.
          */
         INNER,
 
         /**
-         * cross product
+         * cross product.
          */
         CROSS,
 
         /**
-         * left outer join
+         * left outer join.
          */
         LEFT,
 
         /**
-         * right outer join
+         * right outer join.
          */
         RIGHT,
 
         /**
-         * full outer join
+         * full outer join.
          */
         OUTER
     }
@@ -213,7 +213,7 @@ public final class JoinFlux extends AbstractParametrizedFlux {
 
         return this;
     }
-    
+
     /**
      * @param method the type of join to be performed
      * @return this
