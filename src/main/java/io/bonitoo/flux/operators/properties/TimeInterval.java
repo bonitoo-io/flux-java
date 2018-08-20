@@ -84,9 +84,15 @@ public class TimeInterval {
             case WEEKS:
                 unit = "w";
                 break;
+            case MONTHS:
+                unit = "mo";
+                break;
+            case YEARS:
+                unit = "y";
+                break;
             default:
                 String message = "Unit must be one of: "
-                        + "NANOS, MICROS, MILLIS, SECONDS, MINUTES, HOURS, HALF_DAYS, DAYS, WEEKS";
+                        + "NANOS, MICROS, MILLIS, SECONDS, MINUTES, HOURS, HALF_DAYS, DAYS, WEEKS, MONTHS, YEARS";
 
                 throw new IllegalArgumentException(message);
         }
