@@ -98,6 +98,19 @@ class RangeFluxTest {
     }
 
     @Test
+    void startStopString() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .range()
+                    .withStart("-1h")
+                    .withStop("10h");
+
+        Assertions.assertThat(flux.print())
+                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> range(start: -1h, stop: 10h)");
+    }
+
+    @Test
     void startParameter() {
 
         Flux flux = Flux

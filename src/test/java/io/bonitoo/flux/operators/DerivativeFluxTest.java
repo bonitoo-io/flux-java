@@ -78,4 +78,15 @@ class DerivativeFluxTest {
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> derivative(unit: 15d, columns: [\"time\", \"century\"])");
     }
+
+    @Test
+    void derivativeByString() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .derivative()
+                    .withUnit("15s");
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> derivative(unit: 15s)");
+    }
 }

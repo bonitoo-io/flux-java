@@ -64,6 +64,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * @author Jakub Bednar (bednar@github) (27/06/2018 12:01)
  * @since 3.0.0
  */
+//TODO refactored
 public final class WindowFlux extends AbstractParametrizedFlux {
 
     public WindowFlux(@Nonnull final Flux flux) {
@@ -94,6 +95,20 @@ public final class WindowFlux extends AbstractParametrizedFlux {
     }
 
     /**
+     * @param every     duration of time between windows
+     * @return this
+     */
+    @Nonnull
+    public WindowFlux withEvery(@Nonnull final String every) {
+
+        Preconditions.checkDuration(every, "Every");
+
+        this.withPropertyValue("every", every);
+
+        return this;
+    }
+
+    /**
      * @param period     duration of the windowed partition
      * @param periodUnit a {@code ChronoUnit} determining how to interpret the {@code period}
      * @return this
@@ -105,6 +120,20 @@ public final class WindowFlux extends AbstractParametrizedFlux {
         Objects.requireNonNull(periodUnit, "Period ChronoUnit is required");
 
         this.withPropertyValue("period", period, periodUnit);
+
+        return this;
+    }
+
+    /**
+     * @param period     duration of the windowed partition
+     * @return this
+     */
+    @Nonnull
+    public WindowFlux withPeriod(@Nonnull final String period) {
+
+        Preconditions.checkDuration(period, "Period");
+
+        this.withPropertyValue("period", period);
 
         return this;
     }
@@ -133,6 +162,21 @@ public final class WindowFlux extends AbstractParametrizedFlux {
     public WindowFlux withStart(@Nonnull final Instant start) {
 
         Objects.requireNonNull(start, "Start is required");
+
+        this.withPropertyValue("start", start);
+
+        return this;
+    }
+
+
+    /**
+     * @param start the time of the initial window partition
+     * @return this
+     */
+    @Nonnull
+    public WindowFlux withStart(@Nonnull final String start) {
+
+        Preconditions.checkDuration(start, "Start");
 
         this.withPropertyValue("start", start);
 

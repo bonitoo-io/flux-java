@@ -89,6 +89,20 @@ public final class DerivativeFlux extends AbstractParametrizedFlux {
     }
 
     /**
+     * @param unit the time duration to use for the result
+     * @return this
+     */
+    @Nonnull
+    public DerivativeFlux withUnit(@Nonnull final String unit) {
+
+        Preconditions.checkDuration(unit, "Unit");
+
+        this.withPropertyValue("unit", unit);
+
+        return this;
+    }
+
+    /**
      * @param useStartTime Indicates if the derivative is allowed to be negative
      * @return this
      */

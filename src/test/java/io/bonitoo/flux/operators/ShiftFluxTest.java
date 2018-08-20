@@ -86,4 +86,16 @@ class ShiftFluxTest {
         Assertions.assertThat(flux.print())
                 .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> shift(shift: 20d)");
     }
+
+    @Test
+    void shiftByString() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .shift()
+                    .withShift("2y");
+
+        Assertions.assertThat(flux.print())
+                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> shift(shift: 2y)");
+    }
 }

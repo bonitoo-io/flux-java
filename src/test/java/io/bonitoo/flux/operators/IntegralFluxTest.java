@@ -57,4 +57,15 @@ class IntegralFluxTest {
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> integral(unit: 5m)");
     }
+
+    @Test
+    void integralByString() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .integral()
+                    .withUnit("10m6h");
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> integral(unit: 10m6h)");
+    }
 }

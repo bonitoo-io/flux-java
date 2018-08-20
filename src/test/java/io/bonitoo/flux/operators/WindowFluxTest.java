@@ -61,7 +61,7 @@ class WindowFluxTest {
 
         Assertions.assertThatThrownBy(flux::print)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Unit must be one of: NANOS, MICROS, MILLIS, SECONDS, MINUTES, HOURS, HALF_DAYS, DAYS, WEEKS");
+                .hasMessage("Unit must be one of: NANOS, MICROS, MILLIS, SECONDS, MINUTES, HOURS, HALF_DAYS, DAYS, WEEKS, MONTHS, YEARS");
     }
 
     @Test
@@ -124,6 +124,20 @@ class WindowFluxTest {
 
         String expected = "from(db:\"telegraf\") |> "
                 + "window(every: 15m, period: 20s, start: 1970-01-21T06:06:40.000000000Z, round: 1s)";
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
+    }
+
+    @Test
+    void windowEveryPeriodStartString() {
+
+        Flux flux = Flux
+                .from("telegraf")
+                .window()
+                .withEvery("10s").withPeriod("30m").withStart("-1d");
+
+        String expected = "from(db:\"telegraf\") |> "
+                + "window(every: 10s, period: 30m, start: -1d)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }

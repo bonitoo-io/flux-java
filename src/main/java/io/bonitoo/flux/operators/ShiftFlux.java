@@ -28,6 +28,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.Flux;
+import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#shift">shift</a> -
@@ -77,6 +78,19 @@ public final class ShiftFlux extends AbstractParametrizedFlux {
         Objects.requireNonNull(unit, "ChronoUnit is required");
 
         this.withPropertyValue("shift", amount, unit);
+
+        return this;
+    }
+
+    /**
+     * @param amount The amount to add to each time value
+     * @return this
+     */
+    @Nonnull
+    public ShiftFlux withShift(@Nonnull final String amount) {
+        Preconditions.checkDuration(amount, "Amount");
+
+        this.withPropertyValue("shift", amount);
 
         return this;
     }

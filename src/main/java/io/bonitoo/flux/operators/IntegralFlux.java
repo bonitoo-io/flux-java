@@ -27,6 +27,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.Flux;
+import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#integral">integral</a> -
@@ -72,6 +73,20 @@ public final class IntegralFlux extends AbstractParametrizedFlux {
         Objects.requireNonNull(unit, "ChronoUnit is required");
 
         this.withPropertyValue("unit", duration, unit);
+
+        return this;
+    }
+
+    /**
+     * @param unit Time duration to use when computing the integral
+     * @return this
+     */
+    @Nonnull
+    public IntegralFlux withUnit(@Nonnull final String unit) {
+
+        Preconditions.checkDuration(unit, "Unit");
+
+        this.withPropertyValue("unit", unit);
 
         return this;
     }

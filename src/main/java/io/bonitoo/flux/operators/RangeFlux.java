@@ -28,6 +28,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.Flux;
+import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/tree/master/query#range">range</a> - Filters the results by
@@ -95,6 +96,20 @@ public final class RangeFlux extends AbstractParametrizedFlux {
     }
 
     /**
+     * @param start Specifies the oldest time to be included in the results
+     * @return this
+     */
+    @Nonnull
+    public RangeFlux withStart(@Nonnull final String start) {
+
+        Preconditions.checkDuration(start, "Start");
+
+        this.withPropertyValue("start", start);
+
+        return this;
+    }
+
+    /**
      * @param stop Specifies the exclusive newest time to be included in the results
      * @return this
      */
@@ -120,6 +135,20 @@ public final class RangeFlux extends AbstractParametrizedFlux {
         Objects.requireNonNull(unit, "ChronoUnit is required");
 
         this.withPropertyValue("stop", stop, unit);
+
+        return this;
+    }
+
+    /**
+     * @param stop Specifies the exclusive newest time to be included in the results
+     * @return this
+     */
+    @Nonnull
+    public RangeFlux withStop(@Nonnull final String stop) {
+
+        Preconditions.checkDuration(stop, "Stop");
+
+        this.withPropertyValue("stop", stop);
 
         return this;
     }
