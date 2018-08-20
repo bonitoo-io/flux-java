@@ -43,11 +43,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li><b>tables</b> - Map of tables to join. Currently only two tables are allowed. [map of tables]</li>
  * <li><b>on</b> - List of tag keys that when equal produces a result set. [array of strings]</li>
  * <li>
- * <b>fn</b> - Defines the function that merges the values of the tables.
- * The function must defined to accept a single parameter.
- * The parameter is a map, which uses the same keys found in the tables map.
- * The function is called for each joined set of records from the tables. [function(tables)]
- * </li>
+ * <b>method</b> - An optional parameter that specifies the type of join to be performed. </li>
  * </ul>
  *
  * <h3>Example</h3>
@@ -64,7 +60,7 @@ import io.bonitoo.flux.utils.Preconditions;
  *     .withTable("cpu", cpu)
  *     .withTable("mem", mem)
  *     .withOn("host")
- *     .withFunction("tables.cpu[\"_value\"] + tables.mem[\"_value\"]");
+ *     .withMethod("outer");
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (17/07/2018 14:47)
@@ -85,6 +81,34 @@ public final class JoinFlux extends AbstractParametrizedFlux {
             tables.keySet().forEach(key -> tablesValue.add(String.format("%s:%s", key, key)));
             return tablesValue.toString();
         });
+    }
+
+    public enum MethodType
+    {
+        /**
+         * inner join
+         */
+        INNER,
+
+        /**
+         * cross product
+         */
+        CROSS,
+
+        /**
+         * left outer join
+         */
+        LEFT,
+
+        /**
+         * right outer join
+         */
+        RIGHT,
+
+        /**
+         * full outer join
+         */
+        OUTER
     }
 
     @Nonnull
@@ -177,15 +201,29 @@ public final class JoinFlux extends AbstractParametrizedFlux {
     }
 
     /**
-     * @param function Defines the function that merges the values of the tables.
+     * @param method the type of join to be performed
      * @return this
      */
     @Nonnull
-    public JoinFlux withFunction(@Nonnull final String function) {
+    public JoinFlux withMethod(@Nonnull final String method) {
 
-        Preconditions.checkNonEmptyString(function, "Function");
+        Preconditions.checkNonEmptyString(method, "Method");
 
-        this.withPropertyValue("fn: (tables)", function);
+        this.withPropertyValueEscaped("method", method);
+
+        return this;
+    }
+    
+    /**
+     * @param method the type of join to be performed
+     * @return this
+     */
+    @Nonnull
+    public JoinFlux withMethod(@Nonnull final MethodType method) {
+
+        Objects.requireNonNull(method, "Method");
+
+        this.withPropertyValueEscaped("method", method.toString().toLowerCase());
 
         return this;
     }

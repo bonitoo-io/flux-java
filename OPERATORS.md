@@ -261,7 +261,17 @@ Flux flux = Flux
 Join two time series together on time and the list of `on` keys [[doc](https://github.com/influxdata/platform/tree/master/query#join)].
 - `tables` - Map of tables to join. Currently only two tables are allowed. [map of tables]
 - `on` - List of tag keys that when equal produces a result set. [array of strings]
-- `fn` - Defines the function that merges the values of the tables. The function must defined to accept a single parameter. The parameter is a map, which uses the same keys found in the tables map. The function is called for each joined set of records from the tables. [function(tables)]
+- `method` - An optional parameter that specifies the type of join to be performed. When not specified, an inner join is performed. [string] 
+
+The method parameter may take on any one of the following values:
+- `inner` - inner join
+- `cross` - cross product
+- `left` - left outer join
+- `right` - right outer join
+- `outer` - full outer join
+
+The `on` parameter and the `cross` method are mutually exclusive.
+
 ```java
 Flux cpu = Flux.from("telegraf")
     .filter(Restrictions.and(Restrictions.measurement().equal("cpu"), Restrictions.field().equal("usage_user")))
@@ -274,8 +284,7 @@ Flux mem = Flux.from("telegraf")
 Flux flux = Flux.join()
     .withTable("cpu", cpu)
     .withTable("mem", mem)
-    .withOn("host")
-    .withFunction("tables.cpu[\"_value\"] + tables.mem[\"_value\"]");
+    .withOn("host");
 ```
 
 ### keep

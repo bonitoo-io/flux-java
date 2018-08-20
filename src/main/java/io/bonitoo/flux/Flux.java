@@ -187,7 +187,7 @@ public abstract class Flux {
      * <li>{@link JoinFlux#withOn(String)}</li>
      * <li>{@link JoinFlux#withOn(String[])}</li>
      * <li>{@link JoinFlux#withOn(Collection)}</li>
-     * <li>{@link JoinFlux#withFunction(String)}</li>
+     * <li>{@link JoinFlux#withMethod(String)}</li>
      * <li>{@link JoinFlux#withPropertyNamed(String)}</li>
      * <li>{@link JoinFlux#withPropertyNamed(String, String)}</li>
      * </ul>
@@ -203,12 +203,12 @@ public abstract class Flux {
     /**
      * Join two time series together on time and the list of tags.
      *
-     * @param name1    table 1 name
-     * @param table1   table 1 Flux script
-     * @param name2    table 2 name
-     * @param table2   table 2 Flux script
-     * @param tag      tag key to join
-     * @param function function to merge values
+     * @param name1  table 1 name
+     * @param table1 table 1 Flux script
+     * @param name2  table 2 name
+     * @param table2 table 2 Flux script
+     * @param tag    tag key to join
+     * @param method the type of join to be performed
      * @return {@link JoinFlux}
      */
     @Nonnull
@@ -217,13 +217,13 @@ public abstract class Flux {
                                 @Nonnull final String name2,
                                 @Nonnull final Flux table2,
                                 @Nonnull final String tag,
-                                @Nonnull final String function) {
+                                @Nonnull final String method) {
 
         return new JoinFlux()
                 .withTable(name1, table1)
                 .withTable(name2, table2)
                 .withOn(tag)
-                .withFunction(function);
+                .withMethod(method);
     }
 
     /**

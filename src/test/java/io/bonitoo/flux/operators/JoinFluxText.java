@@ -52,11 +52,11 @@ class JoinFluxText {
                 .range(-30L, ChronoUnit.MINUTES);
 
         Flux flux = Flux
-                .join("cpu", cpu, "mem", mem, "host", "tables.cpu[\"_value\"] + tables.mem[\"_value\"]");
+                .join("cpu", cpu, "mem", mem, "host", "left");
 
         String expected = "cpu = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
                 + "mem = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
-                + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\"], fn: (tables) => tables.cpu[\"_value\"] + tables.mem[\"_value\"])";
+                + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\"], method: \"left\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -80,11 +80,39 @@ class JoinFluxText {
                 .withTable("cpu", cpu)
                 .withTable("mem", mem)
                 .withOn(tags)
-                .withFunction("tables.cpu[\"_value\"] + tables.mem[\"_value\"]");
+                .withMethod("cross");
 
         String expected = "cpu = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
                 + "mem = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
-                + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\", \"production\"], fn: (tables) => tables.cpu[\"_value\"] + tables.mem[\"_value\"])";
+                + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\", \"production\"], method: \"cross\")";
+
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
+    }
+
+    @Test
+    void methodByEnum() {
+
+        Flux cpu = Flux.from("telegraf")
+                .filter(Restrictions.and(Restrictions.measurement().equal("cpu"), Restrictions.field().equal("usage_user")))
+                .range(-30L, ChronoUnit.MINUTES);
+
+        Flux mem = Flux.from("telegraf")
+                .filter(Restrictions.and(Restrictions.measurement().equal("mem"), Restrictions.field().equal("used_percent")))
+                .range(-30L, ChronoUnit.MINUTES);
+
+        List<String> tags = new ArrayList<>();
+        tags.add("host");
+        tags.add("production");
+
+        Flux flux = Flux.join()
+                .withTable("cpu", cpu)
+                .withTable("mem", mem)
+                .withOn(tags)
+                .withMethod(JoinFlux.MethodType.RIGHT);
+
+        String expected = "cpu = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
+                + "mem = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
+                + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\", \"production\"], method: \"right\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
