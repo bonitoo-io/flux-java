@@ -51,7 +51,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (26/06/2018 07:04)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class RangeFlux extends AbstractParametrizedFlux {
 

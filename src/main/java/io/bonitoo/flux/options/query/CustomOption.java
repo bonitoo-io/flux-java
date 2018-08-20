@@ -32,7 +32,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * The custom option is prepare for option specified by user.
  *
  * @author Jakub Bednar (bednar@github) (27/07/2018 07:47)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class CustomOption extends AbstractOption {
 
@@ -49,7 +49,7 @@ public final class CustomOption extends AbstractOption {
      *
      * @param optionName name of the option
      * @return a builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public static CustomOption.Builder builder(@Nonnull final String optionName) {
@@ -62,7 +62,7 @@ public final class CustomOption extends AbstractOption {
     /**
      * A builder for {@code CustomOption}.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @NotThreadSafe
     public static final class Builder {
@@ -82,7 +82,7 @@ public final class CustomOption extends AbstractOption {
          *
          * @param optionValue option value
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public CustomOption.Builder value(@Nonnull final String optionValue) {

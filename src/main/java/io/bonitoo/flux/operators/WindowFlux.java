@@ -62,7 +62,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (27/06/2018 12:01)
- * @since 3.0.0
+ * @since 1.0.0
  */
 //TODO refactored
 public final class WindowFlux extends AbstractParametrizedFlux {

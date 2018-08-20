@@ -44,7 +44,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (29/06/2018 09:55)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class YieldFlux extends AbstractParametrizedFlux {
 

@@ -57,7 +57,7 @@ import io.bonitoo.flux.operators.restriction.Restrictions;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (28/06/2018 14:12)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class FilterFlux extends AbstractParametrizedFlux {
 

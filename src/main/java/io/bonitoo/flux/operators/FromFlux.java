@@ -52,7 +52,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (22/06/2018 10:20)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class FromFlux extends Flux {
 

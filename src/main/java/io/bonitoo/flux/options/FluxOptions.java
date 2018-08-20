@@ -37,7 +37,7 @@ import io.bonitoo.flux.options.query.TaskOption;
  * The settings for customize Flux query.
  *
  * @author Jakub Bednar (bednar@github) (16/07/2018 13:50)
- * @since 3.0.0
+ * @since 1.0.0
  */
 @ThreadSafe
 public final class FluxOptions {
@@ -62,7 +62,7 @@ public final class FluxOptions {
      * Creates a builder instance.
      *
      * @return a builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public static FluxOptions.Builder builder() {
@@ -90,7 +90,7 @@ public final class FluxOptions {
     /**
      * A builder for {@code FluxOptions}.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @NotThreadSafe
     public static class Builder {
@@ -103,7 +103,7 @@ public final class FluxOptions {
          *
          * @param parserOptions the CSV parser options. Defaults {@link FluxCsvParserOptions#DEFAULTS}.
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public FluxOptions.Builder parserOptions(@Nonnull final FluxCsvParserOptions parserOptions) {

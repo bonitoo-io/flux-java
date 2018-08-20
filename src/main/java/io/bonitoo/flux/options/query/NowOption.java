@@ -35,7 +35,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * The now option is a function that returns a time value to be used as a proxy for the current system time.
  *
  * @author Jakub Bednar (bednar@github) (26/07/2018 12:14)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class NowOption extends AbstractOption {
 
@@ -56,7 +56,7 @@ public final class NowOption extends AbstractOption {
      * Creates a builder instance.
      *
      * @return a builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public static NowOption.Builder builder() {
@@ -66,7 +66,7 @@ public final class NowOption extends AbstractOption {
     /**
      * A builder for {@code NowOption}.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @NotThreadSafe
     public static final class Builder {
@@ -78,7 +78,7 @@ public final class NowOption extends AbstractOption {
          *
          * @param time static time
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public NowOption.Builder time(@Nonnull final Instant time) {
@@ -93,7 +93,7 @@ public final class NowOption extends AbstractOption {
          *
          * @param function the function that return now
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public NowOption.Builder function(@Nonnull final String function) {

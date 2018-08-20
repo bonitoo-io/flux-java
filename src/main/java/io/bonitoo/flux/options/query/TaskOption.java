@@ -35,7 +35,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * The task option is used by a scheduler to schedule the execution of a Flux query.
  *
  * @author Jakub Bednar (bednar@github) (26/07/2018 12:14)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class TaskOption extends AbstractOption {
 
@@ -73,7 +73,7 @@ public final class TaskOption extends AbstractOption {
      *
      * @param name name of the task
      * @return a builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public static TaskOption.Builder builder(@Nonnull final String name) {
@@ -99,7 +99,7 @@ public final class TaskOption extends AbstractOption {
     /**
      * A builder for {@code TaskOption}.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @NotThreadSafe
     public static final class Builder {
@@ -129,7 +129,7 @@ public final class TaskOption extends AbstractOption {
          * @param every     task should be run at this interval
          * @param everyUnit a {@code ChronoUnit} determining how to interpret the {@code every}
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public TaskOption.Builder every(@Nonnull final Long every,
@@ -150,7 +150,7 @@ public final class TaskOption extends AbstractOption {
          * @param delay     delay scheduling this task by this duration
          * @param delayUnit a {@code ChronoUnit} determining how to interpret the {@code delay}
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public TaskOption.Builder delay(@Nonnull final Long delay,
@@ -172,7 +172,7 @@ public final class TaskOption extends AbstractOption {
          *
          * @param expression cron expression to schedule task
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public TaskOption.Builder cron(@Nonnull final String expression) {
@@ -189,7 +189,7 @@ public final class TaskOption extends AbstractOption {
          *
          * @param retry number of times to retry a failed query
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public TaskOption.Builder retry(@Nonnull final Integer retry) {

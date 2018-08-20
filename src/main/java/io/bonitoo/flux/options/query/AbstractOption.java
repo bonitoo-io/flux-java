@@ -30,7 +30,7 @@ import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * @author Jakub Bednar (bednar@github) (26/07/2018 12:35)
- * @since 3.0.0
+ * @since 1.0.0
  */
 @ThreadSafe
 public abstract class AbstractOption {

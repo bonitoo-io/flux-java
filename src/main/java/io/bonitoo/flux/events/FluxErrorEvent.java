@@ -34,7 +34,7 @@ import io.bonitoo.flux.options.FluxConnectionOptions;
  * The event is published when arrived the error response from Flux server.
  *
  * @author Jakub Bednar (bednar@github) (26/06/2018 15:35)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public class FluxErrorEvent extends AbstractQueryEvent {
 

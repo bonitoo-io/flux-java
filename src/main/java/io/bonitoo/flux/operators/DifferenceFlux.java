@@ -59,7 +59,7 @@ import io.bonitoo.flux.Flux;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (17/07/2018 12:28)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class DifferenceFlux extends AbstractParametrizedFlux {
 

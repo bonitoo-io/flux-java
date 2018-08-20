@@ -128,7 +128,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * </ul>
  *
  * @author Jakub Bednar (bednar@github) (22/06/2018 10:16)
- * @since 3.0.0
+ * @since 1.0.0
  */
 @SuppressWarnings({"FileLength"})
 public abstract class Flux {

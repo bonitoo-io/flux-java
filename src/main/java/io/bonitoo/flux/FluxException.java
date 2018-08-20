@@ -31,7 +31,7 @@ import retrofit2.Response;
 
 /**
  * @author Jakub Bednar (bednar@github) (31/07/2018 11:53)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public class FluxException extends RuntimeException {
 

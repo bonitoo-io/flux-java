@@ -43,7 +43,7 @@ import io.bonitoo.flux.Flux;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (25/06/2018 10:10)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class SpreadFlux extends AbstractParametrizedFlux {
 

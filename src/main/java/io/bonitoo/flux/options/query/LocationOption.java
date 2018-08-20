@@ -36,7 +36,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * The default value is set using the time zone of the running process.
  *
  * @author Jakub Bednar (bednar@github) (20/08/2018 14:10)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class LocationOption extends AbstractOption {
 
@@ -52,7 +52,7 @@ public final class LocationOption extends AbstractOption {
      * Creates a builder instance.
      *
      * @return a builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public static LocationOption.Builder builder() {
@@ -62,7 +62,7 @@ public final class LocationOption extends AbstractOption {
     /**
      * A builder for {@code LocationOption}.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @NotThreadSafe
     public static final class Builder {
@@ -74,7 +74,7 @@ public final class LocationOption extends AbstractOption {
          *
          * @param offset timezone offset
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public LocationOption.Builder offset(@Nonnull final String offset) {
@@ -91,7 +91,7 @@ public final class LocationOption extends AbstractOption {
          * @param offsetUnit a {@code ChronoUnit} determining how to interpret the {@code offset}
          *
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public LocationOption.Builder offset(@Nonnull final Long offset,
@@ -108,7 +108,7 @@ public final class LocationOption extends AbstractOption {
          *
          * @param location location to set
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public LocationOption.Builder location(@Nonnull final String location) {
@@ -123,7 +123,7 @@ public final class LocationOption extends AbstractOption {
          *
          * @param function the function that return location
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         private LocationOption.Builder function(@Nonnull final String function) {

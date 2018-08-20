@@ -35,7 +35,7 @@ import okhttp3.OkHttpClient;
  * FluxConnectionOptions are used to configure queries to the Flux.
  *
  * @author Jakub Bednar (bednar@github) (26/06/2018 08:59)
- * @since 3.0.0
+ * @since 1.0.0
  */
 @ThreadSafe
 public final class FluxConnectionOptions {
@@ -56,7 +56,7 @@ public final class FluxConnectionOptions {
      * Creates a builder instance.
      *
      * @return a builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public static FluxConnectionOptions.Builder builder() {
@@ -66,7 +66,7 @@ public final class FluxConnectionOptions {
     /**
      * @return the url to connect to Flux
      * @see FluxConnectionOptions.Builder#url(String)
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public String getUrl() {
@@ -76,7 +76,7 @@ public final class FluxConnectionOptions {
     /**
      * @return the organization id required by Flux
      * @see FluxConnectionOptions.Builder#orgID(String)
-     * @since 3.0.0
+     * @since 1.0.0
      */
 
     @Nonnull
@@ -87,7 +87,7 @@ public final class FluxConnectionOptions {
     /**
      * @return HTTP client to use for communication with Flux
      * @see FluxConnectionOptions.Builder#okHttpClient(OkHttpClient.Builder)
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public OkHttpClient.Builder getOkHttpClient() {
@@ -97,7 +97,7 @@ public final class FluxConnectionOptions {
     /**
      * A builder for {@code FluxConnectionOptions}.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @NotThreadSafe
     public static class Builder {
@@ -111,7 +111,7 @@ public final class FluxConnectionOptions {
          *
          * @param url the url to connect to Flux. It must be defined.
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public Builder url(@Nonnull final String url) {
@@ -125,7 +125,7 @@ public final class FluxConnectionOptions {
          *
          * @param orgID the organization id required by Flux. It must be defined.
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public Builder orgID(@Nonnull final String orgID) {
@@ -139,7 +139,7 @@ public final class FluxConnectionOptions {
          *
          * @param okHttpClient the HTTP client to use.
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public Builder okHttpClient(@Nonnull final OkHttpClient.Builder okHttpClient) {

@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
  * The event is published when occurs a unhandled exception.
  *
  * @author Jakub Bednar (bednar@github) (30/07/2018 14:57)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public class UnhandledErrorEvent extends AbstractFluxEvent {
 

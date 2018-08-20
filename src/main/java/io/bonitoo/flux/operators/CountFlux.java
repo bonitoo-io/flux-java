@@ -42,7 +42,7 @@ import io.bonitoo.flux.Flux;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (22/06/2018 11:06)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class CountFlux extends AbstractParametrizedFlux {
 

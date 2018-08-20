@@ -34,7 +34,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * The settings for customize parsing the Flux CSV response.
  *
  * @author Jakub Bednar (bednar@github) (16/07/2018 12:42)
- * @since 3.0.0
+ * @since 1.0.0
  */
 @ThreadSafe
 public final class FluxCsvParserOptions {
@@ -56,7 +56,7 @@ public final class FluxCsvParserOptions {
      * Creates a builder instance.
      *
      * @return a builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public static FluxCsvParserOptions.Builder builder() {
@@ -66,7 +66,7 @@ public final class FluxCsvParserOptions {
     /**
      * @return the column names of the record where result will be placed
      * @see Builder#valueDestinations(String...)
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @Nonnull
     public List<String> getValueDestinations() {
@@ -76,7 +76,7 @@ public final class FluxCsvParserOptions {
     /**
      * A builder for {@code FluxCsvParserOptions}.
      *
-     * @since 3.0.0
+     * @since 1.0.0
      */
     @NotThreadSafe
     public static final class Builder {
@@ -104,7 +104,7 @@ public final class FluxCsvParserOptions {
          *
          * @param valueDestinations the column names of the record where result will be placed. Defaults "_value".
          * @return {@code this}
-         * @since 3.0.0
+         * @since 1.0.0
          */
         @Nonnull
         public FluxCsvParserOptions.Builder valueDestinations(@Nonnull final String... valueDestinations) {

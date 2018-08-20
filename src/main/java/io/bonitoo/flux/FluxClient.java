@@ -41,7 +41,7 @@ import retrofit2.Response;
  * improve test (chunked, GZIP, raw)
  *
  * @author Jakub Bednar (bednar@github) (30/07/2018 10:55)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public interface FluxClient {
 

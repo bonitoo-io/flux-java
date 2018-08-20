@@ -68,7 +68,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * </pre>
  *
  * @author Jakub Bednar (bednar@github) (17/07/2018 14:47)
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class JoinFlux extends AbstractParametrizedFlux {
 
