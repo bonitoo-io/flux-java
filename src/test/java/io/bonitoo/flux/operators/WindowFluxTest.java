@@ -168,4 +168,15 @@ class WindowFluxTest {
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters))).isEqualToIgnoringWhitespace(expected);
     }
+
+    @Test
+    void onlyInterval() {
+
+        Flux flux = Flux.from("telegraf")
+                .window()
+                    .withPropertyValue("intervals", "intervals(every:1mo, period:-1d)");
+
+        Assertions.assertThat(flux.print())
+                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> window(intervals: intervals(every:1mo, period:-1d))");
+    }
 }
