@@ -593,8 +593,7 @@ Flux flux = Flux
 Groups the results by a given time range [[doc](https://github.com/influxdata/platform/tree/master/query#window)].
 - `every` - Duration of time between windows. Defaults to `period's` value. [duration] 
 - `period` - Duration of the windowed partition. Defaults to `period's` value. [duration] 
-- `start` - The time of the initial window partition. [time]
-- `round` - Rounds a window's bounds to the nearest duration. Defaults to `every's` value. [duration]
+- `offset` - The offset duration relative to the location offset. It can be negative, indicating that the offset goes backwards in time. The default aligns the window boundaries to line up with the `now` option time. [time]
 - `column` - Name of the time column to use. Defaults to `_time`. [string]
 - `startCol` - Name of the column containing the window start time. Defaults to `_start`. [string]
 - `stopCol` - Name of the column containing the window stop time. Defaults to `_stop`. [string]

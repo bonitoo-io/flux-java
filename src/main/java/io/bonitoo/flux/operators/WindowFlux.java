@@ -38,8 +38,9 @@ import io.bonitoo.flux.utils.Preconditions;
  * <ul>
  * <li><b>every</b> - Duration of time between windows. Defaults to <i>period's</i> value. [duration]
  * <li><b>period</b> - Duration of the windowed partition. Defaults to <i>every's</i> value. [duration]
- * <li><b>start</b> - The time of the initial window partition. [time]
- * <li><b>round</b> - Rounds a window's bounds to the nearest duration. Defaults to <i>every's</i> value. [duration]
+ * <li><b>offset</b> - The offset duration relative to the location offset. It can be negative,
+ * indicating that the offset goes backwards in time.
+ * The default aligns the window boundaries to line up with the <i>now</i> option time. [time]</li>
  * <li><b>column</b> - Name of the time column to use. Defaults to <i>_time</i>. [string]
  * <li><b>startCol</b> - Name of the column containing the window start time. Defaults to <i>_start</i>. [string]
  * <li><b>stopCol</b> - Name of the column containing the window stop time. Defaults to <i>_stop</i>. [string]
@@ -56,7 +57,6 @@ import io.bonitoo.flux.utils.Preconditions;
  *     .from("telegraf")
  *     .window(15L, ChronoUnit.MINUTES,
  *             20L, ChronoUnit.SECONDS,
- *             -50L, ChronoUnit.WEEKS,
  *             1L, ChronoUnit.SECONDS)
  *     .max();
  * </pre>
@@ -95,7 +95,7 @@ public final class WindowFlux extends AbstractParametrizedFlux {
     }
 
     /**
-     * @param every     duration of time between windows
+     * @param every duration of time between windows
      * @return this
      */
     @Nonnull
@@ -125,7 +125,7 @@ public final class WindowFlux extends AbstractParametrizedFlux {
     }
 
     /**
-     * @param period     duration of the windowed partition
+     * @param period duration of the windowed partition
      * @return this
      */
     @Nonnull
@@ -139,62 +139,45 @@ public final class WindowFlux extends AbstractParametrizedFlux {
     }
 
     /**
-     * @param start     the time of the initial window partition
-     * @param startUnit a {@code ChronoUnit} determining how to interpret the {@code start}
+     * @param offset     The offset duration relative to the location offset.
+     * @param offsetUnit a {@code ChronoUnit} determining how to interpret the {@code offset}
      * @return this
      */
     @Nonnull
-    public WindowFlux withStart(@Nonnull final Long start, @Nonnull final ChronoUnit startUnit) {
+    public WindowFlux withOffset(@Nonnull final Long offset, @Nonnull final ChronoUnit offsetUnit) {
 
-        Objects.requireNonNull(start, "Start is required");
-        Objects.requireNonNull(startUnit, "Start ChronoUnit is required");
+        Objects.requireNonNull(offset, "Offset is required");
+        Objects.requireNonNull(offsetUnit, "Offset ChronoUnit is required");
 
-        this.withPropertyValue("start", start, startUnit);
+        this.withPropertyValue("start", offset, offsetUnit);
 
         return this;
     }
 
     /**
-     * @param start the time of the initial window partition
+     * @param start The offset duration relative to the location offset.
      * @return this
      */
     @Nonnull
-    public WindowFlux withStart(@Nonnull final Instant start) {
+    public WindowFlux withOffset(@Nonnull final Instant start) {
 
-        Objects.requireNonNull(start, "Start is required");
+        Objects.requireNonNull(start, "Offset is required");
 
-        this.withPropertyValue("start", start);
-
-        return this;
-    }
-
-
-    /**
-     * @param start the time of the initial window partition
-     * @return this
-     */
-    @Nonnull
-    public WindowFlux withStart(@Nonnull final String start) {
-
-        Preconditions.checkDuration(start, "Start");
-
-        this.withPropertyValue("start", start);
+        this.withPropertyValue("offset", start);
 
         return this;
     }
 
     /**
-     * @param round     rounds a window's bounds to the nearest duration
-     * @param roundUnit a {@code ChronoUnit} determining how to interpret the {@code round}
+     * @param offset The offset duration relative to the location offset.
      * @return this
      */
     @Nonnull
-    public WindowFlux withRound(@Nonnull final Long round, @Nonnull final ChronoUnit roundUnit) {
+    public WindowFlux withOffset(@Nonnull final String offset) {
 
-        Objects.requireNonNull(round, "Round is required");
-        Objects.requireNonNull(roundUnit, "Round ChronoUnit is required");
+        Preconditions.checkDuration(offset, "offset");
 
-        this.withPropertyValue("round", round, roundUnit);
+        this.withPropertyValue("offset", offset);
 
         return this;
     }

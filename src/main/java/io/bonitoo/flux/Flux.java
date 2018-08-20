@@ -1512,9 +1512,8 @@ public abstract class Flux {
      * <ul>
      * <li>{@link WindowFlux#withEvery(Long, ChronoUnit)}</li>
      * <li>{@link WindowFlux#withPeriod(Long, ChronoUnit)}</li>
-     * <li>{@link WindowFlux#withStart(Long, ChronoUnit)}</li>
-     * <li>{@link WindowFlux#withStart(Instant)}</li>
-     * <li>{@link WindowFlux#withRound(Long, ChronoUnit)}</li>
+     * <li>{@link WindowFlux#withOffset(Long, ChronoUnit)}</li>
+     * <li>{@link WindowFlux#withOffset(Instant)}</li>
      * <li>{@link WindowFlux#withColumn(String)}</li>
      * <li>{@link WindowFlux#withStartCol(String)}</li>
      * <li>{@link WindowFlux#withStartCol(String)}</li>
@@ -1580,7 +1579,7 @@ public abstract class Flux {
      * @param everyUnit  a {@code ChronoUnit} determining how to interpret the {@code every}
      * @param period     duration of the windowed partition
      * @param periodUnit a {@code ChronoUnit} determining how to interpret the {@code period}
-     * @param start      the time of the initial window partition
+     * @param offset     The offset duration relative to the location offset
      * @return {@link WindowFlux}
      */
     @Nonnull
@@ -1588,20 +1587,12 @@ public abstract class Flux {
                                    @Nonnull final ChronoUnit everyUnit,
                                    @Nonnull final Long period,
                                    @Nonnull final ChronoUnit periodUnit,
-                                   @Nonnull final Instant start) {
-
-        Objects.requireNonNull(every, "Every is required");
-        Objects.requireNonNull(everyUnit, "Every ChronoUnit is required");
-
-        Objects.requireNonNull(period, "Period is required");
-        Objects.requireNonNull(periodUnit, "Period ChronoUnit is required");
-
-        Objects.requireNonNull(start, "Start is required");
+                                   @Nonnull final Instant offset) {
 
         return new WindowFlux(this)
                 .withEvery(every, everyUnit)
                 .withPeriod(period, periodUnit)
-                .withStart(start);
+                .withOffset(offset);
     }
 
     /**
@@ -1611,8 +1602,8 @@ public abstract class Flux {
      * @param everyUnit  a {@code ChronoUnit} determining how to interpret the {@code every}
      * @param period     duration of the windowed partition
      * @param periodUnit a {@code ChronoUnit} determining how to interpret the {@code period}
-     * @param start      the time of the initial window partition
-     * @param startUnit  a {@code ChronoUnit} determining how to interpret the {@code start}
+     * @param offset     The offset duration relative to the location offset
+     * @param offsetUnit a {@code ChronoUnit} determining how to interpret the {@code offset}
      * @return {@link WindowFlux}
      */
     @Nonnull
@@ -1620,82 +1611,13 @@ public abstract class Flux {
                                    @Nonnull final ChronoUnit everyUnit,
                                    @Nonnull final Long period,
                                    @Nonnull final ChronoUnit periodUnit,
-                                   @Nonnull final Long start,
-                                   @Nonnull final ChronoUnit startUnit) {
-
-        Objects.requireNonNull(every, "Every is required");
-        Objects.requireNonNull(everyUnit, "Every ChronoUnit is required");
-
-        Objects.requireNonNull(period, "Period is required");
-        Objects.requireNonNull(periodUnit, "Period ChronoUnit is required");
-
-        Objects.requireNonNull(start, "Start is required");
-        Objects.requireNonNull(startUnit, "Start ChronoUnit is required");
+                                   @Nonnull final Long offset,
+                                   @Nonnull final ChronoUnit offsetUnit) {
 
         return new WindowFlux(this)
                 .withEvery(every, everyUnit)
                 .withPeriod(period, periodUnit)
-                .withStart(start, startUnit);
-    }
-
-    /**
-     * Groups the results by a given time range.
-     *
-     * @param every      duration of time between windows
-     * @param everyUnit  a {@code ChronoUnit} determining how to interpret the {@code every}
-     * @param period     duration of the windowed partition
-     * @param periodUnit a {@code ChronoUnit} determining how to interpret the {@code period}
-     * @param start      the time of the initial window partition
-     * @param startUnit  a {@code ChronoUnit} determining how to interpret the {@code start}
-     * @param round      rounds a window's bounds to the nearest duration
-     * @param roundUnit  a {@code ChronoUnit} determining how to interpret the {@code round}
-     * @return {@link WindowFlux}
-     */
-    @Nonnull
-    public final WindowFlux window(@Nonnull final Long every,
-                                   @Nonnull final ChronoUnit everyUnit,
-                                   @Nonnull final Long period,
-                                   @Nonnull final ChronoUnit periodUnit,
-                                   @Nonnull final Long start,
-                                   @Nonnull final ChronoUnit startUnit,
-                                   @Nonnull final Long round,
-                                   @Nonnull final ChronoUnit roundUnit) {
-
-        return new WindowFlux(this)
-                .withEvery(every, everyUnit)
-                .withPeriod(period, periodUnit)
-                .withStart(start, startUnit)
-                .withRound(round, roundUnit);
-
-    }
-
-    /**
-     * Groups the results by a given time range.
-     *
-     * @param every      duration of time between windows
-     * @param everyUnit  a {@code ChronoUnit} determining how to interpret the {@code every}
-     * @param period     duration of the windowed partition
-     * @param periodUnit a {@code ChronoUnit} determining how to interpret the {@code period}
-     * @param start      the time of the initial window partition
-     * @param round      rounds a window's bounds to the nearest duration
-     * @param roundUnit  a {@code ChronoUnit} determining how to interpret the {@code round}
-     * @return {@link WindowFlux}
-     */
-    @Nonnull
-    public final WindowFlux window(@Nonnull final Long every,
-                                   @Nonnull final ChronoUnit everyUnit,
-                                   @Nonnull final Long period,
-                                   @Nonnull final ChronoUnit periodUnit,
-                                   @Nonnull final Instant start,
-                                   @Nonnull final Long round,
-                                   @Nonnull final ChronoUnit roundUnit) {
-
-        return new WindowFlux(this)
-                .withEvery(every, everyUnit)
-                .withPeriod(period, periodUnit)
-                .withStart(start)
-                .withRound(round, roundUnit);
-
+                .withOffset(offset, offsetUnit);
     }
 
     /**
@@ -1705,10 +1627,8 @@ public abstract class Flux {
      * @param everyUnit  a {@code ChronoUnit} determining how to interpret the {@code every}
      * @param period     duration of the windowed partition
      * @param periodUnit a {@code ChronoUnit} determining how to interpret the {@code period}
-     * @param start      the time of the initial window partition
-     * @param startUnit  a {@code ChronoUnit} determining how to interpret the {@code start}
-     * @param round      rounds a window's bounds to the nearest duration
-     * @param roundUnit  a {@code ChronoUnit} determining how to interpret the {@code round}
+     * @param offset     The offset duration relative to the location offset
+     * @param offsetUnit a {@code ChronoUnit} determining how to interpret the {@code offset}
      * @param timeColumn name of the time column to use
      * @param startCol   name of the column containing the window start time
      * @param stopCol    name of the column containing the window stop time
@@ -1719,10 +1639,8 @@ public abstract class Flux {
                                    @Nonnull final ChronoUnit everyUnit,
                                    @Nonnull final Long period,
                                    @Nonnull final ChronoUnit periodUnit,
-                                   @Nonnull final Long start,
-                                   @Nonnull final ChronoUnit startUnit,
-                                   @Nonnull final Long round,
-                                   @Nonnull final ChronoUnit roundUnit,
+                                   @Nonnull final Long offset,
+                                   @Nonnull final ChronoUnit offsetUnit,
                                    @Nonnull final String timeColumn,
                                    @Nonnull final String startCol,
                                    @Nonnull final String stopCol) {
@@ -1730,8 +1648,7 @@ public abstract class Flux {
         return new WindowFlux(this)
                 .withEvery(every, everyUnit)
                 .withPeriod(period, periodUnit)
-                .withStart(start, startUnit)
-                .withRound(round, roundUnit)
+                .withOffset(offset, offsetUnit)
                 .withColumn(timeColumn)
                 .withStartCol(startCol)
                 .withStopCol(stopCol);
@@ -1745,9 +1662,7 @@ public abstract class Flux {
      * @param everyUnit  a {@code ChronoUnit} determining how to interpret the {@code every}
      * @param period     duration of the windowed partition
      * @param periodUnit a {@code ChronoUnit} determining how to interpret the {@code period}
-     * @param start      the time of the initial window partition
-     * @param round      rounds a window's bounds to the nearest duration
-     * @param roundUnit  a {@code ChronoUnit} determining how to interpret the {@code round}
+     * @param offset     The offset duration relative to the location offset
      * @param timeColumn name of the time column to use
      * @param startCol   name of the column containing the window start time
      * @param stopCol    name of the column containing the window stop time
@@ -1758,9 +1673,7 @@ public abstract class Flux {
                                    @Nonnull final ChronoUnit everyUnit,
                                    @Nonnull final Long period,
                                    @Nonnull final ChronoUnit periodUnit,
-                                   @Nonnull final Instant start,
-                                   @Nonnull final Long round,
-                                   @Nonnull final ChronoUnit roundUnit,
+                                   @Nonnull final Instant offset,
                                    @Nonnull final String timeColumn,
                                    @Nonnull final String startCol,
                                    @Nonnull final String stopCol) {
@@ -1768,8 +1681,7 @@ public abstract class Flux {
         return new WindowFlux(this)
                 .withEvery(every, everyUnit)
                 .withPeriod(period, periodUnit)
-                .withStart(start)
-                .withRound(round, roundUnit)
+                .withOffset(offset)
                 .withColumn(timeColumn)
                 .withStartCol(startCol)
                 .withStopCol(stopCol);
