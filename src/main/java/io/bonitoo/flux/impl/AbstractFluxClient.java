@@ -38,6 +38,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import retrofit2.Retrofit;
 
@@ -106,8 +107,14 @@ public abstract class AbstractFluxClient<T> {
     protected RequestBody createBody(@Nonnull final String query) {
 
         // TODO configurable
+
+        JSONArray annotations = new JSONArray();
+        annotations.put("datatype");
+        annotations.put("group");
+        annotations.put("default");
+
         JSONObject dialect = new JSONObject().put("header", true)
-                .put("annotations", new String[]{"datatype", "group", "default"});
+                .put("annotations", annotations);
 
         String body = new JSONObject()
                 .put("query", query)
