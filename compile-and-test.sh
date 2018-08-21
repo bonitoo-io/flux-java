@@ -53,6 +53,7 @@ if [ ! "$RUN_NIGHTLY_BINARY" == "true" ]; then
     docker network create influxdb
     INFLUXDB_IP=influxdb
     FLUX_IP=flux
+    DOCKER_NET=influxdb
 
     #
     # InfluxDB
@@ -119,6 +120,7 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
 
     INFLUXDB_IP=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | head -n 1`
     FLUX_IP=${INFLUXDB_IP}
+    DOCKER_NET=host
 fi
 
 echo "INFLUXDB_IP: " ${INFLUXDB_IP} " FLUX_IP: " ${FLUX_IP}
@@ -127,7 +129,7 @@ docker run -it --rm \
        --volume ${PWD}:/usr/src/mymaven \
        --volume ${PWD}/.m2:/root/.m2 \
        --workdir /usr/src/mymaven \
-       --net=influxdb \
+       --net=${DOCKER_NET} \
        --env INFLUXDB_VERSION=${INFLUXDB_VERSION} \
        --env INFLUXDB_IP=${INFLUXDB_IP} \
        --env FLUX_IP=${FLUX_IP} \
