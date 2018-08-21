@@ -118,7 +118,8 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
     echo "Wait 5s to start Flux"
     sleep 5
 
-    INFLUXDB_IP=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | head -n 1`
+    ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'
+    INFLUXDB_IP=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | grep 10`
     FLUX_IP=${INFLUXDB_IP}
     DOCKER_NET=host
 fi
