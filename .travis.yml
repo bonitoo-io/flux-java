@@ -27,3 +27,5 @@ after_success:
 
 after_failure:
   - cat target/surefire-reports/*.txt
+  - cat influxdb-nightly.log
+  - cat fluxd_nightly.log

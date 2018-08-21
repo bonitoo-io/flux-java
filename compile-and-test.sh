@@ -106,13 +106,13 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
     killall influxd || true
     killall fluxd || true
 
-    ./influxdb-nightly/usr/bin/influxd -config ./config/${conf}.conf &>/dev/null &
+    ./influxdb-nightly/usr/bin/influxd -config ./config/${conf}.conf &>./influxdb-nightly.log &
 
     # Wait for start InfluxDB
     echo "Wait 5s to start InfluxDB"
     sleep 5
 
-    ./fluxd_nightly_darwin_amd64/fluxd  &>/dev/null &
+    ./fluxd_nightly_darwin_amd64/fluxd  &>./fluxd_nightly.log &
 
     # Wait for start Flux
     echo "Wait 5s to start Flux"
