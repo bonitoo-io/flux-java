@@ -89,6 +89,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>{@link DifferenceFlux}</li>
  * <li>{@link DistinctFlux}</li>
  * <li>{@link DropFlux}</li>
+ * <li>TODO - duplicate</li>
  * <li>{@link FilterFlux}</li>
  * <li>{@link FirstFlux}</li>
  * <li>{@link GroupFlux}</li>
@@ -102,6 +103,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>{@link MeanFlux}</li>
  * <li>{@link MinFlux}</li>
  * <li>percentile - Not defined in documentation or SPEC</li>
+ * <li>pivot - TODO</li>
  * <li>{@link RangeFlux}</li>
  * <li>{@link RenameFlux}</li>
  * <li>{@link SampleFlux}</li>
@@ -113,6 +115,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>stateTracking - Not defined in documentation or SPEC</li>
  * <li>{@link StddevFlux}</li>
  * <li>{@link SumFlux}</li>
+ * <li>TODO - to</li>
  * <li>{@link ToBoolFlux}</li>
  * <li>{@link ToIntFlux}</li>
  * <li>{@link ToFloatFlux}</li>
