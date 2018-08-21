@@ -122,6 +122,7 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
     INFLUXDB_IP=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | grep 10`
     FLUX_IP=${INFLUXDB_IP}
     DOCKER_NET=host
+    ps ux
 fi
 
 echo "INFLUXDB_IP: " ${INFLUXDB_IP} " FLUX_IP: " ${FLUX_IP}
