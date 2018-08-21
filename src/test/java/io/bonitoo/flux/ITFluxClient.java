@@ -45,7 +45,6 @@ import org.junit.runner.RunWith;
  * @author Jakub Bednar (bednar@github) (31/07/2018 09:30)
  */
 @RunWith(JUnitPlatform.class)
-@DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
 class ITFluxClient extends AbstractITFluxClient {
 
     @BeforeEach
@@ -133,12 +132,14 @@ class ITFluxClient extends AbstractITFluxClient {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void ping() {
 
         Assertions.assertThat(fluxClient.ping()).isTrue();
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void pingGZIP() {
 
         fluxClient.enableGzip();

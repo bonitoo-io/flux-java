@@ -24,10 +24,13 @@ package io.bonitoo.flux;
 
 import java.util.HashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import io.bonitoo.flux.mapper.FluxResult;
 
+import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
@@ -58,8 +61,8 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxClient.flux(Flux.from("flux_database").limit().withPropertyNamed("n"), properties);
 
-        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("query"))
-                .isEqualTo("from(db:\"flux_database\")|> limit(n: 5)");
+        Assertions.assertThat(queryFromRequest())
+                .isEqualToIgnoringWhitespace("from(db:\"flux_database\") |> limit(n: 5)");
     }
 
     @Test
@@ -100,8 +103,8 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         waitToCallback();
 
-        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("query"))
-                .isEqualTo("from(db:\"flux_database\")|> limit(n: 5)");
+        Assertions.assertThat(queryFromRequest())
+                .isEqualToIgnoringWhitespace("from(db:\"flux_database\") |> limit(n: 5)");
     }
 
     @Test
@@ -160,7 +163,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxClient.flux(query);
 
-        Assertions.assertThat(fluxServer.takeRequest().getRequestUrl().queryParameter("query")).isEqualTo(query);
+        Assertions.assertThat(queryFromRequest()).isEqualTo(query);
     }
 
     private void assertSuccessResult(@Nonnull final FluxResult result) {
@@ -168,5 +171,14 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getTables()).hasSize(1);
         Assertions.assertThat(result.getTables().get(0).getRecords()).hasSize(4);
+    }
+
+    @Nullable
+    private String queryFromRequest() throws InterruptedException {
+
+        RecordedRequest recordedRequest = fluxServer.takeRequest();
+        String body = recordedRequest.getBody().readUtf8();
+
+        return new JSONObject(body).getString("query");
     }
 }

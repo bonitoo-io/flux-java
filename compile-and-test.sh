@@ -53,6 +53,7 @@ if [ ! "$RUN_NIGHTLY_BINARY" == "true" ]; then
     docker network create influxdb
     INFLUXDB_IP=influxdb
     FLUX_IP=flux
+    DOCKER_NET=influxdb
 
     #
     # InfluxDB
@@ -92,7 +93,7 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
          ;;
       linux*)
         archive="linux_amd64";
-        conf='influxdb';
+        conf='influxdb_travis';
     esac
 
     wget https://dl.influxdata.com/influxdb/nightlies/influxdb-nightly_${archive}.tar.gz -O influxdb-nightly.tar.gz
@@ -101,24 +102,28 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
 
     wget https://dl.influxdata.com/flux/nightlies/fluxd_nightly_${archive}.tar.gz -O fluxd_nightly.tar.gz
     tar zxvf fluxd_nightly.tar.gz
+    mv `find . -name fluxd_nightly_*` fluxd_nightly
 
     killall influxd || true
     killall fluxd || true
 
-    ./influxdb-nightly/usr/bin/influxd -config ./config/${conf}.conf &>/dev/null &
+    ./influxdb-nightly/usr/bin/influxd -config ./config/${conf}.conf &>./influxdb-nightly.log &
 
     # Wait for start InfluxDB
     echo "Wait 5s to start InfluxDB"
     sleep 5
 
-    ./fluxd_nightly_darwin_amd64/fluxd  &>/dev/null &
+    ./fluxd_nightly/fluxd  &>./fluxd_nightly.log &
 
     # Wait for start Flux
     echo "Wait 5s to start Flux"
     sleep 5
 
-    INFLUXDB_IP=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'`
+    ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'
+    INFLUXDB_IP=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | grep 10`
     FLUX_IP=${INFLUXDB_IP}
+    DOCKER_NET=host
+    ps ux
 fi
 
 echo "INFLUXDB_IP: " ${INFLUXDB_IP} " FLUX_IP: " ${FLUX_IP}
@@ -127,7 +132,7 @@ docker run -it --rm \
        --volume ${PWD}:/usr/src/mymaven \
        --volume ${PWD}/.m2:/root/.m2 \
        --workdir /usr/src/mymaven \
-       --net=influxdb \
+       --net=${DOCKER_NET} \
        --env INFLUXDB_VERSION=${INFLUXDB_VERSION} \
        --env INFLUXDB_IP=${INFLUXDB_IP} \
        --env FLUX_IP=${FLUX_IP} \

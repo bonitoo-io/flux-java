@@ -34,8 +34,11 @@ import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.utils.GzipRequestInterceptor;
 import io.bonitoo.flux.utils.Preconditions;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
+import org.json.JSONObject;
 import retrofit2.Retrofit;
 
 /**
@@ -43,6 +46,8 @@ import retrofit2.Retrofit;
  * @author Jakub Bednar (bednar@github) (30/07/2018 14:01)
  */
 public abstract class AbstractFluxClient<T> {
+
+    private static final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json");
 
     protected final FluxResultMapper mapper = new FluxResultMapper();
     protected final FluxConnectionOptions fluxConnectionOptions;
@@ -95,6 +100,21 @@ public abstract class AbstractFluxClient<T> {
         Objects.requireNonNull(options, "FluxOptions are required");
 
         return flux.print(new FluxChain().addParameters(properties).addOptions(options.getQueryOptions()));
+    }
+
+    @Nonnull
+    protected RequestBody createBody(@Nonnull final String query) {
+
+        // TODO configurable
+        JSONObject dialect = new JSONObject().put("header", true)
+                .put("annotations", new String[]{"datatype", "group", "default"});
+
+        String body = new JSONObject()
+                .put("query", query)
+                .put("dialect", dialect)
+                .toString();
+
+        return RequestBody.create(CONTENT_TYPE_JSON, body);
     }
 
     class StringFlux extends Flux {
