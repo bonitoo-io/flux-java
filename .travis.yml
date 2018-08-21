@@ -24,6 +24,8 @@ jobs:
 
 after_success:
   - test $TRAVIS_BUILD_STAGE_NAME = "Test" && test $MAVEN_JAVA_VERSION = "3-jdk-8-slim" && bash <(curl -s https://codecov.io/bash)
+  - cat influxdb-nightly.log
+  - cat fluxd_nightly.log
 
 after_failure:
   - cat target/surefire-reports/*.txt
