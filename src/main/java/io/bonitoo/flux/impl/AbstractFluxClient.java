@@ -38,7 +38,6 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import retrofit2.Retrofit;
 
@@ -104,21 +103,14 @@ public abstract class AbstractFluxClient<T> {
     }
 
     @Nonnull
-    protected RequestBody createBody(@Nonnull final String query) {
+    protected RequestBody createBody(@Nonnull final String query, @Nonnull final FluxOptions options) {
 
-        // TODO configurable
-
-        JSONArray annotations = new JSONArray();
-        annotations.put("datatype");
-        annotations.put("group");
-        annotations.put("default");
-
-        JSONObject dialect = new JSONObject().put("header", true)
-                .put("annotations", annotations);
+        Preconditions.checkNonEmptyString(query, "query");
+        Objects.requireNonNull(options, "FluxOptions are required");
 
         String body = new JSONObject()
                 .put("query", query)
-                .put("dialect", dialect)
+                .put("dialect", options.getDialect().getJson())
                 .toString();
 
         return RequestBody.create(CONTENT_TYPE_JSON, body);

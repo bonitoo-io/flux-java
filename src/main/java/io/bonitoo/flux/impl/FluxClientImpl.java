@@ -541,7 +541,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
         String orgID = this.fluxConnectionOptions.getOrgID();
 
-        Call<ResponseBody> request = fluxService.query(orgID, createBody(query));
+        Call<ResponseBody> request = fluxService.query(orgID, createBody(query, options));
         if (async) {
             request.enqueue(new Callback<ResponseBody>() {
                 @Override

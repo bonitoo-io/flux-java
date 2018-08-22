@@ -92,6 +92,12 @@ Response<ResponseBody> result = fluxClient.fluxRaw(query);
 
 The Flux query can be configured by `FluxOptions`:
 
+- `dialect` - the dialect is an object defining the options to use by Flux server when encoding the response.
+    - `header` - Header is a boolean value, if true the header row is included, otherwise its is omitted. Defaults to `true`.
+    - `delimiter` - Delimiter is a character to use as the delimiting value between columns. Defaults to `,`.
+    - `quoteChar` - QuoteChar is a character to use to quote values containing the delimiter. Defaults to `"`.
+    - `annotations` - Annotations is a list of annotations that should be encoded. If the list is empty the annotation column is omitted entirely.
+    - `commentPrefix` -  CommentPrefix is a string prefix to add to comment rows. Defaults to `#`. Annotations are always comment rows.
 - `parserOptions` - the CSV parser options
     - `valueDestinations` - the column names of the record where result will be placed (see [map function](#map))
 - `queryOptions` - the options specify a context in which a Flux query is to be run. Currently supported options are `NowOption`, `TaskOption`, `LocationOption` and `CustomOption`.
@@ -150,7 +156,11 @@ fluxClient.subscribeEvents(FluxErrorEvent.class, event -> {
 ```
 ### Advanced Usage
 
-#### Gzip's support 
+#### Gzip's support
+
+> Currently unsupported by `flux` server.
+
+ 
 flux-java client doesn't enable gzip compress for http request body by default. If you want to enable gzip to reduce transfer data's size , you can call:
 
 ```java

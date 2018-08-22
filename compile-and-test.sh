@@ -93,7 +93,7 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
          ;;
       linux*)
         archive="linux_amd64";
-        conf='influxdb';
+        conf='influxdb_travis';
     esac
 
     wget https://dl.influxdata.com/influxdb/nightlies/influxdb-nightly_${archive}.tar.gz -O influxdb-nightly.tar.gz
@@ -102,6 +102,7 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
 
     wget https://dl.influxdata.com/flux/nightlies/fluxd_nightly_${archive}.tar.gz -O fluxd_nightly.tar.gz
     tar zxvf fluxd_nightly.tar.gz
+    mv `find . -name fluxd_nightly_*` fluxd_nightly
 
     killall influxd || true
     killall fluxd || true
@@ -112,7 +113,7 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
     echo "Wait 5s to start InfluxDB"
     sleep 5
 
-    ./fluxd_nightly_darwin_amd64/fluxd  &>./fluxd_nightly.log &
+    ./fluxd_nightly/fluxd  &>./fluxd_nightly.log &
 
     # Wait for start Flux
     echo "Wait 5s to start Flux"

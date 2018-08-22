@@ -31,6 +31,9 @@ import io.bonitoo.flux.options.FluxConnectionOptions;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.Assertions;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -110,5 +113,21 @@ public abstract class AbstractFluxClientTest extends AbstractTest {
         }
 
         return mockResponse.setBody(body);
+    }
+
+    @Nullable
+    protected String getObjectFromBody(@Nonnull final String key) {
+
+        Assertions.assertThat(key).isNotBlank();
+
+        RecordedRequest recordedRequest = null;
+        try {
+            recordedRequest = fluxServer.takeRequest();
+        } catch (InterruptedException e) {
+            Assertions.fail("Unexpected exception", e);
+        }
+        String body = recordedRequest.getBody().readUtf8();
+
+        return new JSONObject(body).get(key).toString();
     }
 }

@@ -103,7 +103,7 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>{@link MeanFlux}</li>
  * <li>{@link MinFlux}</li>
  * <li>percentile - Not defined in documentation or SPEC</li>
- * <li>pivot - TODO</li>
+ * <li>TODO - pivot</li>
  * <li>{@link RangeFlux}</li>
  * <li>{@link RenameFlux}</li>
  * <li>{@link SampleFlux}</li>

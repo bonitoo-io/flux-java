@@ -24,13 +24,10 @@ package io.bonitoo.flux;
 
 import java.util.HashMap;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import io.bonitoo.flux.mapper.FluxResult;
 
-import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
@@ -52,7 +49,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     }
 
     @Test
-    void queryParameters() throws InterruptedException {
+    void queryParameters() {
 
         fluxServer.enqueue(createResponse());
 
@@ -61,7 +58,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxClient.flux(Flux.from("flux_database").limit().withPropertyNamed("n"), properties);
 
-        Assertions.assertThat(queryFromRequest())
+        Assertions.assertThat(getObjectFromBody("query"))
                 .isEqualToIgnoringWhitespace("from(db:\"flux_database\") |> limit(n: 5)");
     }
 
@@ -91,7 +88,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     }
 
     @Test
-    void queryCallbackParameters() throws InterruptedException {
+    void queryCallbackParameters() {
 
         fluxServer.enqueue(createResponse());
 
@@ -103,7 +100,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         waitToCallback();
 
-        Assertions.assertThat(queryFromRequest())
+        Assertions.assertThat(getObjectFromBody("query"))
                 .isEqualToIgnoringWhitespace("from(db:\"flux_database\") |> limit(n: 5)");
     }
 
@@ -154,7 +151,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     }
 
     @Test
-    void queryStringRequestQueryParameter() throws InterruptedException {
+    void queryStringRequestQueryParameter() {
 
         fluxServer.enqueue(createResponse());
 
@@ -163,7 +160,18 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxClient.flux(query);
 
-        Assertions.assertThat(queryFromRequest()).isEqualTo(query);
+        Assertions.assertThat(getObjectFromBody("query")).isEqualTo(query);
+    }
+
+    @Test
+    void queryDialect() {
+
+        fluxServer.enqueue(createResponse());
+
+        fluxClient.flux(Flux.from("telegraf"));
+
+        Assertions.assertThat(getObjectFromBody("dialect"))
+                .isEqualToIgnoringWhitespace("{\"quoteChar\":\"\\\"\",\"commentPrefix\":\"#\",\"delimiter\":\",\",\"header\":true,\"annotations\":[\"datatype\",\"group\",\"default\"]}");
     }
 
     private void assertSuccessResult(@Nonnull final FluxResult result) {
@@ -171,14 +179,5 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getTables()).hasSize(1);
         Assertions.assertThat(result.getTables().get(0).getRecords()).hasSize(4);
-    }
-
-    @Nullable
-    private String queryFromRequest() throws InterruptedException {
-
-        RecordedRequest recordedRequest = fluxServer.takeRequest();
-        String body = recordedRequest.getBody().readUtf8();
-
-        return new JSONObject(body).getString("query");
     }
 }

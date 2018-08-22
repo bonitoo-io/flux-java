@@ -22,6 +22,7 @@
  */
 package io.bonitoo.flux;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,11 @@ import io.bonitoo.flux.mapper.FluxResult;
 import io.bonitoo.flux.mapper.Record;
 import io.bonitoo.flux.mapper.Table;
 import io.bonitoo.flux.operators.restriction.Restrictions;
+import io.bonitoo.flux.options.FluxDialect;
+import io.bonitoo.flux.options.FluxOptions;
 
+import okhttp3.ResponseBody;
+import okio.BufferedSource;
 import org.assertj.core.api.Assertions;
 import org.influxdb.dto.Point;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,12 +45,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
+import retrofit2.Response;
 
 /**
  * @author Jakub Bednar (bednar@github) (31/07/2018 09:30)
  */
 @RunWith(JUnitPlatform.class)
-@DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
 class ITFluxClient extends AbstractITFluxClient {
 
     @BeforeEach
@@ -93,10 +98,31 @@ class ITFluxClient extends AbstractITFluxClient {
         influxDB.write(point6);
     }
 
-    //TODO test chunked, GZIP
+    //TODO test chunked
 
     @Test
     void query() {
+
+        Restrictions restriction = Restrictions
+                .and(Restrictions.measurement().equal("mem"), Restrictions.field().equal("free"));
+
+        Flux flux = Flux.from(DATABASE_NAME)
+                .range(Instant.EPOCH)
+                .filter(restriction)
+                .sum();
+
+        FluxResult fluxResult = fluxClient.flux(flux);
+
+        assertFluxResult(fluxResult);
+    }
+
+    //TODO GZIP
+    @Test
+    @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
+    void queryGZIP() {
+
+        fluxClient.enableGzip();
+        Assertions.assertThat(fluxClient.isGzipEnabled()).isEqualTo(true);
 
         Restrictions restriction = Restrictions
                 .and(Restrictions.measurement().equal("mem"), Restrictions.field().equal("free"));
@@ -132,6 +158,7 @@ class ITFluxClient extends AbstractITFluxClient {
         waitToCallback();
     }
 
+    // TODO ping
     @Test
     @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void ping() {
@@ -147,6 +174,48 @@ class ITFluxClient extends AbstractITFluxClient {
         Assertions.assertThat(fluxClient.isGzipEnabled()).isTrue();
 
         Assertions.assertThat(fluxClient.ping()).isTrue();
+    }
+
+    @Test
+    void dialect() throws IOException {
+
+        Point point = Point.measurement("cpu_dialect")
+                .tag("region", "we!st")
+                .addField("usage_system", 38)
+                .time(20, TimeUnit.SECONDS)
+                .build();
+
+        influxDB.write(point);
+
+        Flux flux = Flux.from(DATABASE_NAME).filter(Restrictions.and(Restrictions.measurement().equal("cpu_dialect"))).last();
+
+        FluxDialect fluxDialect = FluxDialect.builder()
+                .commentPrefix("=")
+                .delimiter("!")
+                .quoteChar("'")
+                .addAnnotation("datatype")
+                .build();
+        
+        FluxOptions options = FluxOptions.builder().dialect(fluxDialect).build();
+        Response<ResponseBody> response = fluxClient.fluxRaw(flux, options);
+
+        Assertions.assertThat(response.isSuccessful()).isTrue();
+
+        BufferedSource bufferedSource = response.body().source();
+
+        // commentPrefix
+        String line = bufferedSource.readUtf8Line();
+        // TODO comment prefix not works
+        // Assertions.assertThat(line).startsWith("=");
+
+        // delimiter
+        line = bufferedSource.readUtf8Line();
+        Assertions.assertThat(line).startsWith("!");
+
+        // quoteChar
+        line = bufferedSource.readUtf8Line();
+        // TODO quoteChar not works
+        // Assertions.assertThat(line).endsWith("'we!st'");
     }
 
     private void assertFluxResult(@Nonnull final FluxResult fluxResult) {

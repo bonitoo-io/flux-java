@@ -55,6 +55,21 @@ public final class Preconditions {
     }
 
     /**
+     * Enforces that the string has exactly one char.
+     *
+     * @param string the string to test
+     * @param name   variable name for reporting
+     * @return {@code string}
+     * @throws IllegalArgumentException if the string has not one char
+     */
+    public static String checkOneCharString(final String string, final String name) throws IllegalArgumentException {
+        if (string == null || string.length() != 1) {
+            throw new IllegalArgumentException("Expecting a one char string for " + name);
+        }
+        return string;
+    }
+
+    /**
      * Enforces that the string is duration literal.
      *
      * @param string the string to test

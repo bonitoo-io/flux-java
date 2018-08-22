@@ -60,6 +60,7 @@ public abstract class AbstractITFluxClient extends AbstractTest {
                 .build();
 
         fluxClient = new FluxClientImpl(fluxConnectionOptions);
+        fluxClient.disableGzip();
 
         String influxdbIP = System.getenv().getOrDefault("INFLUXDB_IP", "127.0.0.1");
         String influxdbPort = System.getenv().getOrDefault("INFLUXDB_PORT_API", "8086");

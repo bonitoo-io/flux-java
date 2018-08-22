@@ -23,6 +23,7 @@
 package io.bonitoo.flux;
 
 import okhttp3.logging.HttpLoggingInterceptor;
+import okhttp3.mockwebserver.MockResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +45,25 @@ class FluxClientTest extends AbstractFluxClientTest {
         // disable
         fluxClient.disableGzip();
         Assertions.assertThat(fluxClient.isGzipEnabled()).isEqualTo(false);
+    }
+
+    @Test
+    void gzipHeader() throws InterruptedException {
+
+        fluxServer.enqueue(new MockResponse());
+        fluxServer.enqueue(new MockResponse());
+
+        // Disabled GZIP
+        fluxClient.disableGzip();
+        fluxClient.flux(Flux.from("flux_database"));
+        // GZIP header IS NOT set
+        Assertions.assertThat(fluxServer.takeRequest().getHeader("Content-Encoding")).isNull();
+
+        // Enabled GZIP
+        fluxClient.enableGzip();
+        fluxClient.flux(Flux.from("flux_database"));
+        // GZIP header IS set
+        Assertions.assertThat(fluxServer.takeRequest().getHeader("Content-Encoding")).isEqualTo("gzip");
     }
 
     @Test

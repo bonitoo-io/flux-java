@@ -134,6 +134,17 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
         waitToCallback();
     }
 
+    @Test
+    void queryRawDialect() {
+
+        fluxServer.enqueue(createResponse());
+
+        fluxClient.fluxRaw(Flux.from("telegraf"));
+
+        Assertions.assertThat(getObjectFromBody("dialect"))
+                .isEqualToIgnoringWhitespace("{\"quoteChar\":\"\\\"\",\"commentPrefix\":\"#\",\"delimiter\":\",\",\"header\":true,\"annotations\":[\"datatype\",\"group\",\"default\"]}");
+    }
+
     private void assertSuccessResult(@Nullable final Response<ResponseBody> result) {
 
         Assertions.assertThat(result).isNotNull();

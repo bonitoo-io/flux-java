@@ -48,6 +48,7 @@ public final class FluxOptions {
     public static final FluxOptions DEFAULTS = FluxOptions.builder().build();
 
     private final FluxCsvParserOptions parserOptions;
+    private final FluxDialect dialect;
     private final List<AbstractOption> queryOptions = new ArrayList<>();
 
     private FluxOptions(@Nonnull final Builder builder) {
@@ -55,6 +56,7 @@ public final class FluxOptions {
         Objects.requireNonNull(builder, "FluxOptions.Builder is required");
 
         this.parserOptions = builder.parserOptions;
+        this.dialect = builder.dialect;
         this.queryOptions.addAll(builder.variables);
     }
 
@@ -79,6 +81,15 @@ public final class FluxOptions {
     }
 
     /**
+     * @return the Flux dialect
+     * @see Builder#dialect(FluxDialect)
+     */
+    @Nonnull
+    public FluxDialect getDialect() {
+        return dialect;
+    }
+
+    /**
      * @return the Flux query options that define variables
      * @see Builder#addOption(AbstractOption)
      */
@@ -96,6 +107,7 @@ public final class FluxOptions {
     public static class Builder {
 
         private FluxCsvParserOptions parserOptions = FluxCsvParserOptions.DEFAULTS;
+        private FluxDialect dialect = FluxDialect.DEFAULTS;
         private List<AbstractOption> variables = new ArrayList<>();
 
         /**
@@ -112,6 +124,21 @@ public final class FluxOptions {
 
             this.parserOptions = parserOptions;
 
+            return this;
+        }
+
+        /**
+         * Set {@link FluxDialect} that defining the options to use when encoding the response.
+         *
+         * @param fluxDialect defining the options to use when encoding the response
+         * @return {@code this}
+         * @since 1.0.0
+         */
+        @Nonnull
+        public Builder dialect(@Nonnull final FluxDialect fluxDialect) {
+            Objects.requireNonNull(fluxDialect, "FluxDialect is required");
+
+            this.dialect = fluxDialect;
             return this;
         }
 
@@ -133,7 +160,6 @@ public final class FluxOptions {
 
             return this;
         }
-
 
         /**
          * Build an instance of FluxOptions.

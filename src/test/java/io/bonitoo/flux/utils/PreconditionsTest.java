@@ -107,4 +107,34 @@ class PreconditionsTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Expecting a positive or zero number for property");
     }
+
+    @Test
+    void checkOneCharString() {
+
+        Preconditions.checkOneCharString("#", "valid");
+    }
+
+    @Test
+    void checkOneCharStringEmpty() {
+
+        Assertions.assertThatThrownBy(() -> Preconditions.checkOneCharString("", "property"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a one char string for property");
+    }
+
+    @Test
+    void checkOneCharStringNull() {
+
+        Assertions.assertThatThrownBy(() -> Preconditions.checkOneCharString("", "property"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a one char string for property");
+    }
+
+    @Test
+    void checkOneCharStringLarge() {
+
+        Assertions.assertThatThrownBy(() -> Preconditions.checkOneCharString("##", "property"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a one char string for property");
+    }
 }
