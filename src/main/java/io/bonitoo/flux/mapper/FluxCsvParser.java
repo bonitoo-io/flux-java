@@ -42,12 +42,12 @@ import org.apache.commons.csv.CSVRecord;
 class FluxCsvParser {
 
     @Nonnull
-    FluxResult parseFluxResponse(@Nonnull final Reader reader) throws FluxResultMapperException, IOException {
+    List<FluxTable> parseFluxResponse(@Nonnull final Reader reader) throws FluxResultMapperException, IOException {
         return parseFluxResponse(reader, FluxCsvParserOptions.DEFAULTS);
     }
 
     @Nonnull
-    FluxResult parseFluxResponse(@Nonnull final Reader reader, @Nonnull final FluxCsvParserOptions settings)
+    List<FluxTable> parseFluxResponse(@Nonnull final Reader reader, @Nonnull final FluxCsvParserOptions settings)
             throws FluxResultMapperException, IOException {
 
         Objects.requireNonNull(reader, "Reader is required");
@@ -56,10 +56,10 @@ class FluxCsvParser {
         final CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT);
         final List<CSVRecord> records = parser.getRecords();
 
-        final List<Table> tables = new ArrayList<>();
+        final List<FluxTable> tables = new ArrayList<>();
 
         boolean startNewTable = false;
-        Table table = null;
+        FluxTable table = null;
 
         int tableIndex = 0;
         int tableColumnIndex = -1;
@@ -71,12 +71,12 @@ class FluxCsvParser {
             if ("#datatype".equals(token)) {
                 startNewTable = true;
 
-                table = new Table();
+                table = new FluxTable();
                 tables.add(tableIndex, table);
                 tableIndex++;
 
             } else if (table == null) {
-                String message = "Unable to parse CSV response. Table definition was not found. Row:" + i;
+                String message = "Unable to parse CSV response. FluxTable definition was not found. Row:" + i;
                 throw new FluxResultMapperException(message);
             }
             //#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,double,string,string,string
@@ -107,23 +107,25 @@ class FluxCsvParser {
                 if (currentIndex > (tableIndex - 1)) {
                     //create new table with previous column headers settings
                     List<ColumnHeader> columnHeaders = table.getColumnHeaders();
-                    table = new Table();
+                    table = new FluxTable();
                     table.setColumnHeaders(columnHeaders);
                     tables.add(tableIndex, table);
                     tableIndex++;
                 }
 
-                Record r = parseRecord(table, csvRecord, settings);
+                FluxRecord r = parseRecord(table, csvRecord, settings);
                 table.getRecords().add(r);
             }
         }
-        return new FluxResult(tables);
+        return tables;
     }
 
-    private Record parseRecord(final Table table, final CSVRecord csvRecord, final FluxCsvParserOptions settings)
+    private FluxRecord parseRecord(final FluxTable table,
+                                   final CSVRecord csvRecord,
+                                   final FluxCsvParserOptions settings)
             throws FluxResultMapperException {
 
-        Record record = new Record();
+        FluxRecord record = new FluxRecord();
 
         List<String> valueDestinations = settings.getValueDestinations();
 

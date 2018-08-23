@@ -22,10 +22,15 @@
  */
 package io.bonitoo.flux;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.flux.mapper.FluxResult;
+import io.bonitoo.flux.events.FluxErrorEvent;
+import io.bonitoo.flux.mapper.FluxRecord;
+import io.bonitoo.flux.mapper.FluxTable;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,7 +48,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxServer.enqueue(createResponse());
 
-        FluxResult result = fluxClient.flux(Flux.from("flux_database"));
+        List<FluxTable> result = fluxClient.flux(Flux.from("flux_database"));
 
         assertSuccessResult(result);
     }
@@ -65,26 +70,32 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     @Test
     void queryError() {
 
+        //TODO exception throws?
         fluxServer.enqueue(createErrorResponse("Flux query is not valid"));
 
-        FluxResult result = fluxClient.flux(Flux.from("flux_database"));
+        List<FluxTable> result = fluxClient.flux(Flux.from("flux_database"));
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getTables()).hasSize(0);
+        Assertions.assertThat(result).hasSize(0);
     }
 
     @Test
     void queryCallback() {
 
+        countDownLatch = new CountDownLatch(4);
+
         fluxServer.enqueue(createResponse());
 
+        List<FluxRecord> records = new ArrayList<>();
         fluxClient.flux(Flux.from("flux_database"), result -> {
-            assertSuccessResult(result);
+            records.add(result);
 
             countDownLatch.countDown();
         });
 
         waitToCallback();
+
+        assertRecords(records);
     }
 
     @Test
@@ -109,12 +120,10 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxServer.enqueue(createErrorResponse("Flux query is not valid", true));
 
+        fluxClient.subscribeEvents(FluxErrorEvent.class, fluxErrorEvent -> countDownLatch.countDown());
         fluxClient.flux(Flux.from("flux_database"), result -> {
 
-            Assertions.assertThat(result).isNotNull();
-            Assertions.assertThat(result.getTables()).hasSize(0);
-
-            countDownLatch.countDown();
+            Assertions.fail("Unreachable");
         });
 
         waitToCallback();
@@ -128,7 +137,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         String query = "from(db:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
-        FluxResult result = fluxClient.flux(query);
+        List<FluxTable> result = fluxClient.flux(query);
 
         assertSuccessResult(result);
     }
@@ -136,18 +145,23 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     @Test
     void queryStringCallback() {
 
+        countDownLatch = new CountDownLatch(4);
+
         fluxServer.enqueue(createResponse());
+
+        List<FluxRecord> records = new ArrayList<>();
 
         String query = "from(db:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
-        fluxClient.flux(query, result -> {
-            assertSuccessResult(result);
+        fluxClient.flux(query, record -> {
+            records.add(record);
 
             countDownLatch.countDown();
         });
 
         waitToCallback();
+        assertRecords(records);
     }
 
     @Test
@@ -174,10 +188,15 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
                 .isEqualToIgnoringWhitespace("{\"quoteChar\":\"\\\"\",\"commentPrefix\":\"#\",\"delimiter\":\",\",\"header\":true,\"annotations\":[\"datatype\",\"group\",\"default\"]}");
     }
 
-    private void assertSuccessResult(@Nonnull final FluxResult result) {
+    private void assertSuccessResult(@Nonnull final List<FluxTable> tables) {
 
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getTables()).hasSize(1);
-        Assertions.assertThat(result.getTables().get(0).getRecords()).hasSize(4);
+        Assertions.assertThat(tables).isNotNull();
+        Assertions.assertThat(tables).hasSize(1);
+        List<FluxRecord> records = tables.get(0).getRecords();
+        assertRecords(records);
+    }
+
+    private void assertRecords(@Nonnull final List<FluxRecord> records) {
+        Assertions.assertThat(records).hasSize(4);
     }
 }

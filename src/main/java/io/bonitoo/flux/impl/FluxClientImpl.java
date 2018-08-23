@@ -24,7 +24,9 @@ package io.bonitoo.flux.impl;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -43,7 +45,8 @@ import io.bonitoo.flux.events.AbstractFluxEvent;
 import io.bonitoo.flux.events.FluxErrorEvent;
 import io.bonitoo.flux.events.FluxSuccessEvent;
 import io.bonitoo.flux.events.UnhandledErrorEvent;
-import io.bonitoo.flux.mapper.FluxResult;
+import io.bonitoo.flux.mapper.FluxRecord;
+import io.bonitoo.flux.mapper.FluxTable;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.utils.Preconditions;
@@ -70,7 +73,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     @Nonnull
     @Override
-    public FluxResult flux(@Nonnull final String query) {
+    public List<FluxTable> flux(@Nonnull final String query) {
 
         Objects.requireNonNull(query, "Flux query is required");
 
@@ -79,7 +82,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     @Nonnull
     @Override
-    public FluxResult flux(@Nonnull final String query, @Nonnull final FluxOptions options) {
+    public List<FluxTable> flux(@Nonnull final String query, @Nonnull final FluxOptions options) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
@@ -88,7 +91,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public void flux(@Nonnull final String query, @Nonnull final Consumer<FluxResult> callback) {
+    public void flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> callback) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(callback, "Callback consumer is required");
@@ -99,7 +102,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     @Override
     public void flux(@Nonnull final String query,
                      @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxResult> callback) {
+                     @Nonnull final Consumer<FluxRecord> callback) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
@@ -150,7 +153,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     @Nonnull
     @Override
-    public FluxResult flux(@Nonnull final Flux query) {
+    public List<FluxTable> flux(@Nonnull final Flux query) {
 
         Objects.requireNonNull(query, "Flux query is required");
 
@@ -158,7 +161,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public void flux(@Nonnull final Flux query, @Nonnull final Consumer<FluxResult> callback) {
+    public void flux(@Nonnull final Flux query, @Nonnull final Consumer<FluxRecord> callback) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(callback, "Callback consumer is required");
@@ -168,7 +171,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     @Nonnull
     @Override
-    public FluxResult flux(@Nonnull final Flux query, @Nonnull final FluxOptions options) {
+    public List<FluxTable> flux(@Nonnull final Flux query, @Nonnull final FluxOptions options) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
@@ -179,7 +182,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     @Override
     public void flux(@Nonnull final Flux query,
                      @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxResult> callback) {
+                     @Nonnull final Consumer<FluxRecord> callback) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
@@ -190,7 +193,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     @Nonnull
     @Override
-    public FluxResult flux(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties) {
+    public List<FluxTable> flux(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
@@ -201,7 +204,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     @Override
     public void flux(@Nonnull final Flux query,
                      @Nonnull final Map<String, Object> properties,
-                     @Nonnull final Consumer<FluxResult> callback) {
+                     @Nonnull final Consumer<FluxRecord> callback) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
@@ -212,29 +215,29 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     @Nonnull
     @Override
-    public FluxResult flux(@Nonnull final Flux query,
-                           @Nonnull final Map<String, Object> properties,
-                           @Nonnull final FluxOptions options) {
+    public List<FluxTable> flux(@Nonnull final Flux query,
+                                @Nonnull final Map<String, Object> properties,
+                                @Nonnull final FluxOptions options) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
 
-        FluxResult fluxResult = flux(query, properties, options, false, result -> {
+        List<FluxTable> fluxTables = flux(query, properties, options, false, result -> {
         });
 
-        if (fluxResult == null) {
+        if (fluxTables == null) {
             throw new IllegalStateException("Result is null");
         }
 
-        return fluxResult;
+        return fluxTables;
     }
 
     @Override
     public void flux(@Nonnull final Flux query,
                      @Nonnull final Map<String, Object> properties,
                      @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxResult> callback) {
+                     @Nonnull final Consumer<FluxRecord> callback) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
@@ -435,11 +438,11 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Nullable
-    private FluxResult flux(@Nonnull final Flux flux,
-                            @Nonnull final Map<String, Object> properties,
-                            @Nonnull final FluxOptions options,
-                            @Nonnull final Boolean async,
-                            @Nonnull final Consumer<FluxResult> callback) {
+    private List<FluxTable> flux(@Nonnull final Flux flux,
+                                 @Nonnull final Map<String, Object> properties,
+                                 @Nonnull final FluxOptions options,
+                                 @Nonnull final Boolean async,
+                                 @Nonnull final Consumer<FluxRecord> callback) {
 
         Objects.requireNonNull(flux, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
@@ -453,7 +456,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
             if (!asyncResponse.isSuccessful()) {
                 errorResponse(query, asyncResponse);
-                callback.accept(FluxResult.empty());
+//                callback.accept(FluxResult.empty());
                 return;
             }
 
@@ -470,10 +473,10 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 //
                 while (!source.exhausted()) {
 
-                    FluxResult fluxResult = mapper.toFluxResult(source, options.getParserOptions());
-                    if (fluxResult != null) {
+                    List<FluxTable> tables = mapper.toFluxTables(source, options.getParserOptions());
+                    if (tables != null) {
 
-                        callback.accept(fluxResult);
+                        tables.forEach(fluxTable -> fluxTable.getRecords().forEach(callback));
                     }
                 }
 
@@ -503,15 +506,15 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
                     ResponseBody body = response.body();
                     if (body == null) {
-                        return FluxResult.empty();
+                        return new ArrayList<>();
                     }
 
                     BufferedSource source = body.source();
-                    FluxResult fluxResult = mapper.toFluxResult(source, options.getParserOptions());
+                    List<FluxTable> tables = mapper.toFluxTables(source, options.getParserOptions());
 
                     publish(new FluxSuccessEvent(fluxConnectionOptions, query));
 
-                    return fluxResult;
+                    return tables;
                 } else {
 
                     errorResponse(query, response);
@@ -523,7 +526,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
             }
         }
 
-        return FluxResult.empty();
+        return new ArrayList<>();
     }
 
     @Nullable

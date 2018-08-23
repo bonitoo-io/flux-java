@@ -25,13 +25,17 @@ package io.bonitoo.flux.mapper;
 import java.time.Instant;
 
 /**
- * This class represents column header specification of {@link Table}.
+ * This class represents column header specification of {@link FluxTable}.
+ *
+ * TODO naming same as in SPEC
  */
 public class ColumnHeader {
 
 
+
     //string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,double,string,string,string
 
+    //TODO implement rest of data
     private static final String STRING_DATATYPE = "string";
     private static final String DATETIME_DATATYPE = "dateTime:RFC3339";
     private static final String LONG_DATATYPE = "long";

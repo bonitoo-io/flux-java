@@ -22,12 +22,14 @@
  */
 package io.bonitoo.flux;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.events.AbstractFluxEvent;
-import io.bonitoo.flux.mapper.FluxResult;
+import io.bonitoo.flux.mapper.FluxRecord;
+import io.bonitoo.flux.mapper.FluxTable;
 import io.bonitoo.flux.options.FluxOptions;
 
 import okhttp3.ResponseBody;
@@ -46,34 +48,34 @@ import retrofit2.Response;
 public interface FluxClient {
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
      *
      * @param query the flux query to execute
-     * @return {@link FluxResult}  which are matched the query
+     * @return {@code List<FluxTable>} which are matched the query
      */
     @Nonnull
-    FluxResult flux(@Nonnull final String query);
+    List<FluxTable> flux(@Nonnull final String query);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
      *
      * @param options the options for the query
      * @param query   the flux query to execute
-     * @return {@link FluxResult}  which are matched the query
+     * @return {@code List<FluxTable>} which are matched the query
      */
     @Nonnull
-    FluxResult flux(@Nonnull final String query, @Nonnull final FluxOptions options);
+    List<FluxTable> flux(@Nonnull final String query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
      * @param query    the flux query to execute
      * @param callback callback to consume result which are matched the query
      */
-    void flux(@Nonnull final String query, @Nonnull final Consumer<FluxResult> callback);
+    void flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
      * @param query    the flux query to execute
      * @param callback callback to consume result which are matched the query
@@ -81,10 +83,10 @@ public interface FluxClient {
      */
     void flux(@Nonnull final String query,
               @Nonnull final FluxOptions options,
-              @Nonnull final Consumer<FluxResult> callback);
+              @Nonnull final Consumer<FluxRecord> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and return the Flux server HTTP response.
      *
      * @param query the flux query to execute
      * @return {@code Response<ResponseBody>} raw response which are matched the query
@@ -93,7 +95,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final String query);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and return the Flux server HTTP response.
      *
      * @param options the options for the query
      * @param query   the flux query to execute
@@ -103,7 +105,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final String query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
      * @param query    the flux query to execute
      * @param callback callback to consume raw response which are matched the query
@@ -122,34 +124,34 @@ public interface FluxClient {
                  @Nonnull final Consumer<Response<ResponseBody>> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
      *
      * @param query the flux query to execute
-     * @return {@link FluxResult}  which are matched the query
+     * @return {@code List<FluxTable>}  which are matched the query
      */
     @Nonnull
-    FluxResult flux(@Nonnull final Flux query);
+    List<FluxTable> flux(@Nonnull final Flux query);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
      * @param query    the flux query to execute
      * @param callback callback to consume result which are matched the query
      */
-    void flux(@Nonnull final Flux query, @Nonnull final Consumer<FluxResult> callback);
+    void flux(@Nonnull final Flux query, @Nonnull final Consumer<FluxRecord> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
      *
      * @param query   the flux query to execute
      * @param options the options for the query
-     * @return {@link FluxResult}  which are matched the query
+     * @return {@code List<FluxTable>} which are matched the query
      */
     @Nonnull
-    FluxResult flux(@Nonnull final Flux query, @Nonnull final FluxOptions options);
+    List<FluxTable> flux(@Nonnull final Flux query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
      * @param query    the flux query to execute
      * @param options  the options for the query
@@ -157,20 +159,20 @@ public interface FluxClient {
      */
     void flux(@Nonnull final Flux query,
               @Nonnull final FluxOptions options,
-              @Nonnull final Consumer<FluxResult> callback);
+              @Nonnull final Consumer<FluxRecord> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
      *
      * @param query      the flux query to execute
      * @param properties named properties
-     * @return {@link FluxResult}  which are matched the query
+     * @return {@code List<FluxTable>} which are matched the query
      */
     @Nonnull
-    FluxResult flux(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties);
+    List<FluxTable> flux(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -178,23 +180,23 @@ public interface FluxClient {
      */
     void flux(@Nonnull final Flux query,
               @Nonnull final Map<String, Object> properties,
-              @Nonnull final Consumer<FluxResult> callback);
+              @Nonnull final Consumer<FluxRecord> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
      *
      * @param query      the flux query to execute
      * @param properties named properties
      * @param options    the options for the query
-     * @return {@link FluxResult}  which are matched the query
+     * @return {@code List<FluxTable>} which are matched the query
      */
     @Nonnull
-    FluxResult flux(@Nonnull final Flux query,
-                    @Nonnull final Map<String, Object> properties,
-                    @Nonnull final FluxOptions options);
+    List<FluxTable> flux(@Nonnull final Flux query,
+                         @Nonnull final Map<String, Object> properties,
+                         @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -204,10 +206,10 @@ public interface FluxClient {
     void flux(@Nonnull final Flux query,
               @Nonnull final Map<String, Object> properties,
               @Nonnull final FluxOptions options,
-              @Nonnull final Consumer<FluxResult> callback);
+              @Nonnull final Consumer<FluxRecord> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and return the Flux server HTTP response.
      *
      * @param query the flux query to execute
      * @return {@code Response<ResponseBody>} raw response which are matched the query
@@ -216,7 +218,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final Flux query);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
      * @param query    the flux query to execute
      * @param callback callback to consume raw response which are matched the query
@@ -224,7 +226,7 @@ public interface FluxClient {
     void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and return the Flux server HTTP response.
      *
      * @param query   the flux query to execute
      * @param options the options for the query
@@ -234,7 +236,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final Flux query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
      * @param query    the flux query to execute
      * @param options  the options for the query
@@ -245,7 +247,7 @@ public interface FluxClient {
                  @Nonnull final Consumer<Response<ResponseBody>> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and return the Flux server HTTP response.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -255,7 +257,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -266,7 +268,7 @@ public interface FluxClient {
                  @Nonnull final Consumer<Response<ResponseBody>> callback);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and return the Flux server HTTP response.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -279,7 +281,7 @@ public interface FluxClient {
                                    @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
      * @param query      the flux query to execute
      * @param properties named properties

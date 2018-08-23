@@ -152,7 +152,7 @@ public final class JoinFlux extends AbstractParametrizedFlux {
     @Nonnull
     public JoinFlux withTable(@Nonnull final String name, @Nonnull final Flux table) {
 
-        Preconditions.checkNonEmptyString(name, "Table name");
+        Preconditions.checkNonEmptyString(name, "FluxTable name");
         Objects.requireNonNull(table, "Flux script to map table");
 
         tables.put(name, table);

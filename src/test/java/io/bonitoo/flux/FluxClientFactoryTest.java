@@ -22,7 +22,6 @@
  */
 package io.bonitoo.flux;
 
-import io.bonitoo.flux.mapper.FluxResult;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 
 import org.assertj.core.api.Assertions;
@@ -47,34 +46,5 @@ class FluxClientFactoryTest {
         FluxClient fluxClient = FluxClientFactory.connect(options);
 
         Assertions.assertThat(fluxClient).isNotNull();
-    }
-
-    @Test
-    void f() {
-
-        FluxConnectionOptions options = FluxConnectionOptions.builder()
-                .url("http://localhost:8093")
-                .orgID("0")
-                .build();
-
-// Results
-        FluxClient fluxClient = FluxClientFactory.connect(options);
-
-        Flux flux = Flux
-                .from("telegraf")
-                .groupBy("_measurement")
-                .difference();
-
-        fluxClient.flux(flux, fluxResult -> {
-
-            logFluxResult(fluxResult);
-        });
-
-        fluxClient.close();
-    }
-
-
-    private void logFluxResult(FluxResult fluxResult) {
-        //To change body of created methods use File | Settings | File Templates.
     }
 }

@@ -30,8 +30,9 @@ import java.util.StringJoiner;
 /**
  * Represents the record in CSV response.
  */
-public class Record {
+public class FluxRecord {
 
+    //TODO generic + getValueByIndex
     private Instant start;
     private Instant stop;
     private Instant time;
@@ -108,7 +109,7 @@ public class Record {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", Record.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", FluxRecord.class.getSimpleName() + "[", "]")
                 .add("measurement='" + measurement + "'")
                 .add("field='" + field + "'")
                 .add("start=" + start)

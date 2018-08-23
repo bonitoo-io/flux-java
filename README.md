@@ -48,7 +48,7 @@ There are two possibilities how to create Flux query:
 ```java
 String query = "from(db:\"telegraf\") |> filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
-FluxResult results = fluxClient.flux(query);
+List<FluxTable> tables = fluxClient.flux(query);
 ```
 
 #### Build-in operators
@@ -61,25 +61,28 @@ Flux query = Flux
     .groupBy("_measurement")
     .difference();
 
-FluxResult results = fluxClient.flux(query);
+List<FluxTable> tables = fluxClient.flux(query);
 ```
 
 #### Asynchronous query
+
+Execute a Flux query against the Flux service and asynchronous stream `FluxRecord`s to `callback`.
+
 ```java
 
 String query = "from(db:\"telegraf\") |> range(start: -30m) |> group(by: [\"tag_a\", \"tag_b\"])";
 
-fluxClient.flux(query, fluxResult -> {
+fluxClient.flux(query, fluxRecord -> {
 
-    // Results
-    logFluxResult(fluxResult);
+    // FluxRecord
+    logFluxRecord(fluxRecord);
 });
 ```
 
 #### Handling server response
 
 There are two possibilities how to handle server response:
-1. Mapping to the `FluxResult` POJO ([mentioned above](#flux-query))
+1. Mapping to the `FluxTable`s POJO ([mentioned above](#flux-query))
 2. Use directly server response to the custom handling
 
 ##### Custom Handling  

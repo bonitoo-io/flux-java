@@ -25,8 +25,8 @@ package io.bonitoo.flux.mapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -42,11 +42,9 @@ import okio.BufferedSource;
 @ThreadSafe
 public class FluxResultMapper {
 
-    private static final Logger LOG = Logger.getLogger(FluxResultMapper.class.getName());
-
     @Nullable
-    public FluxResult toFluxResult(@Nonnull final BufferedSource source,
-                                   @Nonnull final FluxCsvParserOptions parserOptions)
+    public List<FluxTable> toFluxTables(@Nonnull final BufferedSource source,
+                                        @Nonnull final FluxCsvParserOptions parserOptions)
             throws FluxResultMapperException, IOException {
 
         Objects.requireNonNull(source, "BufferedSource is required");

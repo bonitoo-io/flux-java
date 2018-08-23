@@ -24,14 +24,15 @@ package io.bonitoo.flux;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.mapper.ColumnHeader;
-import io.bonitoo.flux.mapper.FluxResult;
-import io.bonitoo.flux.mapper.Record;
-import io.bonitoo.flux.mapper.Table;
+import io.bonitoo.flux.mapper.FluxRecord;
+import io.bonitoo.flux.mapper.FluxTable;
 import io.bonitoo.flux.operators.restriction.Restrictions;
 import io.bonitoo.flux.options.FluxDialect;
 import io.bonitoo.flux.options.FluxOptions;
@@ -90,15 +91,70 @@ class ITFluxClient extends AbstractITFluxClient {
                 .time(20, TimeUnit.SECONDS)
                 .build();
 
+        Point point7 = Point.measurement("cpu")
+                .tag("host", "A")
+                .tag("region", "west")
+                .tag("hyper-threading","true")
+                .addField("user_usage", 49)
+                .addField("usage_system", 38)
+                .time(20, TimeUnit.SECONDS)
+                .build();
+
         influxDB.write(point1);
         influxDB.write(point2);
         influxDB.write(point3);
         influxDB.write(point4);
         influxDB.write(point5);
         influxDB.write(point6);
+        influxDB.write(point7);
     }
 
-    //TODO test chunked
+    //TODO unbound - https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#errors
+
+//    //TODO test chunked
+//    @Test
+//    void chunked() throws InterruptedException, IOException {
+//
+//        Restrictions usage_user = Restrictions.field().equal("usage_user");
+//        Restrictions cpu = Restrictions.measurement().equal("cpu");
+//
+//        Flux flux = Flux
+//                .from("telegraf")
+////                .filter(Restrictions.and(cpu, usage_user))
+//                .range(-1L, ChronoUnit.MINUTES);
+////                .window(1L, ChronoUnit.MINUTES);
+//
+////        fluxClient.flux(flux, new Consumer<FluxResult>() {
+////            @Override
+////            public void accept(FluxResult fluxResult) {
+////                System.out.println("fluxResult = " + fluxResult);
+////            }
+////        });
+//
+//        int i = 0;
+//        Response<ResponseBody> responseBodyResponse = fluxClient.fluxRaw(flux);
+//        if (responseBodyResponse.isSuccessful()) {
+//            BufferedSource source = responseBodyResponse.body().source();
+//
+//            while (!source.exhausted()) {
+//                String line = null;
+//                try {
+//                    line = source.readUtf8Line();
+//                } catch (EOFException e) {
+//                    System.out.println("e = " + e);
+//                    break;
+//                }
+//                System.out.println(line);
+//                i++;
+//
+//                if (i % 10000 == 0) {
+//                    System.out.println("i = " + i);
+//                }
+//            }
+//        }
+//
+//        System.out.println("i = " + i);
+//    }
 
     @Test
     void query() {
@@ -111,9 +167,22 @@ class ITFluxClient extends AbstractITFluxClient {
                 .filter(restriction)
                 .sum();
 
-        FluxResult fluxResult = fluxClient.flux(flux);
+        List<FluxTable> fluxTables = fluxClient.flux(flux);
 
-        assertFluxResult(fluxResult);
+        assertFluxResult(fluxTables);
+    }
+
+    @Test
+    void queryDifferentSchemas() {
+
+        Flux flux = Flux
+                .from(DATABASE_NAME)
+                .range()
+                .withStart(Instant.EPOCH);
+
+        List<FluxTable> fluxTables = fluxClient.flux(flux);
+
+        Assertions.assertThat(fluxTables).hasSize(6);
     }
 
     //TODO GZIP
@@ -132,13 +201,16 @@ class ITFluxClient extends AbstractITFluxClient {
                 .filter(restriction)
                 .sum();
 
-        FluxResult fluxResult = fluxClient.flux(flux);
+        List<FluxTable> fluxTables = fluxClient.flux(flux);
 
-        assertFluxResult(fluxResult);
+        assertFluxResult(fluxTables);
     }
 
     @Test
     void callback() {
+
+        countDownLatch = new CountDownLatch(2);
+        List<FluxRecord> records = new ArrayList<>();
 
         Restrictions restriction = Restrictions
                 .and(Restrictions.measurement().equal("mem"), Restrictions.field().equal("free"));
@@ -148,14 +220,15 @@ class ITFluxClient extends AbstractITFluxClient {
                 .filter(restriction)
                 .sum();
 
-        fluxClient.flux(flux, fluxResult -> {
+        fluxClient.flux(flux, record -> {
 
-            assertFluxResult(fluxResult);
+            records.add(record);
 
             countDownLatch.countDown();
         });
 
         waitToCallback();
+        assertFluxRecords(records);
     }
 
     // TODO ping
@@ -195,7 +268,7 @@ class ITFluxClient extends AbstractITFluxClient {
                 .quoteChar("'")
                 .addAnnotation("datatype")
                 .build();
-        
+
         FluxOptions options = FluxOptions.builder().dialect(fluxDialect).build();
         Response<ResponseBody> response = fluxClient.fluxRaw(flux, options);
 
@@ -218,15 +291,13 @@ class ITFluxClient extends AbstractITFluxClient {
         // Assertions.assertThat(line).endsWith("'we!st'");
     }
 
-    private void assertFluxResult(@Nonnull final FluxResult fluxResult) {
+    private void assertFluxResult(@Nonnull final List<FluxTable> tables) {
 
-        Assertions.assertThat(fluxResult).isNotNull();
-
-        List<Table> tables = fluxResult.getTables();
+        Assertions.assertThat(tables).isNotNull();
 
         Assertions.assertThat(tables).hasSize(2);
 
-        Table table1 = tables.get(0);
+        FluxTable table1 = tables.get(0);
         // Data types
         Assertions.assertThat(table1.getColumnHeaders()).hasSize(11);
         Assertions.assertThat(table1.getColumnHeaders().stream().map(ColumnHeader::getDataType))
@@ -239,8 +310,19 @@ class ITFluxClient extends AbstractITFluxClient {
         // Records
         Assertions.assertThat(table1.getRecords()).hasSize(1);
 
+        List<FluxRecord> records = new ArrayList<>();
+        records.add(table1.getRecords().get(0));
+        records.add(tables.get(1).getRecords().get(0));
+        assertFluxRecords(records);
+    }
+
+    private void assertFluxRecords(@Nonnull final List<FluxRecord> records)
+    {
+        Assertions.assertThat(records).isNotNull();
+        Assertions.assertThat(records).hasSize(2);
+
         // Record 1
-        Record record1 = table1.getRecords().get(0);
+        FluxRecord record1 = records.get(0);
         Assertions.assertThat(record1.getMeasurement()).isEqualTo("mem");
         Assertions.assertThat(record1.getField()).isEqualTo("free");
 
@@ -255,7 +337,7 @@ class ITFluxClient extends AbstractITFluxClient {
         Assertions.assertThat(record1.getTags().get("region")).isEqualTo("west");
 
         // Record 2
-        Record record2 = tables.get(1).getRecords().get(0);
+        FluxRecord record2 = records.get(1);
         Assertions.assertThat(record2.getMeasurement()).isEqualTo("mem");
         Assertions.assertThat(record2.getField()).isEqualTo("free");
 

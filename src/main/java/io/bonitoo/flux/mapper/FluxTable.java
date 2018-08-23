@@ -32,13 +32,13 @@ import io.bonitoo.flux.options.FluxCsvParserOptions;
 /**
  * This class represents table structure in FluxRequest.
  */
-public class Table {
+public class FluxTable {
 
     //column header specification
     private List<ColumnHeader> columnHeaders = new ArrayList<>();
 
     //list of records
-    private List<Record> records = new ArrayList<>();
+    private List<FluxRecord> records = new ArrayList<>();
 
     public List<ColumnHeader> getColumnHeaders() {
         return columnHeaders;
@@ -48,7 +48,7 @@ public class Table {
         this.columnHeaders = columnHeaders;
     }
 
-    public List<Record> getRecords() {
+    public List<FluxRecord> getRecords() {
         return records;
     }
 

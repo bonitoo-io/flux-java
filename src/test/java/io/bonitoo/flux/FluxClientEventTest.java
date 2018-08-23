@@ -105,7 +105,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
             Assertions.assertThat(event.getThrowable())
                     .isInstanceOf(FluxException.class)
                     .hasCauseInstanceOf(FluxResultMapperException.class)
-                    .hasMessageContaining("Unable to parse CSV response. Table definition was not found. Row:0");
+                    .hasMessageContaining("Unable to parse CSV response. FluxTable definition was not found. Row:0");
 
             countDownLatch.countDown();
         });
