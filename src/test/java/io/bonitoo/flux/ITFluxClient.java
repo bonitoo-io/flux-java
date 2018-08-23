@@ -30,7 +30,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.flux.mapper.ColumnHeader;
+import io.bonitoo.flux.mapper.FluxColumn;
 import io.bonitoo.flux.mapper.FluxRecord;
 import io.bonitoo.flux.mapper.FluxTable;
 import io.bonitoo.flux.operators.restriction.Restrictions;
@@ -299,13 +299,13 @@ class ITFluxClient extends AbstractITFluxClient {
 
         FluxTable table1 = tables.get(0);
         // Data types
-        Assertions.assertThat(table1.getColumnHeaders()).hasSize(11);
-        Assertions.assertThat(table1.getColumnHeaders().stream().map(ColumnHeader::getDataType))
-                .containsExactlyInAnyOrder("#datatype", "string", "long", "dateTime:RFC3339", "dateTime:RFC3339", "dateTime:RFC3339", "long", "string", "string", "string", "string");
+        Assertions.assertThat(table1.getColumns()).hasSize(10);
+        Assertions.assertThat(table1.getColumns().stream().map(FluxColumn::getDataType))
+                .containsExactlyInAnyOrder("string", "long", "dateTime:RFC3339", "dateTime:RFC3339", "dateTime:RFC3339", "long", "string", "string", "string", "string");
 
         // Columns
-        Assertions.assertThat(table1.getColumnHeaders().stream().map(ColumnHeader::getColumnName))
-                .containsExactlyInAnyOrder("", "result", "table", "_start", "_stop", "_time", "_value", "_field", "_measurement", "host", "region");
+        Assertions.assertThat(table1.getColumns().stream().map(FluxColumn::getLabel))
+                .containsExactlyInAnyOrder("result", "table", "_start", "_stop", "_time", "_value", "_field", "_measurement", "host", "region");
 
         // Records
         Assertions.assertThat(table1.getRecords()).hasSize(1);
@@ -332,9 +332,9 @@ class ITFluxClient extends AbstractITFluxClient {
 
         Assertions.assertThat(record1.getValue()).isEqualTo(21L);
 
-        Assertions.assertThat(record1.getTags()).hasSize(2);
-        Assertions.assertThat(record1.getTags().get("host")).isEqualTo("A");
-        Assertions.assertThat(record1.getTags().get("region")).isEqualTo("west");
+        Assertions.assertThat(record1.getValues())
+                .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
+                .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
 
         // Record 2
         FluxRecord record2 = records.get(1);
@@ -347,8 +347,8 @@ class ITFluxClient extends AbstractITFluxClient {
 
         Assertions.assertThat(record2.getValue()).isEqualTo(42L);
 
-        Assertions.assertThat(record2.getTags()).hasSize(2);
-        Assertions.assertThat(record2.getTags().get("host")).isEqualTo("B");
-        Assertions.assertThat(record2.getTags().get("region")).isEqualTo("west");
+        Assertions.assertThat(record2.getValues())
+                .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("B"))
+                .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
     }
 }

@@ -23,100 +23,98 @@
 package io.bonitoo.flux.mapper;
 
 import java.time.Instant;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.StringJoiner;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import io.bonitoo.flux.utils.Preconditions;
 
 /**
- * Represents the record in CSV response.
+ * A record is a tuple of values.
+ *
+ * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#record">Specification</a>.
  */
 public final class FluxRecord {
 
-    //TODO generic + getValueByIndex
-    private Instant start;
-    private Instant stop;
-    private Instant time;
-    private Object value;
-    private Map<String, Object> values = new HashMap<>();
+    private LinkedHashMap<String, Object> values = new LinkedHashMap<>();
 
-    private String field;
-    private String measurement;
-    private Map<String, String> tags = new HashMap<>();
-
+    /**
+     * @return the inclusive lower time bound of all records
+     */
+    @Nullable
     public Instant getStart() {
-        return start;
+        return getValueByKey("_start");
     }
 
-    public void setStart(final Instant start) {
-        this.start = start;
-    }
-
+    /**
+     * @return the exclusive upper time bound of all records
+     */
+    @Nullable
     public Instant getStop() {
-        return stop;
+        return getValueByKey("_stop");
     }
 
-    public void setStop(final Instant stop) {
-        this.stop = stop;
-    }
-
+    /**
+     * @return the time of the record
+     */
+    @Nullable
     public Instant getTime() {
-        return time;
+        return getValueByKey("_time");
     }
 
-    public void setTime(final Instant time) {
-        this.time = time;
-    }
-
+    /**
+     * @return the value of the record
+     */
+    @Nullable
     public Object getValue() {
-        return value;
+        return getValueByKey("_value");
     }
 
-    public void setValue(final Object value) {
-        this.value = value;
-    }
-
+    /**
+     * @return get value with key <i>_field</i>
+     */
+    @Nullable
     public String getField() {
-        return field;
+        return getValueByKey("_field");
     }
 
-    public void setField(final String field) {
-        this.field = field;
-    }
-
+    /**
+     * @return get value with key <i>_measurement</i>
+     */
+    @Nullable
     public String getMeasurement() {
-        return measurement;
+        return getValueByKey("_measurement");
     }
 
-    public void setMeasurement(final String measurement) {
-        this.measurement = measurement;
-    }
-
-    public Map<String, String> getTags() {
-        return tags;
-    }
-
-    public void setTags(final Map<String, String> tags) {
-        this.tags = tags;
-    }
-
+    /**
+     * @return tuple of values
+     */
+    @Nonnull
     public Map<String, Object> getValues() {
         return values;
     }
 
-    public void setValues(final Map<String, Object> values) {
-        this.values = values;
+    /**
+     * @param index of value in CSV response
+     * @return value
+     * @see ArrayIndexOutOfBoundsException
+     */
+    @Nullable
+    public Object getValueByIndex(final int index) {
+        return values.values().toArray()[index];
     }
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", FluxRecord.class.getSimpleName() + "[", "]")
-                .add("measurement='" + measurement + "'")
-                .add("field='" + field + "'")
-                .add("start=" + start)
-                .add("stop=" + stop)
-                .add("time=" + time)
-                .add("tags=" + tags)
-                .add("value=" + value)
-                .toString();
+    /**
+     * @param key of value in CSV response
+     * @return value
+     */
+    @Nullable
+    public <T> T getValueByKey(@Nonnull final String key) {
+
+        Preconditions.checkNonEmptyString(key, "key");
+
+        //noinspection unchecked
+        return (T) values.get(key);
     }
 }

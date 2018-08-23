@@ -24,7 +24,6 @@ package io.bonitoo.flux.mapper;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -102,63 +101,35 @@ class FluxCsvParser {
                     throw new FluxResultMapperException("table index is not found in CSV header");
                 }
 
-                int currentIndex = Integer.parseInt(csvRecord.get(tableColumnIndex));
+                int currentIndex = Integer.parseInt(csvRecord.get(tableColumnIndex + 1));
 
                 if (currentIndex > (tableIndex - 1)) {
                     //create new table with previous column headers settings
-                    List<ColumnHeader> columnHeaders = table.getColumnHeaders();
+                    List<FluxColumn> fluxColumns = table.getColumns();
                     table = new FluxTable();
-                    table.setColumnHeaders(columnHeaders);
+                    table.setColumns(fluxColumns);
                     tables.add(tableIndex, table);
                     tableIndex++;
                 }
 
-                FluxRecord r = parseRecord(table, csvRecord, settings);
+                FluxRecord r = parseRecord(table, csvRecord);
                 table.getRecords().add(r);
             }
         }
         return tables;
     }
 
-    private FluxRecord parseRecord(final FluxTable table,
-                                   final CSVRecord csvRecord,
-                                   final FluxCsvParserOptions settings)
+    private FluxRecord parseRecord(final FluxTable table, final CSVRecord csvRecord)
             throws FluxResultMapperException {
 
         FluxRecord record = new FluxRecord();
 
-        List<String> valueDestinations = settings.getValueDestinations();
+        for (FluxColumn fluxColumn : table.getColumns()) {
 
-        for (ColumnHeader columnHeader : table.getColumnHeaders()) {
+            int index = fluxColumn.getIndex();
+            String columnName = fluxColumn.getLabel();
 
-            int index = columnHeader.getIndex();
-            String columnName = columnHeader.getColumnName();
-
-            if ("_field".equals(columnName)) {
-                record.setField(csvRecord.get(index));
-            } else if ("_measurement".equals(columnName)) {
-                record.setMeasurement(csvRecord.get(index));
-            } else if ("_start".equals(columnName)) {
-                record.setStart((Instant) columnHeader.toValue(csvRecord.get(index)));
-            } else if ("_stop".equals(columnName)) {
-                record.setStop((Instant) columnHeader.toValue(csvRecord.get(index)));
-            } else if ("_time".equals(columnName)) {
-                record.setTime((Instant) columnHeader.toValue(csvRecord.get(index)));
-            } else if (columnHeader.getTag()) {
-                record.getTags().put(columnName, csvRecord.get(index));
-            }
-
-            // values
-            //
-            // Record can have multiple values see:
-            // FluxCsvParserOptions.Builder.valueDestinations
-            if (valueDestinations.contains(columnName)) {
-                record.getValues().put(columnName, columnHeader.toValue(csvRecord.get(index)));
-
-                if (valueDestinations.get(0).equals(columnName)) {
-                    record.setValue(columnHeader.toValue(csvRecord.get(index)));
-                }
-            }
+            record.getValues().put(columnName, fluxColumn.toValue(csvRecord.get(index + 1)));
         }
         return record;
     }
@@ -168,7 +139,7 @@ class FluxCsvParser {
         List<String> ret = new ArrayList<>(csvRecord.size());
         int size = csvRecord.size();
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 1; i < size; i++) {
             String rec = csvRecord.get(i);
             ret.add(rec);
         }

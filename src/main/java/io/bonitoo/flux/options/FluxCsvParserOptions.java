@@ -33,7 +33,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * The settings for customize parsing the Flux CSV response.
  *
- * TODO every constant can be renamed
+ * TODO every constant can be renamed or its useless
  *
  * @author Jakub Bednar (bednar@github) (16/07/2018 12:42)
  * @since 1.0.0

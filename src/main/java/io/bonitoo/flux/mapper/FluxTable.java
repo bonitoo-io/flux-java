@@ -35,17 +35,17 @@ import io.bonitoo.flux.options.FluxCsvParserOptions;
 public final class FluxTable {
 
     //column header specification
-    private List<ColumnHeader> columnHeaders = new ArrayList<>();
+    private List<FluxColumn> columns = new ArrayList<>();
 
     //list of records
     private List<FluxRecord> records = new ArrayList<>();
 
-    public List<ColumnHeader> getColumnHeaders() {
-        return columnHeaders;
+    public List<FluxColumn> getColumns() {
+        return columns;
     }
 
-    void setColumnHeaders(final List<ColumnHeader> columnHeaders) {
-        this.columnHeaders = columnHeaders;
+    void setColumns(final List<FluxColumn> columns) {
+        this.columns = columns;
     }
 
     public List<FluxRecord> getRecords() {
@@ -57,11 +57,11 @@ public final class FluxTable {
         for (int i = 0; i < datatypes.size(); i++) {
             String s = datatypes.get(i);
 
-            ColumnHeader columnDef = new ColumnHeader();
+            FluxColumn columnDef = new FluxColumn();
             columnDef.setDataType(s);
             columnDef.setIndex(i);
 
-            columnHeaders.add(columnDef);
+            columns.add(columnDef);
 
         }
     }
@@ -71,17 +71,17 @@ public final class FluxTable {
         for (int i = 0; i < groups.size(); i++) {
             String s = groups.get(i);
 
-            if (columnHeaders.isEmpty()) {
+            if (columns.isEmpty()) {
                 throw new FluxResultMapperException("Unable to parse response, no #datatypes header found.");
             }
-            ColumnHeader def = columnHeaders.get(i);
+            FluxColumn def = columns.get(i);
 
             if (def == null) {
                 String message = "Unable to parse response, inconsistent  #datatypes and #group header";
                 throw new FluxResultMapperException(message);
             }
 
-            def.addGroup(s);
+            def.setGroup(Boolean.valueOf(s));
         }
 
     }
@@ -91,17 +91,17 @@ public final class FluxTable {
         for (int i = 0; i < defaultEmptyValues.size(); i++) {
             String s = defaultEmptyValues.get(i);
 
-            if (columnHeaders.isEmpty()) {
+            if (columns.isEmpty()) {
                 throw new FluxResultMapperException("Unable to parse response, no #datatypes header found.");
             }
-            ColumnHeader def = columnHeaders.get(i);
+            FluxColumn def = columns.get(i);
 
             if (def == null) {
                 String message = "Unable to parse response, inconsistent  #datatypes and #group header";
                 throw new FluxResultMapperException(message);
             }
 
-            def.setDefaultEmptyValue(s);
+            def.setDefaultValue(s);
         }
 
     }
@@ -125,28 +125,20 @@ public final class FluxTable {
         for (int i = 0; i < size; i++) {
             String columnName = columnNames.get(i);
 
-            if (columnHeaders.isEmpty()) {
+            if (columns.isEmpty()) {
                 throw new FluxResultMapperException("Unable to parse response, no #datatypes header found.");
             }
-            ColumnHeader def = columnHeaders.get(i);
+            FluxColumn def = columns.get(i);
 
             if (def == null) {
                 String message = "Unable to parse response, inconsistent  #datatypes and #group header";
                 throw new FluxResultMapperException(message);
             }
 
-            def.setColumnName(columnName);
+            def.setLabel(columnName);
 
             if ("table".equals(columnName)) {
                 tableIndexColumn = i;
-            }
-
-            if (!(columnName.startsWith("_")
-                    || columnName.isEmpty()
-                    || "result".equals(columnName)
-                    || "table".equals(columnName)
-                    || settings.getValueDestinations().contains(columnName))) {
-                def.setTag(true);
             }
         }
 

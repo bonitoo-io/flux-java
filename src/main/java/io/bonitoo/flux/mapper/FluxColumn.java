@@ -23,38 +23,38 @@
 package io.bonitoo.flux.mapper;
 
 import java.time.Instant;
+import javax.annotation.Nullable;
 
 /**
  * This class represents column header specification of {@link FluxTable}.
- *
- * TODO naming same as in SPEC
  */
-public class ColumnHeader {
+public final class FluxColumn {
 
 
-
-    //string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,double,string,string,string
-
-    //TODO implement rest of data
+    //TODO implement rest of data => to enum
     private static final String STRING_DATATYPE = "string";
     private static final String DATETIME_DATATYPE = "dateTime:RFC3339";
     private static final String LONG_DATATYPE = "long";
     private static final String DOUBLE_DATATYPE = "double";
 
-    //flux datatype
+    private String label;
     private String dataType;
 
-    //column index in csv
+    /**
+     * Column index in record.
+     */
     private int index;
 
-    //column name in csv
-    private String columnName;
+    /**
+     * Boolean flag indicating if the column is part of the table's group key.
+     */
+    private boolean group;
+    /**
+     * Default value to be used for rows whose string value is the empty string.
+     */
+    private String defaultValue;
 
-    //group
-    private String group;
-    private String defaultEmptyValue;
-    private boolean tag;
-
+    @Nullable
     public String getDataType() {
         return dataType;
     }
@@ -71,12 +71,12 @@ public class ColumnHeader {
         this.index = index;
     }
 
-    public String getColumnName() {
-        return columnName;
+    public String getLabel() {
+        return label;
     }
 
-    public void setColumnName(final String columnName) {
-        this.columnName = columnName;
+    public void setLabel(final String label) {
+        this.label = label;
     }
 
     public Object toValue(final String strValue) throws FluxResultMapperException {
@@ -101,27 +101,19 @@ public class ColumnHeader {
 
     }
 
-    public void addGroup(final String group) {
-        this.group = group;
-    }
-
-    public String getGroup() {
+    public boolean isGroup() {
         return group;
     }
 
-    public String getDefaultEmptyValue() {
-        return defaultEmptyValue;
+    public void setGroup(final boolean group) {
+        this.group = group;
     }
 
-    public void setDefaultEmptyValue(final String defaultEmptyValue) {
-        this.defaultEmptyValue = defaultEmptyValue;
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
-    public boolean getTag() {
-        return tag;
-    }
-
-    public void setTag(final boolean tag) {
-        this.tag = tag;
+    public void setDefaultValue(final String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }
