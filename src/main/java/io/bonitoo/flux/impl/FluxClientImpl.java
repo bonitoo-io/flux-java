@@ -473,11 +473,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 //
                 while (!source.exhausted()) {
 
-                    List<FluxTable> tables = mapper.toFluxTables(source, options.getParserOptions());
-                    if (tables != null) {
-
-                        tables.forEach(fluxTable -> fluxTable.getRecords().forEach(callback));
-                    }
+                    mapper.toFluxRecords(source, options.getParserOptions(), callback);
                 }
 
                 publish(new FluxSuccessEvent(fluxConnectionOptions, query));

@@ -30,7 +30,7 @@ import java.util.StringJoiner;
 /**
  * Represents the record in CSV response.
  */
-public class FluxRecord {
+public final class FluxRecord {
 
     //TODO generic + getValueByIndex
     private Instant start;
