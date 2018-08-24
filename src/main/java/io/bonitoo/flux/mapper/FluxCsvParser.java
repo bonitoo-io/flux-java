@@ -24,10 +24,16 @@ package io.bonitoo.flux.mapper;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import io.bonitoo.flux.options.FluxCsvParserOptions;
 
@@ -39,6 +45,12 @@ import org.apache.commons.csv.CSVRecord;
  * This class us used to construct FluxResult from CSV.
  */
 class FluxCsvParser {
+
+    private final DateTimeFormatter nanoFormatter = new DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ISO_INSTANT)
+            .appendPattern("[.SSSSSSSSS][.SSSSSS][.SSS][.]")
+            .appendOffset("+HH:mm", "Z")
+            .toFormatter();
 
     @Nonnull
     List<FluxTable> parseFluxResponse(@Nonnull final Reader reader) throws FluxResultMapperException, IOException {
@@ -126,10 +138,11 @@ class FluxCsvParser {
 
         for (FluxColumn fluxColumn : table.getColumns()) {
 
-            int index = fluxColumn.getIndex();
             String columnName = fluxColumn.getLabel();
 
-            record.getValues().put(columnName, fluxColumn.toValue(csvRecord.get(index + 1)));
+            String strValue = csvRecord.get(fluxColumn.getIndex() + 1);
+
+            record.getValues().put(columnName, toValue(strValue, fluxColumn));
         }
         return record;
     }
@@ -146,4 +159,44 @@ class FluxCsvParser {
         return ret;
     }
 
+    @Nullable
+    private Object toValue(@Nullable final String strValue, final @Nonnull FluxColumn column)
+            throws FluxResultMapperException {
+
+        Objects.requireNonNull(column, "FluxColumn is required");
+
+        // Default value
+        if (strValue == null || strValue.isEmpty()) {
+            String defaultValue = column.getDefaultValue();
+            if (defaultValue == null || defaultValue.isEmpty()) {
+                return null;
+            }
+
+            return toValue(defaultValue, column);
+        }
+
+        String dataType = column.getDataType();
+        switch (dataType) {
+            case "boolean":
+                return Boolean.valueOf(strValue);
+            case "unsignedLong":
+                return Long.parseUnsignedLong(strValue);
+            case "long":
+                return Long.parseLong(strValue);
+            case "double":
+                return Double.parseDouble(strValue);
+            case "string":
+                return strValue;
+            case "base64Binary":
+                return Base64.getDecoder().decode(strValue);
+            case "dateTime:RFC3339":
+                return Instant.parse(strValue);
+            case "dateTime:RFC3339Nano":
+                return nanoFormatter.parse(strValue, Instant::from);
+            case "duration":
+                return Duration.ofNanos(Long.parseUnsignedLong(strValue));
+            default:
+                throw new FluxResultMapperException("Unsupported datatype: " + dataType);
+        }
+    }
 }

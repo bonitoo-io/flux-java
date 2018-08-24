@@ -22,20 +22,12 @@
  */
 package io.bonitoo.flux.mapper;
 
-import java.time.Instant;
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 /**
  * This class represents column header specification of {@link FluxTable}.
  */
 public final class FluxColumn {
-
-
-    //TODO implement rest of data => to enum
-    private static final String STRING_DATATYPE = "string";
-    private static final String DATETIME_DATATYPE = "dateTime:RFC3339";
-    private static final String LONG_DATATYPE = "long";
-    private static final String DOUBLE_DATATYPE = "double";
 
     private String label;
     private String dataType;
@@ -54,7 +46,7 @@ public final class FluxColumn {
      */
     private String defaultValue;
 
-    @Nullable
+    @Nonnull
     public String getDataType() {
         return dataType;
     }
@@ -77,28 +69,6 @@ public final class FluxColumn {
 
     public void setLabel(final String label) {
         this.label = label;
-    }
-
-    public Object toValue(final String strValue) throws FluxResultMapperException {
-
-        if (STRING_DATATYPE.equals(dataType)) {
-            return strValue;
-        }
-
-        if (DATETIME_DATATYPE.equals(dataType)) {
-            return Instant.parse(strValue);
-        }
-
-        if (LONG_DATATYPE.equals(dataType)) {
-            return Long.parseLong(strValue);
-        }
-
-        if (DOUBLE_DATATYPE.equals(dataType)) {
-            return Double.parseDouble(strValue);
-        }
-
-        throw new FluxResultMapperException("Unsupported datatype: " + dataType);
-
     }
 
     public boolean isGroup() {

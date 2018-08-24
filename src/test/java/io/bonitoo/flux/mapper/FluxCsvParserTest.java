@@ -24,6 +24,9 @@ package io.bonitoo.flux.mapper;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
 
 import io.bonitoo.flux.options.FluxCsvParserOptions;
@@ -33,6 +36,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author Jakub Bednar (bednar@github) (16/07/2018 12:26)
@@ -136,5 +141,138 @@ class FluxCsvParserTest {
                 .hasEntrySatisfying("value1", value -> Assertions.assertThat(value).isEqualTo(49L))
                 .hasEntrySatisfying("_value2", value -> Assertions.assertThat(value).isEqualTo(2401L))
                 .hasEntrySatisfying("value_str", value -> Assertions.assertThat(value).isEqualTo("test"));
+    }
+
+    @Test
+    void mappingBoolean() throws IOException {
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,boolean\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,true\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,true\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,false\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,x\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        FluxCsvParserOptions settings = FluxCsvParserOptions
+                .builder()
+                .build();
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(true);
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isEqualTo(false);
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(2).getValueByKey("value")).isEqualTo(false);
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(3).getValueByKey("value")).isEqualTo(true);
+    }
+
+    @Test
+    void mappingUnsignedLong() throws IOException {
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,unsignedLong\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,17916881237904312345\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        FluxCsvParserOptions settings = FluxCsvParserOptions
+                .builder()
+                .build();
+
+        long expected = Long.parseUnsignedLong("17916881237904312345");
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(expected);
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
+    }
+
+    @Test
+    void mappingBase64Binary() throws IOException {
+
+        String binaryData = "test value";
+        String encodedString = Base64.getEncoder().encodeToString(binaryData.getBytes(UTF_8));
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,base64Binary\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A," + encodedString + "\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        FluxCsvParserOptions settings = FluxCsvParserOptions
+                .builder()
+                .build();
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+
+        byte[] value = tables.get(0).getRecords().get(0).getValueByKey("value");
+        Assertions.assertThat(value).isNotEmpty();
+        Assertions.assertThat(new String(value, UTF_8)).isEqualTo(binaryData);
+
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
+    }
+
+    @Test
+    void mappingRFC3339() throws IOException {
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,dateTime:RFC3339\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,1970-01-01T00:00:10Z\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        FluxCsvParserOptions settings = FluxCsvParserOptions
+                .builder()
+                .build();
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(Instant.ofEpochSecond(10));
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
+    }
+
+    @Test
+    void mappingRFC3339Nano() throws IOException {
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,dateTime:RFC3339Nano\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,1970-01-01T00:00:10.999999999Z+07:00\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        FluxCsvParserOptions settings = FluxCsvParserOptions
+                .builder()
+                .build();
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value"))
+                .isEqualTo(Instant.ofEpochSecond(10).plusNanos(999999999));
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value"))
+                .isNull();
+    }
+
+    @Test
+    void mappingDuration() throws IOException {
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,duration\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,125\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        FluxCsvParserOptions settings = FluxCsvParserOptions
+                .builder()
+                .build();
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value"))
+                .isEqualTo(Duration.ofNanos(125));
+        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value"))
+                .isNull();
     }
 }

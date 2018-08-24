@@ -84,7 +84,7 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
     echo "Run tests on InfluxDB nightly binary with Flux nightly binary"
 
     rm -rf ./influxdb-*
-    rm -rf ./fluxd_nightly_*
+    rm -rf ./fluxd_nightly*
 
     case "$OSTYPE" in
       darwin*)
