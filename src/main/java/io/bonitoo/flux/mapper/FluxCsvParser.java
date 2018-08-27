@@ -35,6 +35,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.flux.FluxException;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -57,6 +59,24 @@ class FluxCsvParser {
 
         final CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT);
         final List<CSVRecord> records = parser.getRecords();
+
+        // check error
+        if (records.size() >= 2) {
+            CSVRecord firstRow = records.get(0);
+            if (firstRow.get(0).equals("error") && firstRow.get(1).equals("reference")) {
+
+                CSVRecord secondRow = records.get(1);
+
+                String error = secondRow.get(0);
+                String reference = secondRow.get(1);
+
+                if (!reference.isEmpty()) {
+                    error += String.format(" [reference: %s]", reference);
+                }
+
+                throw new FluxException(error);
+            }
+        }
 
         final List<FluxTable> tables = new ArrayList<>();
 

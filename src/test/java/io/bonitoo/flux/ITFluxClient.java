@@ -109,8 +109,6 @@ class ITFluxClient extends AbstractITFluxClient {
         influxDB.write(point7);
     }
 
-    //TODO errors: unbound - https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#errors
-
 //    //TODO test chunked
 //    @Test
 //    void chunked() throws InterruptedException, IOException {
@@ -204,6 +202,14 @@ class ITFluxClient extends AbstractITFluxClient {
         List<FluxTable> fluxTables = fluxClient.flux(flux);
 
         assertFluxResult(fluxTables);
+    }
+
+    @Test
+    void errorWithStatusOK() {
+
+        Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from(DATABASE_NAME)))
+                .isInstanceOf(FluxException.class)
+                .hasMessage("failed to create physical plan: invalid time bounds from procedure from: bounds contain zero time");
     }
 
     @Test

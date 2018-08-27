@@ -50,6 +50,10 @@ public class FluxException extends RuntimeException {
     @Nonnull
     public static FluxException fromCause(@Nullable final Throwable cause) {
 
+        if (cause instanceof FluxException) {
+            return (FluxException) cause;
+        }
+
         if (cause instanceof HttpException) {
             Response<?> response = ((HttpException) cause).response();
 

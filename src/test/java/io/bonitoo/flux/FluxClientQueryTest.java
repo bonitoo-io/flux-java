@@ -74,7 +74,20 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
                 .isInstanceOf(FluxException.class)
-                .hasMessage("io.bonitoo.flux.FluxException: Flux query is not valid");
+                .hasMessage("Flux query is not valid");
+    }
+
+    @Test
+    void queryErrorSuccessResponse() {
+
+        String error = "error,reference\n" + "Failed to parse query,897";
+
+        fluxServer.enqueue(createResponse(error));
+
+        Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
+                .isInstanceOf(FluxException.class)
+                .hasMessage("Failed to parse query [reference: 897]");
+
     }
 
     @Test

@@ -92,7 +92,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database"), fluxOptions))
                 .isInstanceOf(FluxException.class)
-                .hasMessage("io.bonitoo.flux.FluxException: rpc error: code = Unavailable desc = all SubConns are in Transie");
+                .hasMessage("rpc error: code = Unavailable desc = all SubConns are in Transie");
 
         waitToCallback();
     }
