@@ -33,16 +33,16 @@ import org.junit.jupiter.api.BeforeEach;
  */
 abstract class AbstractTest {
 
-    protected CountDownLatch countDownLatch;
+    CountDownLatch countDownLatch;
 
     @BeforeEach
     protected void prepare() {
         countDownLatch = new CountDownLatch(1);
     }
 
-    protected void waitToCallback() {
+    void waitToCallback() {
         try {
-            Assertions.assertThat(countDownLatch.await(10, TimeUnit.SECONDS)).isTrue();
+            Assertions.assertThat(countDownLatch.await(10, TimeUnit.MINUTES)).isTrue();
         } catch (InterruptedException e) {
             Assertions.fail("Unexpected exception", e);
         }

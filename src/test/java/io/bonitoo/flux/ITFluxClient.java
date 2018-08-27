@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.mapper.FluxColumn;
@@ -40,6 +42,7 @@ import io.bonitoo.flux.options.FluxOptions;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import org.assertj.core.api.Assertions;
+import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +56,8 @@ import retrofit2.Response;
  */
 @RunWith(JUnitPlatform.class)
 class ITFluxClient extends AbstractITFluxClient {
+
+    private static final Logger LOG = Logger.getLogger(ITFluxClient.class.getName());
 
     @BeforeEach
     void prepareDate() {
@@ -94,7 +99,7 @@ class ITFluxClient extends AbstractITFluxClient {
         Point point7 = Point.measurement("cpu")
                 .tag("host", "A")
                 .tag("region", "west")
-                .tag("hyper-threading","true")
+                .tag("hyper-threading", "true")
                 .addField("user_usage", 49)
                 .addField("usage_system", 38)
                 .time(20, TimeUnit.SECONDS)
@@ -109,50 +114,54 @@ class ITFluxClient extends AbstractITFluxClient {
         influxDB.write(point7);
     }
 
-//    //TODO test chunked
-//    @Test
-//    void chunked() throws InterruptedException, IOException {
-//
-//        Restrictions usage_user = Restrictions.field().equal("usage_user");
-//        Restrictions cpu = Restrictions.measurement().equal("cpu");
-//
-//        Flux flux = Flux
-//                .from("telegraf")
-////                .filter(Restrictions.and(cpu, usage_user))
-//                .range(-1L, ChronoUnit.MINUTES);
-////                .window(1L, ChronoUnit.MINUTES);
-//
-////        fluxClient.flux(flux, new Consumer<FluxResult>() {
-////            @Override
-////            public void accept(FluxResult fluxResult) {
-////                System.out.println("fluxResult = " + fluxResult);
-////            }
-////        });
-//
-//        int i = 0;
-//        Response<ResponseBody> responseBodyResponse = fluxClient.fluxRaw(flux);
-//        if (responseBodyResponse.isSuccessful()) {
-//            BufferedSource source = responseBodyResponse.body().source();
-//
-//            while (!source.exhausted()) {
-//                String line = null;
-//                try {
-//                    line = source.readUtf8Line();
-//                } catch (EOFException e) {
-//                    System.out.println("e = " + e);
-//                    break;
-//                }
-//                System.out.println(line);
-//                i++;
-//
-//                if (i % 10000 == 0) {
-//                    System.out.println("i = " + i);
-//                }
-//            }
-//        }
-//
-//        System.out.println("i = " + i);
-//    }
+    @Test
+    void chunkedOneTable() {
+
+        prepareChunkRecords();
+
+        Flux flux = Flux
+                .from(DATABASE_NAME)
+                .filter(Restrictions.measurement().equal("chunked"))
+                .range().withStart(Instant.EPOCH);
+
+        fluxClient.flux(flux, fluxRecord -> {
+
+            // +1 record
+            countDownLatch.countDown();
+
+            if (countDownLatch.getCount() % 100_000 == 0) {
+                LOG.info(String.format("Remaining parsed: %s records", countDownLatch.getCount()));
+            }
+        });
+
+        waitToCallback();
+    }
+
+    @Test
+    void chunkedMoreTables() {
+
+        prepareChunkRecords();
+
+        Flux flux = Flux
+                .from(DATABASE_NAME)
+                .filter(Restrictions.measurement().equal("chunked"))
+                .range()
+                .withStart(Instant.EPOCH)
+                .window()
+                .withEvery("10m");
+
+        fluxClient.flux(flux, fluxRecord -> {
+
+            // +1 record
+            countDownLatch.countDown();
+
+            if (countDownLatch.getCount() % 100_000 == 0) {
+                LOG.info(String.format("Remaining parsed: %s records", countDownLatch.getCount()));
+            }
+        });
+
+        waitToCallback();
+    }
 
     @Test
     void query() {
@@ -322,8 +331,7 @@ class ITFluxClient extends AbstractITFluxClient {
         assertFluxRecords(records);
     }
 
-    private void assertFluxRecords(@Nonnull final List<FluxRecord> records)
-    {
+    private void assertFluxRecords(@Nonnull final List<FluxRecord> records) {
         Assertions.assertThat(records).isNotNull();
         Assertions.assertThat(records).hasSize(2);
 
@@ -356,5 +364,23 @@ class ITFluxClient extends AbstractITFluxClient {
         Assertions.assertThat(record2.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("B"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
+    }
+
+    private void prepareChunkRecords() {
+        int totalRecords = 1_000_000;
+        countDownLatch = new CountDownLatch(totalRecords);
+
+        List<String> points = new ArrayList<>();
+
+        IntStream.range(1, totalRecords + 1).forEach(i -> {
+
+            String format = String.format("chunked,host=A,region=west free=%1$si %1$s", i);
+            points.add(format);
+
+            if (i % 1_000 == 0) {
+                influxDB.write(DATABASE_NAME, "autogen", InfluxDB.ConsistencyLevel.ONE, TimeUnit.SECONDS, points);
+                points.clear();
+            }
+        });
     }
 }

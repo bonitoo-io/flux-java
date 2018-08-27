@@ -85,52 +85,68 @@ class FluxCsvParserTest {
         Assertions.assertThat(tables).hasSize(4);
 
         // Record 1
-        Assertions.assertThat(tables.get(0).getRecords()).hasSize(1);
-        Assertions.assertThat(tables.get(0).getRecords().get(0).getValues())
+        FluxTable fluxTable1 = tables.get(0);
+        Assertions.assertThat(fluxTable1.getRecords()).hasSize(1);
+
+        FluxRecord fluxRecord1 = fluxTable1.getRecords().get(0);
+        Assertions.assertThat(0).isEqualTo(fluxRecord1.getTableIndex());
+        Assertions.assertThat(fluxRecord1.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
-        Assertions.assertThat(tables.get(0).getRecords().get(0).getValues()).hasSize(11);
-        Assertions.assertThat(tables.get(0).getRecords().get(0).getValue()).isNull();
-        Assertions.assertThat(tables.get(0).getRecords().get(0).getValues())
+        Assertions.assertThat(fluxRecord1.getValues()).hasSize(11);
+        Assertions.assertThat(fluxRecord1.getValue()).isNull();
+        Assertions.assertThat(fluxRecord1.getValues())
                 .hasEntrySatisfying("value1", value -> Assertions.assertThat(value).isEqualTo(11L))
                 .hasEntrySatisfying("_value2", value -> Assertions.assertThat(value).isEqualTo(121L))
                 .hasEntrySatisfying("value_str", value -> Assertions.assertThat(value).isEqualTo("test"));
-        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByIndex(8)).isEqualTo(121L);
-        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByIndex(9)).isEqualTo(11L);
-        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByIndex(10)).isEqualTo("test");
+        Assertions.assertThat(fluxRecord1.getValueByIndex(8)).isEqualTo(121L);
+        Assertions.assertThat(fluxRecord1.getValueByIndex(9)).isEqualTo(11L);
+        Assertions.assertThat(fluxRecord1.getValueByIndex(10)).isEqualTo("test");
 
         // Record 2
-        Assertions.assertThat(tables.get(1).getRecords()).hasSize(1);
-        Assertions.assertThat(tables.get(1).getRecords().get(0).getValues())
+        FluxTable fluxTable2 = tables.get(1);
+        Assertions.assertThat(fluxTable2.getRecords()).hasSize(1);
+
+        FluxRecord fluxRecord2 = fluxTable2.getRecords().get(0);
+        Assertions.assertThat(1).isEqualTo(fluxRecord2.getTableIndex());
+        Assertions.assertThat(fluxRecord2.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("B"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
-        Assertions.assertThat(tables.get(1).getRecords().get(0).getValues()).hasSize(11);
-        Assertions.assertThat(tables.get(1).getRecords().get(0).getValue()).isNull();
-        Assertions.assertThat(tables.get(1).getRecords().get(0).getValues())
+        Assertions.assertThat(fluxRecord2.getValues()).hasSize(11);
+        Assertions.assertThat(fluxRecord2.getValue()).isNull();
+        Assertions.assertThat(fluxRecord2.getValues())
                 .hasEntrySatisfying("value1", value -> Assertions.assertThat(value).isEqualTo(22L))
                 .hasEntrySatisfying("_value2", value -> Assertions.assertThat(value).isEqualTo(484L))
                 .hasEntrySatisfying("value_str", value -> Assertions.assertThat(value).isEqualTo("test"));
 
         // Record 3
-        Assertions.assertThat(tables.get(2).getRecords()).hasSize(1);
-        Assertions.assertThat(tables.get(2).getRecords().get(0).getValues())
+        FluxTable fluxTable3 = tables.get(2);
+        Assertions.assertThat(fluxTable3.getRecords()).hasSize(1);
+
+        FluxRecord fluxRecord3 = fluxTable3.getRecords().get(0);
+        Assertions.assertThat(2).isEqualTo(fluxRecord3.getTableIndex());
+        Assertions.assertThat(fluxRecord3.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
-        Assertions.assertThat(tables.get(2).getRecords().get(0).getValues()).hasSize(11);
-        Assertions.assertThat(tables.get(2).getRecords().get(0).getValue()).isNull();
-        Assertions.assertThat(tables.get(2).getRecords().get(0).getValues())
+        Assertions.assertThat(fluxRecord3.getValues()).hasSize(11);
+        Assertions.assertThat(fluxRecord3.getValue()).isNull();
+        Assertions.assertThat(fluxRecord3.getValues())
                 .hasEntrySatisfying("value1", value -> Assertions.assertThat(value).isEqualTo(38L))
                 .hasEntrySatisfying("_value2", value -> Assertions.assertThat(value).isEqualTo(1444L))
                 .hasEntrySatisfying("value_str", value -> Assertions.assertThat(value).isEqualTo("test"));
 
         // Record 4
-        Assertions.assertThat(tables.get(3).getRecords()).hasSize(1);
-        Assertions.assertThat(tables.get(3).getRecords().get(0).getValues())
+        FluxTable fluxTable4 = tables.get(3);
+        Assertions.assertThat(fluxTable4.getRecords()).hasSize(1);
+
+        FluxRecord fluxRecord4 = fluxTable4.getRecords().get(0);
+        Assertions.assertThat(3).isEqualTo(fluxRecord4.getTableIndex());
+        Assertions.assertThat(fluxRecord4.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
-        Assertions.assertThat(tables.get(3).getRecords().get(0).getValues()).hasSize(11);
-        Assertions.assertThat(tables.get(3).getRecords().get(0).getValue()).isNull();
-        Assertions.assertThat(tables.get(3).getRecords().get(0).getValues())
+        Assertions.assertThat(fluxRecord4.getValues()).hasSize(11);
+        Assertions.assertThat(fluxRecord4.getValue()).isNull();
+        Assertions.assertThat(fluxRecord4.getValues())
                 .hasEntrySatisfying("value1", value -> Assertions.assertThat(value).isEqualTo(49L))
                 .hasEntrySatisfying("_value2", value -> Assertions.assertThat(value).isEqualTo(2401L))
                 .hasEntrySatisfying("value_str", value -> Assertions.assertThat(value).isEqualTo("test"));

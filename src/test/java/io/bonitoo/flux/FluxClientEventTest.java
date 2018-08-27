@@ -138,7 +138,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
             Assertions.assertThat(event.getThrowable())
                     .isInstanceOf(FluxException.class)
                     .hasCauseInstanceOf(FluxResultMapperException.class)
-                    .hasMessageContaining("Unable to parse CSV response. FluxTable definition was not found. Row:0");
+                    .hasMessageContaining("Unable to parse CSV response. FluxTable definition was not found. Record: 1");
 
             countDownLatch.countDown();
         });
@@ -149,7 +149,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database"), fluxOptions))
                 .isInstanceOf(FluxException.class)
-                .hasMessage("io.bonitoo.flux.mapper.FluxResultMapperException: Unable to parse CSV response. FluxTable definition was not found. Row:0");
+                .hasMessage("io.bonitoo.flux.mapper.FluxResultMapperException: Unable to parse CSV response. FluxTable definition was not found. Record: 1");
 
         waitToCallback();
     }

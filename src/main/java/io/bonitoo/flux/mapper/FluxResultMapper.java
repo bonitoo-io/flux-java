@@ -31,7 +31,6 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
-import okio.Buffer;
 import okio.BufferedSource;
 
 /**
@@ -47,9 +46,7 @@ public class FluxResultMapper {
 
         Objects.requireNonNull(source, "BufferedSource is required");
 
-        Buffer buffer = new Buffer();
-        source.readAll(buffer);
-        Reader reader = new InputStreamReader(buffer.inputStream());
+        Reader reader = new InputStreamReader(source.inputStream());
         FluxCsvParser tableCsvParser = new FluxCsvParser();
 
         return tableCsvParser.parseFluxResponse(reader);
@@ -61,6 +58,9 @@ public class FluxResultMapper {
         Objects.requireNonNull(source, "BufferedSource is required");
         Objects.requireNonNull(consumer, "Consumer is required");
 
-        toFluxTables(source).forEach(fluxTable -> fluxTable.getRecords().forEach(consumer));
+        Reader reader = new InputStreamReader(source.inputStream());
+        FluxCsvParser tableCsvParser = new FluxCsvParser();
+
+        tableCsvParser.parseFluxResponse(reader, consumer);
     }
 }

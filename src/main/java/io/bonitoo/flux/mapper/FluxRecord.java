@@ -25,6 +25,7 @@ package io.bonitoo.flux.mapper;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -37,7 +38,15 @@ import io.bonitoo.flux.utils.Preconditions;
  */
 public final class FluxRecord {
 
+    private final Integer tableIndex;
     private LinkedHashMap<String, Object> values = new LinkedHashMap<>();
+
+    public FluxRecord(@Nonnull final Integer tableIndex) {
+
+        Objects.requireNonNull(tableIndex, "Table index is required");
+
+        this.tableIndex = tableIndex;
+    }
 
     /**
      * @return the inclusive lower time bound of all records
@@ -85,6 +94,14 @@ public final class FluxRecord {
     @Nullable
     public String getMeasurement() {
         return getValueByKey("_measurement");
+    }
+
+    /**
+     * @return the index of table which contains the record
+     */
+    @Nonnull
+    public Integer getTableIndex() {
+        return tableIndex;
     }
 
     /**

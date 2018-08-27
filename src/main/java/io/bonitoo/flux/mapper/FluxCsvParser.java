@@ -28,10 +28,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -46,29 +48,124 @@ import org.apache.commons.csv.CSVRecord;
  */
 class FluxCsvParser {
 
-    private final DateTimeFormatter nanoFormatter = new DateTimeFormatterBuilder()
+    private static final int FRACTION_MIN_WIDTH = 0;
+    private static final int FRACTION_MAX_WIDTH = 9;
+    private static final boolean ADD_DECIMAL_POINT = true;
+
+    private static final DateTimeFormatter RFC3339_FORMATTER = new DateTimeFormatterBuilder()
             .append(DateTimeFormatter.ISO_INSTANT)
             .appendPattern("[.SSSSSSSSS][.SSSSSS][.SSS][.]")
             .appendOffset("+HH:mm", "Z")
             .toFormatter();
 
+    private static final DateTimeFormatter RFC3339_NANO_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+            .appendFraction(ChronoField.NANO_OF_SECOND, FRACTION_MIN_WIDTH, FRACTION_MAX_WIDTH, ADD_DECIMAL_POINT)
+            .appendPattern("X")
+            .toFormatter();
+
+    /**
+     * Synchronously parse Flux CSV response to {@link FluxTable}s.
+     *
+     * @param reader with data
+     * @return parsed data to {@link FluxTable}s
+     * @throws IOException throw by {@link CSVParser}
+     */
     @Nonnull
-    List<FluxTable> parseFluxResponse(@Nonnull final Reader reader) throws FluxResultMapperException, IOException {
+    List<FluxTable> parseFluxResponse(@Nonnull final Reader reader) throws IOException {
 
         Objects.requireNonNull(reader, "Reader is required");
 
+        final List<FluxTable> tables = new ArrayList<>();
+
+        parseFluxResponse(reader, new FluxResponseConsumer() {
+            @Override
+            public void addTable(final int tableIndex, @Nonnull final FluxTable table) {
+                tables.add(tableIndex, table);
+            }
+
+            @Override
+            public void addRecord(final int tableIndex, @Nonnull final FluxRecord record) {
+
+                tables.get(tableIndex).getRecords().add(record);
+            }
+        });
+
+        return tables;
+    }
+
+    /**
+     * Asynchronously parse Flux CSV response to {@link FluxColumn}s.
+     *
+     * @param reader   with data
+     * @param consumer of response
+     * @throws IOException throw by {@link CSVParser}
+     */
+    void parseFluxResponse(@Nonnull final Reader reader,
+                           @Nonnull final Consumer<FluxRecord> consumer) throws IOException {
+
+        Objects.requireNonNull(reader, "Reader is required");
+        Objects.requireNonNull(consumer, "Consumer<FluxRecord> is required");
+
+        parseFluxResponse(reader, new FluxResponseConsumer() {
+            @Override
+            public void addTable(final int tableIndex, @Nonnull final FluxTable fluxTable) {
+
+            }
+
+            @Override
+            public void addRecord(final int tableIndex, @Nonnull final FluxRecord fluxRecord) {
+                consumer.accept(fluxRecord);
+            }
+        });
+
+    }
+
+    private enum ParsingState {
+        NORMAL,
+
+        IN_ERROR
+    }
+
+    private interface FluxResponseConsumer {
+        void addTable(final int tableIndex, @Nonnull final FluxTable fluxTable);
+
+        void addRecord(final int tableIndex, @Nonnull final FluxRecord fluxRecord);
+    }
+
+    private void parseFluxResponse(@Nonnull final Reader reader,
+                                   @Nonnull final FluxResponseConsumer consumer) throws IOException {
+
+        Objects.requireNonNull(reader, "Reader is required");
+        Objects.requireNonNull(consumer, "FluxResponseConsumer is required");
+
+        ParsingState parsingState = ParsingState.NORMAL;
+
         final CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT);
-        final List<CSVRecord> records = parser.getRecords();
 
-        // check error
-        if (records.size() >= 2) {
-            CSVRecord firstRow = records.get(0);
-            if (firstRow.get(0).equals("error") && firstRow.get(1).equals("reference")) {
+        int tableIndex = 0;
+        boolean startNewTable = false;
+        FluxTable table = null;
 
-                CSVRecord secondRow = records.get(1);
+        for (CSVRecord csvRecord : parser) {
 
-                String error = secondRow.get(0);
-                String reference = secondRow.get(1);
+            long recordNumber = csvRecord.getRecordNumber();
+
+            //
+            // Response has HTTP status ok, but response is error.
+            //
+            if (1 == recordNumber && csvRecord.get(0).equals("error") && csvRecord.get(1).equals("reference")) {
+                parsingState = ParsingState.IN_ERROR;
+                continue;
+
+            }
+
+            //
+            // Throw FluxException with error response
+            //
+            if (ParsingState.IN_ERROR.equals(parsingState)) {
+                String error = csvRecord.get(0);
+                String reference = csvRecord.get(1);
 
                 if (!reference.isEmpty()) {
                     error += String.format(" [reference: %s]", reference);
@@ -76,31 +173,22 @@ class FluxCsvParser {
 
                 throw new FluxException(error);
             }
-        }
 
-        final List<FluxTable> tables = new ArrayList<>();
-
-        boolean startNewTable = false;
-        FluxTable table = null;
-
-        int tableIndex = 0;
-        int tableColumnIndex = 1;
-
-        for (int i = 0, recordsSize = records.size(); i < recordsSize; i++) {
-            CSVRecord csvRecord = records.get(i);
             String token = csvRecord.get(0);
             //// start new table
             if ("#datatype".equals(token)) {
                 startNewTable = true;
 
                 table = new FluxTable();
-                tables.add(tableIndex, table);
+                consumer.addTable(tableIndex, table);
                 tableIndex++;
 
             } else if (table == null) {
-                String message = "Unable to parse CSV response. FluxTable definition was not found. Row:" + i;
-                throw new FluxResultMapperException(message);
+                String message = "Unable to parse CSV response. FluxTable definition was not found. Record: %d";
+
+                throw new FluxResultMapperException(String.format(message, recordNumber));
             }
+
             //#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,double,string,string,string
             if ("#datatype".equals(token)) {
                 table.addDataTypes(toList(csvRecord));
@@ -119,28 +207,27 @@ class FluxCsvParser {
                     continue;
                 }
 
-                int currentIndex = Integer.parseInt(csvRecord.get(tableColumnIndex + 1));
+                int currentIndex = Integer.parseInt(csvRecord.get(1 + 1));
 
                 if (currentIndex > (tableIndex - 1)) {
                     //create new table with previous column headers settings
                     List<FluxColumn> fluxColumns = table.getColumns();
                     table = new FluxTable();
                     table.setColumns(fluxColumns);
-                    tables.add(tableIndex, table);
+                    consumer.addTable(tableIndex, table);
                     tableIndex++;
                 }
 
-                FluxRecord r = parseRecord(table, csvRecord);
-                table.getRecords().add(r);
+                FluxRecord r = parseRecord(tableIndex - 1, table, csvRecord);
+                consumer.addRecord(tableIndex - 1, r);
             }
         }
-        return tables;
     }
 
-    private FluxRecord parseRecord(final FluxTable table, final CSVRecord csvRecord)
+    private FluxRecord parseRecord(final int tableIndex, final FluxTable table, final CSVRecord csvRecord)
             throws FluxResultMapperException {
 
-        FluxRecord record = new FluxRecord();
+        FluxRecord record = new FluxRecord(tableIndex);
 
         for (FluxColumn fluxColumn : table.getColumns()) {
 
@@ -196,9 +283,9 @@ class FluxCsvParser {
             case "base64Binary":
                 return Base64.getDecoder().decode(strValue);
             case "dateTime:RFC3339":
-                return Instant.parse(strValue);
+                return RFC3339_NANO_FORMATTER.parse(strValue, Instant::from);
             case "dateTime:RFC3339Nano":
-                return nanoFormatter.parse(strValue, Instant::from);
+                return RFC3339_FORMATTER.parse(strValue, Instant::from);
             case "duration":
                 return Duration.ofNanos(Long.parseUnsignedLong(strValue));
             default:
