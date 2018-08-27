@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import io.bonitoo.flux.events.FluxErrorEvent;
 import io.bonitoo.flux.events.FluxSuccessEvent;
 import io.bonitoo.flux.events.UnhandledErrorEvent;
+import io.bonitoo.flux.mapper.FluxRecord;
 import io.bonitoo.flux.mapper.FluxResultMapperException;
 import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.options.query.NowOption;
@@ -89,7 +90,39 @@ class FluxClientEventTest extends AbstractFluxClientTest {
                 .addOption(NowOption.builder().time(Instant.ofEpochSecond(120)).build())
                 .build();
 
-        fluxClient.flux(Flux.from("flux_database"), fluxOptions);
+        Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database"), fluxOptions))
+                .isInstanceOf(FluxException.class)
+                .hasMessage("io.bonitoo.flux.FluxException: rpc error: code = Unavailable desc = all SubConns are in Transie");
+
+        waitToCallback();
+    }
+
+    @Test
+    void fluxErrorEventAsync() {
+
+        fluxServer.enqueue(createErrorResponse("rpc error: code = Unavailable desc = all SubConns are in Transie"));
+
+        fluxClient.subscribeEvents(FluxErrorEvent.class, event -> {
+
+            String expected = "option now = () => 1970-01-01T00:02:00.000000000Z from(db:\"flux_database\")";
+
+            Assertions.assertThat(event).isNotNull();
+            Assertions.assertThat(event.getFluxQuery()).isEqualToIgnoringWhitespace(expected);
+            Assertions.assertThat(event.getException()).hasMessage("rpc error: code = Unavailable desc = all SubConns are in Transie");
+
+            countDownLatch.countDown();
+        });
+
+        FluxOptions fluxOptions = FluxOptions.builder()
+                .addOption(NowOption.builder().time(Instant.ofEpochSecond(120)).build())
+                .build();
+
+        fluxClient.flux(Flux.from("flux_database"), fluxOptions, new Consumer<FluxRecord>() {
+            @Override
+            public void accept(FluxRecord fluxRecord) {
+
+            }
+        });
 
         waitToCallback();
     }
@@ -114,7 +147,9 @@ class FluxClientEventTest extends AbstractFluxClientTest {
                 .addOption(NowOption.builder().time(Instant.ofEpochSecond(120)).build())
                 .build();
 
-        fluxClient.flux(Flux.from("flux_database"), fluxOptions);
+        Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database"), fluxOptions))
+                .isInstanceOf(FluxException.class)
+                .hasMessage("io.bonitoo.flux.mapper.FluxResultMapperException: Unable to parse CSV response. FluxTable definition was not found. Row:0");
 
         waitToCallback();
     }

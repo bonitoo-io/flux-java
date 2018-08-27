@@ -82,7 +82,7 @@ fluxClient.flux(query, fluxRecord -> {
 #### Handling server response
 
 There are two possibilities how to handle server response:
-1. Mapping to the `FluxTable`s POJO ([mentioned above](#flux-query))
+1. Mapping to the `FluxTable` POJO ([mentioned above](#flux-query))
 2. Use directly server response to the custom handling
 
 ##### Custom Handling  

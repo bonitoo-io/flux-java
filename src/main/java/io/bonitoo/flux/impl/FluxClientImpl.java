@@ -455,7 +455,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         Response<ResponseBody> response = fluxRaw(query, properties, options, async, asyncResponse -> {
 
             if (!asyncResponse.isSuccessful()) {
-                errorResponse(query, asyncResponse);
+                errorResponse(query, asyncResponse, true);
 //                callback.accept(FluxResult.empty());
                 return;
             }
@@ -488,11 +488,13 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 } else {
                     publish(new UnhandledErrorEvent(e));
                 }
+            } finally {
+
+                body.close();
             }
 
             publish(new FluxSuccessEvent(fluxConnectionOptions, query));
 
-            body.close();
         });
 
         if (!async && response != null) {
@@ -513,12 +515,15 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                     return tables;
                 } else {
 
-                    errorResponse(query, response);
+                    errorResponse(query, response, false);
                 }
 
             } catch (Exception e) {
 
-                publish(new UnhandledErrorEvent(FluxException.fromCause(e)));
+                FluxException exception = FluxException.fromCause(e);
+                publish(new UnhandledErrorEvent(exception));
+
+                throw exception;
             }
         }
 
@@ -564,17 +569,23 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
             } catch (Exception e) {
 
-                publish(new UnhandledErrorEvent(FluxException.fromCause(e)));
+                FluxException throwable = FluxException.fromCause(e);
+
+                publish(new UnhandledErrorEvent(throwable));
+
+                throw throwable;
             }
         }
 
         return null;
     }
 
-    private void errorResponse(@Nonnull final String query, @Nonnull final Response<ResponseBody> response) {
+    private void errorResponse(@Nonnull final String query, @Nonnull final Response<ResponseBody> response,
+                               @Nonnull final Boolean async) {
 
         Preconditions.checkNonEmptyString(query, "Query");
         Objects.requireNonNull(response, "Response is required");
+        Objects.requireNonNull(async, "Async is required");
 
         String error = FluxException.getErrorMessage(response);
 
@@ -586,6 +597,10 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         }
 
         publish(new FluxErrorEvent(fluxConnectionOptions, query, exception));
+
+        if (!async) {
+            throw exception;
+        }
     }
 
     private void publish(@Nonnull final AbstractFluxEvent event) {

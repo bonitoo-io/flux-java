@@ -70,13 +70,11 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     @Test
     void queryError() {
 
-        //TODO exception throws?
         fluxServer.enqueue(createErrorResponse("Flux query is not valid"));
 
-        List<FluxTable> result = fluxClient.flux(Flux.from("flux_database"));
-
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result).hasSize(0);
+        Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
+                .isInstanceOf(FluxException.class)
+                .hasMessage("io.bonitoo.flux.FluxException: Flux query is not valid");
     }
 
     @Test

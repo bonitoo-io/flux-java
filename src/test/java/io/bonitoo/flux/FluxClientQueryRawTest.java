@@ -135,6 +135,16 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
     }
 
     @Test
+    void queryRawError() {
+
+        fluxServer.enqueue(createErrorResponse("Flux query is not valid"));
+
+        Response<ResponseBody> fluxQuery = fluxClient.fluxRaw(Flux.from("flux_database"));
+
+        Assertions.assertThat(fluxQuery.isSuccessful()).isFalse();
+    }
+
+    @Test
     void queryRawDialect() {
 
         fluxServer.enqueue(createResponse());
