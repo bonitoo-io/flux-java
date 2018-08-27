@@ -109,7 +109,7 @@ class ITFluxClient extends AbstractITFluxClient {
         influxDB.write(point7);
     }
 
-    //TODO unbound - https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#errors
+    //TODO errors: unbound - https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#errors
 
 //    //TODO test chunked
 //    @Test

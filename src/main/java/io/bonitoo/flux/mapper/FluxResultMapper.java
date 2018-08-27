@@ -31,8 +31,6 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
-import io.bonitoo.flux.options.FluxCsvParserOptions;
-
 import okio.Buffer;
 import okio.BufferedSource;
 
@@ -43,30 +41,26 @@ import okio.BufferedSource;
 public class FluxResultMapper {
 
     @Nonnull
-    public List<FluxTable> toFluxTables(@Nonnull final BufferedSource source,
-                                        @Nonnull final FluxCsvParserOptions options)
+    public List<FluxTable> toFluxTables(@Nonnull final BufferedSource source)
 
             throws FluxResultMapperException, IOException {
 
         Objects.requireNonNull(source, "BufferedSource is required");
-        Objects.requireNonNull(options, "FluxCsvParserOptions are required");
 
         Buffer buffer = new Buffer();
         source.readAll(buffer);
         Reader reader = new InputStreamReader(buffer.inputStream());
         FluxCsvParser tableCsvParser = new FluxCsvParser();
 
-        return tableCsvParser.parseFluxResponse(reader, options);
+        return tableCsvParser.parseFluxResponse(reader);
     }
 
     public void toFluxRecords(@Nonnull final BufferedSource source,
-                              @Nonnull final FluxCsvParserOptions options,
                               @Nonnull final Consumer<FluxRecord> consumer) throws IOException {
 
         Objects.requireNonNull(source, "BufferedSource is required");
-        Objects.requireNonNull(options, "FluxCsvParserOptions are required");
         Objects.requireNonNull(consumer, "Consumer is required");
 
-        toFluxTables(source, options).forEach(fluxTable -> fluxTable.getRecords().forEach(consumer));
+        toFluxTables(source).forEach(fluxTable -> fluxTable.getRecords().forEach(consumer));
     }
 }

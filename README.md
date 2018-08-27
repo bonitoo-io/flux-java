@@ -101,15 +101,9 @@ The Flux query can be configured by `FluxOptions`:
     - `quoteChar` - QuoteChar is a character to use to quote values containing the delimiter. Defaults to `"`.
     - `annotations` - Annotations is a list of annotations that should be encoded. If the list is empty the annotation column is omitted entirely.
     - `commentPrefix` -  CommentPrefix is a string prefix to add to comment rows. Defaults to `#`. Annotations are always comment rows.
-- `parserOptions` - the CSV parser options
-    - `valueDestinations` - the column names of the record where result will be placed (see [map function](#map))
 - `queryOptions` - the options specify a context in which a Flux query is to be run. Currently supported options are `NowOption`, `TaskOption`, `LocationOption` and `CustomOption`.
     
 ```java
-FluxCsvParserOptions parserOptions = FluxCsvParserOptions.builder()
-    .valueDestinations("value1", "_value2", "value_str")
-    .build();
-
 TaskOption task = TaskOption.builder("foo")
     .every(1L, ChronoUnit.HOURS)
     .delay(10L, ChronoUnit.MINUTES)
@@ -118,7 +112,6 @@ TaskOption task = TaskOption.builder("foo")
     .build();
 
 FluxOptions options = FluxOptions.builder()
-    .parserOptions(parserOptions)
     .addOption(task)
     .build();
 

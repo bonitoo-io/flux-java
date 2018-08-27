@@ -29,8 +29,6 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 
-import io.bonitoo.flux.options.FluxCsvParserOptions;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,12 +66,7 @@ class FluxCsvParserTest {
                 + ",,2,1677-09-21T00:12:43.145224192Z,2018-07-16T11:21:02.547596934Z,usage_system,cpu,A,west,1444,38,test\n"
                 + ",,3,1677-09-21T00:12:43.145224192Z,2018-07-16T11:21:02.547596934Z,user_usage,cpu,A,west,2401,49,test";
 
-        FluxCsvParserOptions settings = FluxCsvParserOptions
-                .builder()
-                .valueDestinations("value1", "_value2", "value_str")
-                .build();
-
-        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
 
         List<FluxColumn> columnHeaders = tables.get(0).getColumns();
         Assertions.assertThat(columnHeaders).hasSize(11);
@@ -155,11 +148,7 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,x\n"
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
-        FluxCsvParserOptions settings = FluxCsvParserOptions
-                .builder()
-                .build();
-
-        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
         Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(true);
         Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isEqualTo(false);
         Assertions.assertThat((Object) tables.get(0).getRecords().get(2).getValueByKey("value")).isEqualTo(false);
@@ -176,13 +165,9 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,17916881237904312345\n"
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
-        FluxCsvParserOptions settings = FluxCsvParserOptions
-                .builder()
-                .build();
-
         long expected = Long.parseUnsignedLong("17916881237904312345");
 
-        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
         Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(expected);
         Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
     }
@@ -200,11 +185,7 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A," + encodedString + "\n"
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
-        FluxCsvParserOptions settings = FluxCsvParserOptions
-                .builder()
-                .build();
-
-        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
 
         byte[] value = tables.get(0).getRecords().get(0).getValueByKey("value");
         Assertions.assertThat(value).isNotEmpty();
@@ -223,11 +204,7 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,1970-01-01T00:00:10Z\n"
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
-        FluxCsvParserOptions settings = FluxCsvParserOptions
-                .builder()
-                .build();
-
-        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
         Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(Instant.ofEpochSecond(10));
         Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
     }
@@ -242,11 +219,7 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,1970-01-01T00:00:10.999999999Z+07:00\n"
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
-        FluxCsvParserOptions settings = FluxCsvParserOptions
-                .builder()
-                .build();
-
-        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
         
         Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value"))
                 .isEqualTo(Instant.ofEpochSecond(10).plusNanos(999999999));
@@ -264,11 +237,7 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,125\n"
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
-        FluxCsvParserOptions settings = FluxCsvParserOptions
-                .builder()
-                .build();
-
-        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data), settings);
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
 
         Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value"))
                 .isEqualTo(Duration.ofNanos(125));

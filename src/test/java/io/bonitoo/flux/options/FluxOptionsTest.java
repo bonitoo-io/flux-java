@@ -36,26 +36,21 @@ class FluxOptionsTest {
     @Test
     void defaultSettings() {
 
-        Assertions.assertThat(FluxOptions.DEFAULTS.getParserOptions().getValueDestinations())
-                .hasSize(1)
-                .containsExactlyInAnyOrder("_value");
+        Assertions.assertThat(FluxOptions.DEFAULTS.getDialect())
+                .isNotNull();
     }
 
     @Test
     void customize() {
 
-        FluxCsvParserOptions parserOptions = FluxCsvParserOptions
-                .builder()
-                .valueDestinations("val", "val2")
-                .build();
+        FluxDialect fluxDialect = FluxDialect.builder().header(false).build();
 
         FluxOptions queryOptions = FluxOptions
                 .builder()
-                .parserOptions(parserOptions)
+                .dialect(fluxDialect)
                 .build();
 
-        Assertions.assertThat(queryOptions.getParserOptions().getValueDestinations())
-                .hasSize(2)
-                .containsExactlyInAnyOrder("val", "val2");
+        Assertions.assertThat(queryOptions.getDialect())
+                .isEqualTo(fluxDialect);
     }
 }

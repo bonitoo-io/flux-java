@@ -24,10 +24,6 @@ package io.bonitoo.flux.mapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import javax.annotation.Nonnull;
-
-import io.bonitoo.flux.options.FluxCsvParserOptions;
 
 /**
  * This class represents table structure in FluxRequest.
@@ -110,17 +106,11 @@ public final class FluxTable {
      * Sets the column names and tags and returns index of "table" column.
      *
      * @param columnNames
-     * @param settings    of parsing
-     * @return index of "table" column
      * @throws FluxResultMapperException
      */
-    int addColumnNamesAndTags(final List<String> columnNames, @Nonnull final FluxCsvParserOptions settings)
-            throws FluxResultMapperException {
-
-        Objects.requireNonNull(settings, "FluxCsvParserOptions is required");
+    void addColumnNamesAndTags(final List<String> columnNames) throws FluxResultMapperException {
 
         int size = columnNames.size();
-        int tableIndexColumn = -1;
 
         for (int i = 0; i < size; i++) {
             String columnName = columnNames.get(i);
@@ -136,13 +126,6 @@ public final class FluxTable {
             }
 
             def.setLabel(columnName);
-
-            if ("table".equals(columnName)) {
-                tableIndexColumn = i;
-            }
         }
-
-        return tableIndexColumn;
     }
-
 }

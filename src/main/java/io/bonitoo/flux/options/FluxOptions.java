@@ -47,7 +47,6 @@ public final class FluxOptions {
      */
     public static final FluxOptions DEFAULTS = FluxOptions.builder().build();
 
-    private final FluxCsvParserOptions parserOptions;
     private final FluxDialect dialect;
     private final List<AbstractOption> queryOptions = new ArrayList<>();
 
@@ -55,7 +54,6 @@ public final class FluxOptions {
 
         Objects.requireNonNull(builder, "FluxOptions.Builder is required");
 
-        this.parserOptions = builder.parserOptions;
         this.dialect = builder.dialect;
         this.queryOptions.addAll(builder.variables);
     }
@@ -69,15 +67,6 @@ public final class FluxOptions {
     @Nonnull
     public static FluxOptions.Builder builder() {
         return new FluxOptions.Builder();
-    }
-
-    /**
-     * @return the CSV parser options
-     * @see Builder#parserOptions(FluxCsvParserOptions)
-     */
-    @Nonnull
-    public FluxCsvParserOptions getParserOptions() {
-        return parserOptions;
     }
 
     /**
@@ -106,26 +95,8 @@ public final class FluxOptions {
     @NotThreadSafe
     public static class Builder {
 
-        private FluxCsvParserOptions parserOptions = FluxCsvParserOptions.DEFAULTS;
         private FluxDialect dialect = FluxDialect.DEFAULTS;
         private List<AbstractOption> variables = new ArrayList<>();
-
-        /**
-         * Set the CSV parser options.
-         *
-         * @param parserOptions the CSV parser options. Defaults {@link FluxCsvParserOptions#DEFAULTS}.
-         * @return {@code this}
-         * @since 1.0.0
-         */
-        @Nonnull
-        public FluxOptions.Builder parserOptions(@Nonnull final FluxCsvParserOptions parserOptions) {
-
-            Objects.requireNonNull(parserOptions, "FluxCsvParserOptions is required");
-
-            this.parserOptions = parserOptions;
-
-            return this;
-        }
 
         /**
          * Set {@link FluxDialect} that defining the options to use when encoding the response.
@@ -154,7 +125,7 @@ public final class FluxOptions {
         @Nonnull
         public <O extends AbstractOption> FluxOptions.Builder addOption(@Nonnull final O option) {
 
-            Objects.requireNonNull(parserOptions, "FluxCsvParserOptions is required");
+            Objects.requireNonNull(option, "Option is required");
 
             this.variables.add(option);
 

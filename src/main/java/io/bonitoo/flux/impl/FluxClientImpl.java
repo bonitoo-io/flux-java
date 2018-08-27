@@ -473,7 +473,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 //
                 while (!source.exhausted()) {
 
-                    mapper.toFluxRecords(source, options.getParserOptions(), callback);
+                    mapper.toFluxRecords(source, callback);
                 }
 
                 publish(new FluxSuccessEvent(fluxConnectionOptions, query));
@@ -508,7 +508,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                     }
 
                     BufferedSource source = body.source();
-                    List<FluxTable> tables = mapper.toFluxTables(source, options.getParserOptions());
+                    List<FluxTable> tables = mapper.toFluxTables(source);
 
                     publish(new FluxSuccessEvent(fluxConnectionOptions, query));
 

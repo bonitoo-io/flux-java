@@ -35,8 +35,6 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.bonitoo.flux.options.FluxCsvParserOptions;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -54,15 +52,8 @@ class FluxCsvParser {
 
     @Nonnull
     List<FluxTable> parseFluxResponse(@Nonnull final Reader reader) throws FluxResultMapperException, IOException {
-        return parseFluxResponse(reader, FluxCsvParserOptions.DEFAULTS);
-    }
-
-    @Nonnull
-    List<FluxTable> parseFluxResponse(@Nonnull final Reader reader, @Nonnull final FluxCsvParserOptions settings)
-            throws FluxResultMapperException, IOException {
 
         Objects.requireNonNull(reader, "Reader is required");
-        Objects.requireNonNull(settings, "FluxCsvParserOptions is required");
 
         final CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT);
         final List<CSVRecord> records = parser.getRecords();
@@ -73,7 +64,7 @@ class FluxCsvParser {
         FluxTable table = null;
 
         int tableIndex = 0;
-        int tableColumnIndex = -1;
+        int tableColumnIndex = 1;
 
         for (int i = 0, recordsSize = records.size(); i < recordsSize; i++) {
             CSVRecord csvRecord = records.get(i);
@@ -97,20 +88,15 @@ class FluxCsvParser {
             } else if ("#group".equals(token)) {
                 table.addGroups(toList(csvRecord));
 
-            } else if (token.startsWith("#")) {
+            } else if ("#default".equals(token)) {
                 table.addDefaultEmptyValues(toList(csvRecord));
 
             } else {
                 // parse column names
                 if (startNewTable) {
-                    tableColumnIndex = table.addColumnNamesAndTags(toList(csvRecord), settings);
+                    table.addColumnNamesAndTags(toList(csvRecord));
                     startNewTable = false;
                     continue;
-                }
-
-                //create the new table object if tableColumnIndex is incremented
-                if (tableColumnIndex < 0) {
-                    throw new FluxResultMapperException("table index is not found in CSV header");
                 }
 
                 int currentIndex = Integer.parseInt(csvRecord.get(tableColumnIndex + 1));
@@ -147,7 +133,7 @@ class FluxCsvParser {
         return record;
     }
 
-
+    @Nonnull
     private List<String> toList(final CSVRecord csvRecord) {
         List<String> ret = new ArrayList<>(csvRecord.size());
         int size = csvRecord.size();
