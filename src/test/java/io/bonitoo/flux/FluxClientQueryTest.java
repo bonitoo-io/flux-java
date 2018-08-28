@@ -110,6 +110,30 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     }
 
     @Test
+    void queryCallbackOnComplete() {
+
+        countDownLatch = new CountDownLatch(5);
+
+        fluxServer.enqueue(createResponse());
+
+        List<FluxRecord> records = new ArrayList<>();
+        fluxClient.flux(Flux.from("flux_database"), result -> {
+            records.add(result);
+
+            countDownLatch.countDown();
+        }, canceled -> {
+
+            Assertions.assertThat(canceled).isFalse();
+
+            countDownLatch.countDown();
+        });
+
+        waitToCallback();
+
+        assertRecords(records);
+    }
+
+    @Test
     void queryCallbackParameters() {
 
         fluxServer.enqueue(createResponse());
@@ -136,6 +160,23 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
             Assertions.fail("Unreachable");
         });
+
+        waitToCallback();
+    }
+
+
+    @Test
+    void queryCallbackErrorOnError() {
+
+        countDownLatch = new CountDownLatch(2);
+
+        fluxServer.enqueue(createErrorResponse("Flux query is not valid", true));
+
+        fluxClient.subscribeEvents(FluxErrorEvent.class, fluxErrorEvent -> countDownLatch.countDown());
+        fluxClient.flux(Flux.from("flux_database"), result -> {
+
+            Assertions.fail("Unreachable");
+        }, FluxClient.EMPTY_ON_COMPLETE, throwable -> countDownLatch.countDown());
 
         waitToCallback();
     }

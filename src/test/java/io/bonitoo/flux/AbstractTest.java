@@ -42,7 +42,7 @@ abstract class AbstractTest {
 
     void waitToCallback() {
         try {
-            Assertions.assertThat(countDownLatch.await(10, TimeUnit.MINUTES)).isTrue();
+            Assertions.assertThat(countDownLatch.await(10, TimeUnit.SECONDS)).isTrue();
         } catch (InterruptedException e) {
             Assertions.fail("Unexpected exception", e);
         }

@@ -25,9 +25,11 @@ package io.bonitoo.flux;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import okhttp3.ResponseBody;
+import okhttp3.mockwebserver.MockResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
@@ -48,6 +50,16 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
         Response<ResponseBody> result = fluxClient.fluxRaw(Flux.from("telegraf"));
 
         assertSuccessResult(result);
+    }
+
+    @Test
+    void queryRawError() {
+
+        fluxServer.enqueue(createErrorResponse());
+
+        Response<ResponseBody> result = fluxClient.fluxRaw(Flux.from("telegraf"));
+
+        Assertions.assertThat(result.isSuccessful()).isFalse();
     }
 
     @Test
@@ -86,6 +98,26 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
 
             countDownLatch.countDown();
         });
+
+        waitToCallback();
+    }
+
+    @Test
+    void queryRawCallbackFailure() throws IOException {
+
+        fluxServer.shutdown();
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("n", 10);
+
+        Flux query = Flux
+                .from("telegraf")
+                .count()
+                .withPropertyNamed("n");
+
+        fluxClient.fluxRaw(query, properties,
+                result -> Assertions.fail("Unreachable"),
+                throwable -> countDownLatch.countDown());
 
         waitToCallback();
     }
@@ -135,11 +167,26 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
     }
 
     @Test
-    void queryRawError() {
+    void queryRawStringCallbackFailure() throws IOException {
 
-        fluxServer.enqueue(createErrorResponse("Flux query is not valid"));
+        fluxServer.shutdown();
 
-        Response<ResponseBody> fluxQuery = fluxClient.fluxRaw(Flux.from("flux_database"));
+        String query = "from(db:\"telegraf\") |> " +
+                "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
+
+        fluxClient.fluxRaw(query,
+                result -> Assertions.fail("Unreachable"),
+                throwable -> countDownLatch.countDown());
+
+        waitToCallback();
+    }
+
+    @Test
+    void queryRawStringError() {
+
+        fluxServer.enqueue(createErrorResponse());
+
+        Response<ResponseBody> fluxQuery = fluxClient.fluxRaw("from(db: \"telegraf\")");
 
         Assertions.assertThat(fluxQuery.isSuccessful()).isFalse();
     }
@@ -167,4 +214,10 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
             throw new RuntimeException(e);
         }
     }
+
+    @Nonnull
+    private MockResponse createErrorResponse() {
+        return createErrorResponse("Flux query is not valid");
+    }
+
 }

@@ -47,6 +47,13 @@ import retrofit2.Response;
  */
 public interface FluxClient {
 
+    Consumer<FluxRecord> EMPTY_ON_NEXT = fluxRecord -> {
+    };
+    Consumer<Boolean> EMPTY_ON_COMPLETE = canceled -> {
+    };
+    Consumer<? super Throwable> EMPTY_ON_ERROR = (Consumer<Throwable>) throwable -> {
+    };
+
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
      *
@@ -69,21 +76,73 @@ public interface FluxClient {
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
-     * @param query    the flux query to execute
-     * @param callback callback to consume result which are matched the query
+     * @param query  the flux query to execute
+     * @param onNext callback to consume result which are matched the query
      */
-    void flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> callback);
+    void flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> onNext);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
-     * @param query    the flux query to execute
-     * @param callback callback to consume result which are matched the query
-     * @param options  the options for the query
+     * @param query      the flux query to execute
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     */
+    void flux(@Nonnull final String query,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     * @param onError    callback to consume any error notification
+     */
+    void flux(@Nonnull final String query,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query   the flux query to execute
+     * @param onNext  callback to consume result which are matched the query
+     * @param options the options for the query
      */
     void flux(@Nonnull final String query,
               @Nonnull final FluxOptions options,
-              @Nonnull final Consumer<FluxRecord> callback);
+              @Nonnull final Consumer<FluxRecord> onNext);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param onNext     callback to consume result which are matched the query
+     * @param options    the options for the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     */
+    void flux(@Nonnull final String query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param onNext     callback to consume result which are matched the query
+     * @param options    the options for the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     * @param onError    callback to consume any error notification
+     */
+    void flux(@Nonnull final String query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and return the Flux server HTTP response.
@@ -107,21 +166,47 @@ public interface FluxClient {
     /**
      * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
-     * @param query    the flux query to execute
-     * @param callback callback to consume raw response which are matched the query
+     * @param query      the flux query to execute
+     * @param onResponse callback to consume raw response which are matched the query
      */
-    void fluxRaw(@Nonnull final String query, @Nonnull final Consumer<Response<ResponseBody>> callback);
+    void fluxRaw(@Nonnull final String query, @Nonnull final Consumer<Response<ResponseBody>> onResponse);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param onResponse callback to consume raw response which are matched the query
+     * @param onFailure  callback to consume error notification invoked when a network exception occurred
+     *                   talking to the server
+     */
+    void fluxRaw(@Nonnull final String query,
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                 @Nonnull final Consumer<? super Throwable> onFailure);
 
     /**
      * Execute a Flux against the Flux service.
      *
-     * @param query    the flux query to execute
-     * @param callback callback to consume raw response which are matched the query
-     * @param options  the options for the query
+     * @param query      the flux query to execute
+     * @param onResponse callback to consume raw response which are matched the query
+     * @param options    the options for the query
      */
     void fluxRaw(@Nonnull final String query,
                  @Nonnull final FluxOptions options,
-                 @Nonnull final Consumer<Response<ResponseBody>> callback);
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse);
+
+    /**
+     * Execute a Flux against the Flux service.
+     *
+     * @param query      the flux query to execute
+     * @param onResponse callback to consume raw response which are matched the query
+     * @param options    the options for the query
+     * @param onFailure  callback to consume error notification invoked when a network exception occurred
+     *                   talking to the server
+     */
+    void fluxRaw(@Nonnull final String query,
+                 @Nonnull final FluxOptions options,
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                 @Nonnull final Consumer<? super Throwable> onFailure);
 
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
@@ -135,10 +220,35 @@ public interface FluxClient {
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
-     * @param query    the flux query to execute
-     * @param callback callback to consume result which are matched the query
+     * @param query  the flux query to execute
+     * @param onNext callback to consume result which are matched the query
      */
-    void flux(@Nonnull final Flux query, @Nonnull final Consumer<FluxRecord> callback);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Consumer<FluxRecord> onNext);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     * @param onError    callback to consume any error notification
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
@@ -153,13 +263,41 @@ public interface FluxClient {
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
      *
-     * @param query    the flux query to execute
-     * @param options  the options for the query
-     * @param callback callback to consume result which are matched the query
+     * @param query   the flux query to execute
+     * @param options the options for the query
+     * @param onNext  callback to consume result which are matched the query
      */
     void flux(@Nonnull final Flux query,
               @Nonnull final FluxOptions options,
-              @Nonnull final Consumer<FluxRecord> callback);
+              @Nonnull final Consumer<FluxRecord> onNext);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param options    the options for the query
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param options    the options for the query
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     * @param onError    callback to consume any error notification
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
@@ -176,11 +314,39 @@ public interface FluxClient {
      *
      * @param query      the flux query to execute
      * @param properties named properties
-     * @param callback   callback to consume result which are matched the query
+     * @param onNext     callback to consume result which are matched the query
      */
     void flux(@Nonnull final Flux query,
               @Nonnull final Map<String, Object> properties,
-              @Nonnull final Consumer<FluxRecord> callback);
+              @Nonnull final Consumer<FluxRecord> onNext);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     * @param onError    callback to consume any error notification
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
@@ -201,12 +367,46 @@ public interface FluxClient {
      * @param query      the flux query to execute
      * @param properties named properties
      * @param options    the options for the query
-     * @param callback   callback to consume result which are matched the query
+     * @param onNext     callback to consume result which are matched the query
      */
     void flux(@Nonnull final Flux query,
               @Nonnull final Map<String, Object> properties,
               @Nonnull final FluxOptions options,
-              @Nonnull final Consumer<FluxRecord> callback);
+              @Nonnull final Consumer<FluxRecord> onNext);
+
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param options    the options for the query
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final FluxOptions options,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete);
+
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param options    the options for the query
+     * @param onNext     callback to consume result which are matched the query
+     * @param onComplete callback to consume a completion notification, {@link Boolean#TRUE} it query was canceled
+     * @param onError    callback to consume any error notification
+     */
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final FluxOptions options,
+              @Nonnull final Consumer<FluxRecord> onNext,
+              @Nonnull final Consumer<Boolean> onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and return the Flux server HTTP response.
@@ -220,10 +420,22 @@ public interface FluxClient {
     /**
      * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
-     * @param query    the flux query to execute
-     * @param callback callback to consume raw response which are matched the query
+     * @param query      the flux query to execute
+     * @param onResponse callback to consume raw response which are matched the query
      */
-    void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> callback);
+    void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> onResponse);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param onResponse callback to consume raw response which are matched the query
+     * @param onFailure  callback to consume error notification invoked when a network exception occurred
+     *                   talking to the server
+     */
+    void fluxRaw(@Nonnull final Flux query,
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                 @Nonnull final Consumer<? super Throwable> onFailure);
 
     /**
      * Execute a Flux against the Flux service and return the Flux server HTTP response.
@@ -238,13 +450,28 @@ public interface FluxClient {
     /**
      * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
      *
-     * @param query    the flux query to execute
-     * @param options  the options for the query
-     * @param callback callback to consume raw response which are matched the query
+     * @param query      the flux query to execute
+     * @param options    the options for the query
+     * @param onResponse callback to consume raw response which are matched the query
      */
     void fluxRaw(@Nonnull final Flux query,
                  @Nonnull final FluxOptions options,
-                 @Nonnull final Consumer<Response<ResponseBody>> callback);
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse);
+
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param options    the options for the query
+     * @param onResponse callback to consume raw response which are matched the query
+     * @param onFailure  callback to consume error notification invoked when a network exception occurred
+     *                   talking to the server
+     */
+    void fluxRaw(@Nonnull final Flux query,
+                 @Nonnull final FluxOptions options,
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                 @Nonnull final Consumer<? super Throwable> onFailure);
 
     /**
      * Execute a Flux against the Flux service and return the Flux server HTTP response.
@@ -261,11 +488,25 @@ public interface FluxClient {
      *
      * @param query      the flux query to execute
      * @param properties named properties
-     * @param callback   callback to consume raw response which are matched the query
+     * @param onResponse callback to consume raw response which are matched the query
      */
     void fluxRaw(@Nonnull final Flux query,
                  @Nonnull final Map<String, Object> properties,
-                 @Nonnull final Consumer<Response<ResponseBody>> callback);
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse);
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param onResponse callback to consume raw response which are matched the query
+     * @param onFailure  callback to consume error notification invoked when a network exception occurred
+     *                   talking to the server
+     */
+    void fluxRaw(@Nonnull final Flux query,
+                 @Nonnull final Map<String, Object> properties,
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                 @Nonnull final Consumer<? super Throwable> onFailure);
 
     /**
      * Execute a Flux against the Flux service and return the Flux server HTTP response.
@@ -286,12 +527,29 @@ public interface FluxClient {
      * @param query      the flux query to execute
      * @param properties named properties
      * @param options    the options for the query
-     * @param callback   callback to consume raw response which are matched the query
+     * @param onResponse callback to consume raw response which are matched the query
      */
     void fluxRaw(@Nonnull final Flux query,
                  @Nonnull final Map<String, Object> properties,
                  @Nonnull final FluxOptions options,
-                 @Nonnull final Consumer<Response<ResponseBody>> callback);
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse);
+
+
+    /**
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     *
+     * @param query      the flux query to execute
+     * @param properties named properties
+     * @param options    the options for the query
+     * @param onResponse callback to consume raw response which are matched the query
+     * @param onFailure  callback to consume error notification invoked when a network exception occurred
+     *                   talking to the server
+     */
+    void fluxRaw(@Nonnull final Flux query,
+                 @Nonnull final Map<String, Object> properties,
+                 @Nonnull final FluxOptions options,
+                 @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                 @Nonnull final Consumer<? super Throwable> onFailure);
 
     /**
      * Listen the events produced by {@link FluxClient}.

@@ -224,7 +224,7 @@ class ITFluxClient extends AbstractITFluxClient {
     @Test
     void callback() {
 
-        countDownLatch = new CountDownLatch(2);
+        countDownLatch = new CountDownLatch(3);
         List<FluxRecord> records = new ArrayList<>();
 
         Restrictions restriction = Restrictions
@@ -239,6 +239,9 @@ class ITFluxClient extends AbstractITFluxClient {
 
             records.add(record);
 
+            countDownLatch.countDown();
+        }, canceled -> {
+            Assertions.assertThat(canceled).isFalse();
             countDownLatch.countDown();
         });
 

@@ -23,7 +23,6 @@
 package io.bonitoo.flux.impl;
 
 import java.io.EOFException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,24 +90,78 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public void flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> callback) {
+    public void flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> onNext) {
 
         Objects.requireNonNull(query, "Flux query is required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onNext, "Callback consumer is required");
 
-        flux(query, FluxOptions.DEFAULTS, callback);
+        flux(query, onNext, EMPTY_ON_COMPLETE);
+    }
+
+    @Override
+    public void flux(@Nonnull final String query,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+
+        flux(query, onNext, onComplete, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final String query,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete,
+                     @Nonnull final Consumer<? super Throwable> onError) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
+
+        flux(query, FluxOptions.DEFAULTS, onNext, onComplete, onError);
     }
 
     @Override
     public void flux(@Nonnull final String query,
                      @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> callback) {
+                     @Nonnull final Consumer<FluxRecord> onNext) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onNext, "Callback consumer is required");
 
-        flux(new StringFlux(query), options, callback);
+        flux(query, options, onNext, EMPTY_ON_COMPLETE);
+    }
+
+    @Override
+    public void flux(@Nonnull final String query,
+                     @Nonnull final FluxOptions options,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+
+        flux(query, options, onNext, onComplete, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final String query,
+                     @Nonnull final FluxOptions options,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete,
+                     @Nonnull final Consumer<? super Throwable> onError) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
+
+        flux(new StringFlux(query), options, onNext, onComplete, onError);
     }
 
     @Nonnull
@@ -131,24 +184,50 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public void fluxRaw(@Nonnull final String query, @Nonnull final Consumer<Response<ResponseBody>> callback) {
+    public void fluxRaw(@Nonnull final String query, @Nonnull final Consumer<Response<ResponseBody>> onResponse) {
 
         Objects.requireNonNull(query, "Flux query is required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onResponse, "Callback consumer is required");
 
-        fluxRaw(query, FluxOptions.DEFAULTS, callback);
+        fluxRaw(query, FluxOptions.DEFAULTS, onResponse);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final String query,
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                        @Nonnull final Consumer<? super Throwable> onFailure) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onResponse, "onResponse consumer is required");
+        Objects.requireNonNull(onFailure, "onFailure consumer is required");
+
+        fluxRaw(query, FluxOptions.DEFAULTS, onResponse, onFailure);
     }
 
     @Override
     public void fluxRaw(@Nonnull final String query,
                         @Nonnull final FluxOptions options,
-                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onResponse, "Callback consumer is required");
 
-        fluxRaw(new StringFlux(query), options, callback);
+        fluxRaw(new StringFlux(query), options, onResponse);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final String query,
+                        @Nonnull final FluxOptions options,
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                        @Nonnull final Consumer<? super Throwable> onFailure) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(onResponse, "onResponse consumer is required");
+        Objects.requireNonNull(onFailure, "onFailure consumer is required");
+
+        fluxRaw(new StringFlux(query), options, onResponse, onFailure);
     }
 
     @Nonnull
@@ -161,12 +240,38 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public void flux(@Nonnull final Flux query, @Nonnull final Consumer<FluxRecord> callback) {
+    public void flux(@Nonnull final Flux query, @Nonnull final Consumer<FluxRecord> onNext) {
 
         Objects.requireNonNull(query, "Flux query is required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onNext, "Callback consumer is required");
 
-        flux(query, FluxOptions.DEFAULTS, callback);
+        flux(query, onNext, EMPTY_ON_COMPLETE, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+
+        flux(query, onNext, onComplete, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete,
+                     @Nonnull final Consumer<? super Throwable> onError) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
+
+        flux(query, new HashMap<>(), FluxOptions.DEFAULTS, onNext, onComplete, onError);
     }
 
     @Nonnull
@@ -182,13 +287,43 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     @Override
     public void flux(@Nonnull final Flux query,
                      @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> callback) {
+                     @Nonnull final Consumer<FluxRecord> onNext) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onNext, "Callback consumer is required");
 
-        flux(query, new HashMap<>(), options, callback);
+        flux(query, options, onNext, EMPTY_ON_COMPLETE);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final FluxOptions options,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+
+        flux(query, options, onNext, onComplete, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final FluxOptions options,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete,
+                     @Nonnull final Consumer<? super Throwable> onError) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
+
+        flux(query, new HashMap<>(), options, onNext, onComplete, onError);
     }
 
     @Nonnull
@@ -204,13 +339,43 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     @Override
     public void flux(@Nonnull final Flux query,
                      @Nonnull final Map<String, Object> properties,
-                     @Nonnull final Consumer<FluxRecord> callback) {
+                     @Nonnull final Consumer<FluxRecord> onNext) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onNext, "Callback consumer is required");
 
-        flux(query, properties, FluxOptions.DEFAULTS, callback);
+        flux(query, properties, onNext, EMPTY_ON_COMPLETE);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final Map<String, Object> properties,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+
+        flux(query, properties, onNext, onComplete, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final Map<String, Object> properties,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete,
+                     @Nonnull final Consumer<? super Throwable> onError) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
+
+        flux(query, properties, FluxOptions.DEFAULTS, onNext, onComplete, onError);
     }
 
     @Nonnull
@@ -223,28 +388,55 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
 
-        List<FluxTable> fluxTables = flux(query, properties, options, false, result -> {
-        });
-
-        if (fluxTables == null) {
-            throw new IllegalStateException("Result is null");
-        }
-
-        return fluxTables;
+        return flux(query, properties, options, false, EMPTY_ON_NEXT, EMPTY_ON_COMPLETE, EMPTY_ON_ERROR);
     }
 
     @Override
     public void flux(@Nonnull final Flux query,
                      @Nonnull final Map<String, Object> properties,
                      @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> callback) {
+                     @Nonnull final Consumer<FluxRecord> onNext) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onNext, "Callback consumer is required");
 
-        flux(query, properties, options, true, callback);
+        flux(query, properties, options, onNext, EMPTY_ON_COMPLETE, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final Map<String, Object> properties,
+                     @Nonnull final FluxOptions options,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+
+        flux(query, properties, options, onNext, onComplete, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void flux(@Nonnull final Flux query,
+                     @Nonnull final Map<String, Object> properties,
+                     @Nonnull final FluxOptions options,
+                     @Nonnull final Consumer<FluxRecord> onNext,
+                     @Nonnull final Consumer<Boolean> onComplete,
+                     @Nonnull final Consumer<? super Throwable> onError) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
+
+        flux(query, properties, options, true, onNext, onComplete, onError);
     }
 
     @Nonnull
@@ -257,12 +449,24 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> callback) {
+    public void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> onResponse) {
 
         Objects.requireNonNull(query, "Flux query is required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onResponse, "Callback consumer is required");
 
-        fluxRaw(query, FluxOptions.DEFAULTS, callback);
+        fluxRaw(query, onResponse, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final Flux query,
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                        @Nonnull final Consumer<? super Throwable> onFailure) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(onResponse, "onResponse consumer is required");
+        Objects.requireNonNull(onFailure, "onFailure consumer is required");
+
+        fluxRaw(query, FluxOptions.DEFAULTS, onResponse, onFailure);
     }
 
     @Nonnull
@@ -278,13 +482,27 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     @Override
     public void fluxRaw(@Nonnull final Flux query,
                         @Nonnull final FluxOptions options,
-                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(options, "FluxOptions are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onResponse, "Callback consumer is required");
 
-        fluxRaw(query, new HashMap<>(), options, callback);
+        fluxRaw(query, options, onResponse, EMPTY_ON_ERROR);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final Flux query,
+                        @Nonnull final FluxOptions options,
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                        @Nonnull final Consumer<? super Throwable> onFailure) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(onResponse, "onResponse consumer is required");
+        Objects.requireNonNull(onFailure, "onFailure consumer is required");
+
+        fluxRaw(query, new HashMap<>(), options, onResponse, onFailure);
     }
 
     @Nonnull
@@ -301,13 +519,27 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     @Override
     public void fluxRaw(@Nonnull final Flux query,
                         @Nonnull final Map<String, Object> properties,
-                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse) {
 
         Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onResponse, "Callback consumer is required");
 
-        fluxRaw(query, properties, FluxOptions.DEFAULTS, callback);
+        fluxRaw(query, properties, FluxOptions.DEFAULTS, onResponse);
+    }
+
+    @Override
+    public void fluxRaw(@Nonnull final Flux query,
+                        @Nonnull final Map<String, Object> properties,
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                        @Nonnull final Consumer<? super Throwable> onFailure) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(onResponse, "onResponse consumer is required");
+        Objects.requireNonNull(onFailure, "onFailure consumer is required");
+
+        fluxRaw(query, properties, FluxOptions.DEFAULTS, onResponse, onFailure);
     }
 
     @Nonnull
@@ -323,7 +555,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         String query = toFluxString(flux, properties, options);
 
         Response<ResponseBody> response = fluxRaw(query, properties, options, false, result -> {
-        });
+        }, EMPTY_ON_ERROR);
 
         if (response == null) {
             throw new IllegalStateException("Response is null");
@@ -333,19 +565,35 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public void fluxRaw(@Nonnull final Flux flux,
+    public void fluxRaw(@Nonnull final Flux query,
                         @Nonnull final Map<String, Object> properties,
                         @Nonnull final FluxOptions options,
-                        @Nonnull final Consumer<Response<ResponseBody>> callback) {
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse) {
 
-        Objects.requireNonNull(flux, "Flux query is required");
+        Objects.requireNonNull(query, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onResponse, "Callback consumer is required");
 
-        String query = toFluxString(flux, properties, options);
+        fluxRaw(query, properties, options, onResponse, EMPTY_ON_ERROR);
+    }
 
-        fluxRaw(query, properties, options, true, callback);
+    @Override
+    public void fluxRaw(@Nonnull final Flux query,
+                        @Nonnull final Map<String, Object> properties,
+                        @Nonnull final FluxOptions options,
+                        @Nonnull final Consumer<Response<ResponseBody>> onResponse,
+                        @Nonnull final Consumer<? super Throwable> onFailure) {
+
+        Objects.requireNonNull(query, "Flux query is required");
+        Objects.requireNonNull(properties, "Properties are required");
+        Objects.requireNonNull(options, "FluxOptions are required");
+        Objects.requireNonNull(onResponse, "onResponse consumer is required");
+        Objects.requireNonNull(onFailure, "onFailure consumer is required");
+
+        String queryString = toFluxString(query, properties, options);
+
+        fluxRaw(queryString, properties, options, true, onResponse, onFailure);
     }
 
     @Override
@@ -437,26 +685,28 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         return this;
     }
 
-    @Nullable
+    @Nonnull
     private List<FluxTable> flux(@Nonnull final Flux flux,
                                  @Nonnull final Map<String, Object> properties,
                                  @Nonnull final FluxOptions options,
                                  @Nonnull final Boolean async,
-                                 @Nonnull final Consumer<FluxRecord> callback) {
+                                 @Nonnull final Consumer<FluxRecord> onNext,
+                                 @Nonnull final Consumer<Boolean> onComplete,
+                                 @Nonnull final Consumer<? super Throwable> onError) {
 
         Objects.requireNonNull(flux, "Flux query is required");
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
         Objects.requireNonNull(async, "Async configuration is required");
-        Objects.requireNonNull(callback, "Callback consumer is required");
-
+        Objects.requireNonNull(onNext, "onNext consumer is required");
+        Objects.requireNonNull(onComplete, "onComplete consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
 
         String query = toFluxString(flux, properties, options);
         Response<ResponseBody> response = fluxRaw(query, properties, options, async, asyncResponse -> {
 
             if (!asyncResponse.isSuccessful()) {
-                errorResponse(query, asyncResponse, true);
-//                callback.accept(FluxResult.empty());
+                errorResponse(query, asyncResponse, onError, true);
                 return;
             }
 
@@ -473,12 +723,13 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 //
                 while (!source.exhausted()) {
 
-                    mapper.toFluxRecords(source, callback);
+                    mapper.toFluxRecords(source, onNext);
                 }
 
                 publish(new FluxSuccessEvent(fluxConnectionOptions, query));
+                onComplete.accept(false);
 
-            } catch (IOException e) {
+            } catch (Exception e) {
 
                 //
                 // Socket closed by remote server or end of data
@@ -487,6 +738,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                     LOG.log(Level.FINEST, "Socket closed by remote server or end of data", e);
                 } else {
                     publish(new UnhandledErrorEvent(e));
+                    onError.accept(e);
                 }
             } finally {
 
@@ -495,7 +747,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
             publish(new FluxSuccessEvent(fluxConnectionOptions, query));
 
-        });
+        }, onError);
 
         if (!async && response != null) {
             try {
@@ -515,7 +767,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                     return tables;
                 } else {
 
-                    errorResponse(query, response, false);
+                    errorResponse(query, response, onError, false);
                 }
 
             } catch (Exception e) {
@@ -535,13 +787,15 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                                            @Nonnull final Map<String, Object> properties,
                                            @Nonnull final FluxOptions options,
                                            @Nonnull final Boolean async,
-                                           @Nonnull final Consumer<Response<ResponseBody>> callback) {
+                                           @Nonnull final Consumer<Response<ResponseBody>> callback,
+                                           @Nonnull final Consumer<? super Throwable> onFailure) {
 
         Preconditions.checkNonEmptyString(query, "Flux query");
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
         Objects.requireNonNull(async, "Async configuration is required");
         Objects.requireNonNull(callback, "Callback consumer is required");
+        Objects.requireNonNull(onFailure, "onFailure consumer is required");
 
         String orgID = this.fluxConnectionOptions.getOrgID();
 
@@ -560,6 +814,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                                       @Nonnull final Throwable t) {
 
                     publish(new UnhandledErrorEvent(t));
+                    onFailure.accept(t);
                 }
             });
         } else {
@@ -572,6 +827,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 FluxException throwable = FluxException.fromCause(e);
 
                 publish(new UnhandledErrorEvent(throwable));
+                onFailure.accept(e);
 
                 throw throwable;
             }
@@ -580,7 +836,9 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         return null;
     }
 
-    private void errorResponse(@Nonnull final String query, @Nonnull final Response<ResponseBody> response,
+    private void errorResponse(@Nonnull final String query,
+                               @Nonnull final Response<ResponseBody> response,
+                               @Nonnull final Consumer<? super Throwable> onError,
                                @Nonnull final Boolean async) {
 
         Preconditions.checkNonEmptyString(query, "Query");
@@ -597,6 +855,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         }
 
         publish(new FluxErrorEvent(fluxConnectionOptions, query, exception));
+        onError.accept(exception);
 
         if (!async) {
             throw exception;
