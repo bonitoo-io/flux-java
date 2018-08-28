@@ -41,8 +41,14 @@ abstract class AbstractTest {
     }
 
     void waitToCallback() {
+        waitToCallback(10);
+    }
+
+    void waitToCallback(final int seconds) {
         try {
-            Assertions.assertThat(countDownLatch.await(10, TimeUnit.SECONDS)).isTrue();
+            Assertions.assertThat(countDownLatch.await(seconds, TimeUnit.SECONDS))
+                    .overridingErrorMessage("The countDown wasn't counted to zero. Before elapsed: %s seconds.", seconds)
+                    .isTrue();
         } catch (InterruptedException e) {
             Assertions.fail("Unexpected exception", e);
         }

@@ -134,7 +134,7 @@ class ITFluxClient extends AbstractITFluxClient {
             }
         });
 
-        waitToCallback();
+        waitToCallback(30);
     }
 
     @Test
@@ -160,7 +160,7 @@ class ITFluxClient extends AbstractITFluxClient {
             }
         });
 
-        waitToCallback();
+        waitToCallback(30);
     }
 
     @Test
@@ -370,7 +370,7 @@ class ITFluxClient extends AbstractITFluxClient {
     }
 
     private void prepareChunkRecords() {
-        int totalRecords = 1_000_000;
+        int totalRecords = 500_000;
         countDownLatch = new CountDownLatch(totalRecords);
 
         List<String> points = new ArrayList<>();
