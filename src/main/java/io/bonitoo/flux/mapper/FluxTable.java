@@ -24,6 +24,7 @@ package io.bonitoo.flux.mapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * This class represents table structure in FluxRequest.
@@ -48,84 +49,11 @@ public final class FluxTable {
         return records;
     }
 
-    void addDataTypes(final List<String> datatypes) {
-
-        for (int i = 0; i < datatypes.size(); i++) {
-            String s = datatypes.get(i);
-
-            FluxColumn columnDef = new FluxColumn();
-            columnDef.setDataType(s);
-            columnDef.setIndex(i);
-
-            columns.add(columnDef);
-
-        }
-    }
-
-    void addGroups(final List<String> groups) throws FluxResultMapperException {
-
-        for (int i = 0; i < groups.size(); i++) {
-            String s = groups.get(i);
-
-            if (columns.isEmpty()) {
-                throw new FluxResultMapperException("Unable to parse response, no #datatypes header found.");
-            }
-            FluxColumn def = columns.get(i);
-
-            if (def == null) {
-                String message = "Unable to parse response, inconsistent  #datatypes and #group header";
-                throw new FluxResultMapperException(message);
-            }
-
-            def.setGroup(Boolean.valueOf(s));
-        }
-
-    }
-
-    void addDefaultEmptyValues(final List<String> defaultEmptyValues) throws FluxResultMapperException {
-
-        for (int i = 0; i < defaultEmptyValues.size(); i++) {
-            String s = defaultEmptyValues.get(i);
-
-            if (columns.isEmpty()) {
-                throw new FluxResultMapperException("Unable to parse response, no #datatypes header found.");
-            }
-            FluxColumn def = columns.get(i);
-
-            if (def == null) {
-                String message = "Unable to parse response, inconsistent  #datatypes and #group header";
-                throw new FluxResultMapperException(message);
-            }
-
-            def.setDefaultValue(s);
-        }
-
-    }
-
-    /**
-     * Sets the column names and tags and returns index of "table" column.
-     *
-     * @param columnNames
-     * @throws FluxResultMapperException
-     */
-    void addColumnNamesAndTags(final List<String> columnNames) throws FluxResultMapperException {
-
-        int size = columnNames.size();
-
-        for (int i = 0; i < size; i++) {
-            String columnName = columnNames.get(i);
-
-            if (columns.isEmpty()) {
-                throw new FluxResultMapperException("Unable to parse response, no #datatypes header found.");
-            }
-            FluxColumn def = columns.get(i);
-
-            if (def == null) {
-                String message = "Unable to parse response, inconsistent  #datatypes and #group header";
-                throw new FluxResultMapperException(message);
-            }
-
-            def.setLabel(columnName);
-        }
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", FluxTable.class.getSimpleName() + "[", "]")
+                .add("columns=" + columns.size())
+                .add("records=" + records.size())
+                .toString();
     }
 }

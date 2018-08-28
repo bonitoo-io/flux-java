@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -124,6 +125,7 @@ public final class FluxRecord {
 
     /**
      * @param key of value in CSV response
+     * @param <T> type of value
      * @return value
      */
     @Nullable
@@ -133,5 +135,13 @@ public final class FluxRecord {
 
         //noinspection unchecked
         return (T) values.get(key);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", FluxRecord.class.getSimpleName() + "[", "]")
+                .add("tableIndex=" + tableIndex)
+                .add("values=" + values.size())
+                .toString();
     }
 }

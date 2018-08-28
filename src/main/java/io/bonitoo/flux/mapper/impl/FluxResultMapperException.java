@@ -20,14 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.mapper;
+package io.bonitoo.flux.mapper.impl;
 
 public class FluxResultMapperException extends RuntimeException {
     FluxResultMapperException(final String s) {
         super(s);
-    }
-
-    FluxResultMapperException(final Exception e) {
-        super(e);
     }
 }

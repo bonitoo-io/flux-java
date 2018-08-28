@@ -79,6 +79,30 @@ fluxClient.flux(query, fluxRecord -> {
 });
 ```
 
+##### OnComplete notification
+The callback to consume a completion notification. If the query was cancelled than return `TRUE`.
+
+```java
+fluxClient.flux(query, 
+    fluxRecord -> logFluxRecord(fluxRecord), 
+    canceled -> {
+        // callback to consume a completion notification 
+        System.out.println("End of response");   
+    });
+```
+
+##### OnError notification  
+The callback to consume any error notification.                   
+                   
+```java
+fluxClient.flux(query, 
+    fluxRecord -> logFluxRecord(fluxRecord), 
+    canceled -> {},
+    throwable -> {
+        logError(throwable);
+    });
+```
+
 #### Handling server response
 
 There are two possibilities how to handle server response:
@@ -125,7 +149,7 @@ The Flux client produces events that allow user to be notified and react to this
 - `FluxErrorEvent` - published when arrived the error response from Flux server
 - `UnhandledErrorEvent` -  published when occurs a unhandled exception
 
-#### Handling success response
+#### Handling success response by events
 
 ```java
 FluxClient fluxClient = FluxClientFactory.connect(options);
@@ -138,7 +162,7 @@ fluxClient.subscribeEvents(FluxSuccessEvent.class, event -> {
 });
 ```
 
-#### Handling error response
+#### Handling error response by events
 
 ```java
 FluxClient fluxClient = FluxClientFactory.connect(options);

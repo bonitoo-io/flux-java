@@ -22,6 +22,7 @@
  */
 package io.bonitoo.flux.mapper;
 
+import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 
 /**
@@ -29,13 +30,13 @@ import javax.annotation.Nonnull;
  */
 public final class FluxColumn {
 
-    private String label;
-    private String dataType;
-
     /**
      * Column index in record.
      */
     private int index;
+
+    private String label;
+    private String dataType;
 
     /**
      * Boolean flag indicating if the column is part of the table's group key.
@@ -85,5 +86,16 @@ public final class FluxColumn {
 
     public void setDefaultValue(final String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", FluxColumn.class.getSimpleName() + "[", "]")
+                .add("index=" + index)
+                .add("label='" + label + "'")
+                .add("dataType='" + dataType + "'")
+                .add("group=" + group)
+                .add("defaultValue='" + defaultValue + "'")
+                .toString();
     }
 }

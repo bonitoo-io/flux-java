@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.mapper;
+package io.bonitoo.flux.mapper.impl;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -28,6 +28,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
+
+import io.bonitoo.flux.mapper.FluxColumn;
+import io.bonitoo.flux.mapper.FluxRecord;
+import io.bonitoo.flux.mapper.FluxTable;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

@@ -29,7 +29,7 @@ import io.bonitoo.flux.events.FluxErrorEvent;
 import io.bonitoo.flux.events.FluxSuccessEvent;
 import io.bonitoo.flux.events.UnhandledErrorEvent;
 import io.bonitoo.flux.mapper.FluxRecord;
-import io.bonitoo.flux.mapper.FluxResultMapperException;
+import io.bonitoo.flux.mapper.impl.FluxResultMapperException;
 import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.options.query.NowOption;
 
@@ -149,7 +149,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database"), fluxOptions))
                 .isInstanceOf(FluxException.class)
-                .hasMessage("io.bonitoo.flux.mapper.FluxResultMapperException: Unable to parse CSV response. FluxTable definition was not found. Record: 1");
+                .hasMessage("io.bonitoo.flux.mapper.impl.FluxResultMapperException: Unable to parse CSV response. FluxTable definition was not found. Record: 1");
 
         waitToCallback();
     }
