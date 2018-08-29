@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.mapper.impl;
+package io.bonitoo.flux.impl;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,6 +28,7 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -40,10 +41,10 @@ import okio.BufferedSource;
  * @author Jakub Bednar (bednar@github) (26/06/2018 12:04)
  */
 @ThreadSafe
-public class FluxResultMapper {
+class FluxResultMapper {
 
     @Nonnull
-    public List<FluxTable> toFluxTables(@Nonnull final BufferedSource source)
+    List<FluxTable> toFluxTables(@Nonnull final BufferedSource source)
 
             throws FluxResultMapperException, IOException {
 
@@ -55,15 +56,20 @@ public class FluxResultMapper {
         return tableCsvParser.parseFluxResponse(reader);
     }
 
-    public void toFluxRecords(@Nonnull final BufferedSource source,
-                              @Nonnull final Consumer<FluxRecord> consumer) throws IOException {
+    /**
+     * @param requiredNext it the supplier return {@link Boolean#FALSE} than the processing of record ends
+     */
+    void toFluxRecords(@Nonnull final BufferedSource source,
+                       @Nonnull final Consumer<FluxRecord> onNext,
+                       @Nonnull final Supplier<Boolean> requiredNext) throws IOException {
 
         Objects.requireNonNull(source, "BufferedSource is required");
-        Objects.requireNonNull(consumer, "Consumer is required");
+        Objects.requireNonNull(onNext, "onNext is required");
+        Objects.requireNonNull(requiredNext, "requiredNext Supplier is required");
 
         Reader reader = new InputStreamReader(source.inputStream());
         FluxCsvParser tableCsvParser = new FluxCsvParser();
 
-        tableCsvParser.parseFluxResponse(reader, consumer);
+        tableCsvParser.parseFluxResponse(reader, onNext, requiredNext);
     }
 }

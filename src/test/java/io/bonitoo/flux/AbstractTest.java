@@ -24,6 +24,7 @@ package io.bonitoo.flux;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,12 +46,24 @@ abstract class AbstractTest {
     }
 
     void waitToCallback(final int seconds) {
+        waitToCallback(countDownLatch, seconds);
+    }
+
+    void waitToCallback(@Nonnull final CountDownLatch countDownLatch, final int seconds) {
         try {
             Assertions.assertThat(countDownLatch.await(seconds, TimeUnit.SECONDS))
                     .overridingErrorMessage("The countDown wasn't counted to zero. Before elapsed: %s seconds.", seconds)
                     .isTrue();
         } catch (InterruptedException e) {
             Assertions.fail("Unexpected exception", e);
+        }
+    }
+
+    void holdTheProcessing() {
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -103,6 +103,17 @@ fluxClient.flux(query,
     });
 ```
 
+##### Cancel the query
+The `Cancellable` object has the cancel method to stop asynchronous query.
+
+```java
+Cancellable cancellable = fluxClient.flux(query, fluxRecord -> logFluxRecord(fluxRecord));
+
+...
+
+cancellable.cancel();
+```
+
 #### Handling server response
 
 There are two possibilities how to handle server response:

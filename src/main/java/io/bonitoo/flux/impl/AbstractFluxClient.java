@@ -28,7 +28,6 @@ import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
-import io.bonitoo.flux.mapper.impl.FluxResultMapper;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.utils.GzipRequestInterceptor;

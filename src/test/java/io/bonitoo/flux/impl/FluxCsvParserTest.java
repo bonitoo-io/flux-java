@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.mapper.impl;
+package io.bonitoo.flux.impl;
 
 import java.io.IOException;
 import java.io.StringReader;

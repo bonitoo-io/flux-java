@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.mapper.impl;
+package io.bonitoo.flux.impl;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -34,6 +34,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -92,6 +93,11 @@ class FluxCsvParser {
 
                 tables.get(tableIndex).getRecords().add(record);
             }
+
+            @Override
+            public boolean isRequiredNext() {
+                return true;
+            }
         });
 
         return tables;
@@ -100,15 +106,18 @@ class FluxCsvParser {
     /**
      * Asynchronously parse Flux CSV response to {@link FluxColumn}s.
      *
-     * @param reader   with data
-     * @param consumer of response
+     * @param reader    with data
+     * @param consumer  of response
+     * @param  requiredNext it the supplier return {@link Boolean#FALSE} than the processing of record end
      * @throws IOException throw by {@link CSVParser}
      */
     void parseFluxResponse(@Nonnull final Reader reader,
-                           @Nonnull final Consumer<FluxRecord> consumer) throws IOException {
+                           @Nonnull final Consumer<FluxRecord> consumer,
+                           @Nonnull final Supplier<Boolean> requiredNext) throws IOException {
 
         Objects.requireNonNull(reader, "Reader is required");
         Objects.requireNonNull(consumer, "Consumer<FluxRecord> is required");
+        Objects.requireNonNull(requiredNext, "Satisfied Supplier is required");
 
         parseFluxResponse(reader, new FluxResponseConsumer() {
             @Override
@@ -119,6 +128,11 @@ class FluxCsvParser {
             @Override
             public void addRecord(final int tableIndex, @Nonnull final FluxRecord fluxRecord) {
                 consumer.accept(fluxRecord);
+            }
+
+            @Override
+            public boolean isRequiredNext() {
+                return requiredNext.get();
             }
         });
 
@@ -134,6 +148,8 @@ class FluxCsvParser {
         void addTable(final int tableIndex, @Nonnull final FluxTable fluxTable);
 
         void addRecord(final int tableIndex, @Nonnull final FluxRecord fluxRecord);
+
+        boolean isRequiredNext();
     }
 
     private void parseFluxResponse(@Nonnull final Reader reader,
@@ -151,6 +167,10 @@ class FluxCsvParser {
         FluxTable table = null;
 
         for (CSVRecord csvRecord : parser) {
+
+            if (!consumer.isRequiredNext()) {
+                return;
+            }
 
             long recordNumber = csvRecord.getRecordNumber();
 

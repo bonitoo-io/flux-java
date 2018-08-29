@@ -121,9 +121,9 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
             records.add(result);
 
             countDownLatch.countDown();
-        }, canceled -> {
+        }, success -> {
 
-            Assertions.assertThat(canceled).isFalse();
+            Assertions.assertThat(success).isTrue();
 
             countDownLatch.countDown();
         });
@@ -179,6 +179,68 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         }, FluxClient.EMPTY_ON_COMPLETE, throwable -> countDownLatch.countDown());
 
         waitToCallback();
+    }
+
+    @Test
+    void queryCallbackCancellableDoneSuccess() {
+
+        countDownLatch = new CountDownLatch(5);
+
+        fluxServer.enqueue(createResponse());
+
+        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("flux_database"),
+                result -> countDownLatch.countDown(),
+                success -> countDownLatch.countDown());
+
+        Assertions.assertThat(cancellable.isDone()).isFalse();
+
+        waitToCallback();
+
+        Assertions.assertThat(cancellable.isDone()).isTrue();
+    }
+
+    @Test
+    void queryCallbackCancellableDoneError() {
+
+        countDownLatch = new CountDownLatch(1);
+
+        fluxServer.enqueue(createErrorResponse("Flux query is not valid", true));
+
+        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("flux_database"),
+                result -> Assertions.fail("Unreachable"),
+                FluxClient.EMPTY_ON_COMPLETE,
+                throwable -> {
+                    holdTheProcessing();
+                    countDownLatch.countDown();
+                });
+
+        Assertions.assertThat(cancellable.isDone()).isFalse();
+
+        waitToCallback();
+
+        Assertions.assertThat(cancellable.isDone()).isTrue();
+    }
+
+    @Test
+    void queryCallbackCancellableDoneCancel() {
+
+        countDownLatch = new CountDownLatch(4);
+
+        fluxServer.enqueue(createResponse());
+
+        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("flux_database"), result -> {
+
+            holdTheProcessing();
+            countDownLatch.countDown();
+        });
+
+        Assertions.assertThat(cancellable.isDone()).isFalse();
+        Assertions.assertThat(cancellable.isCancelled()).isFalse();
+
+        cancellable.cancel();
+
+        Assertions.assertThat(cancellable.isDone()).isTrue();
+        Assertions.assertThat(cancellable.isCancelled()).isTrue();
     }
 
     @Test
