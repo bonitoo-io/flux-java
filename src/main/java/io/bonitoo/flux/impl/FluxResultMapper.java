@@ -32,8 +32,8 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
-import io.bonitoo.flux.mapper.FluxRecord;
-import io.bonitoo.flux.mapper.FluxTable;
+import io.bonitoo.flux.dto.FluxRecord;
+import io.bonitoo.flux.dto.FluxTable;
 
 import okio.BufferedSource;
 

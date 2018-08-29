@@ -25,11 +25,11 @@ package io.bonitoo.flux;
 import java.time.Instant;
 import java.util.function.Consumer;
 
+import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.events.FluxErrorEvent;
 import io.bonitoo.flux.events.FluxSuccessEvent;
 import io.bonitoo.flux.events.UnhandledErrorEvent;
 import io.bonitoo.flux.impl.FluxResultMapperException;
-import io.bonitoo.flux.mapper.FluxRecord;
 import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.options.query.NowOption;
 

@@ -32,9 +32,9 @@ import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.flux.mapper.FluxColumn;
-import io.bonitoo.flux.mapper.FluxRecord;
-import io.bonitoo.flux.mapper.FluxTable;
+import io.bonitoo.flux.dto.FluxColumn;
+import io.bonitoo.flux.dto.FluxRecord;
+import io.bonitoo.flux.dto.FluxTable;
 import io.bonitoo.flux.operators.restriction.Restrictions;
 import io.bonitoo.flux.options.FluxDialect;
 import io.bonitoo.flux.options.FluxOptions;

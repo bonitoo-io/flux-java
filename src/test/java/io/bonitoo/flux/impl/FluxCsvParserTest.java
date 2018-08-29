@@ -29,9 +29,9 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 
-import io.bonitoo.flux.mapper.FluxColumn;
-import io.bonitoo.flux.mapper.FluxRecord;
-import io.bonitoo.flux.mapper.FluxTable;
+import io.bonitoo.flux.dto.FluxColumn;
+import io.bonitoo.flux.dto.FluxRecord;
+import io.bonitoo.flux.dto.FluxTable;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

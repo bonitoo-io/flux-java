@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.mapper;
+package io.bonitoo.flux.dto;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;

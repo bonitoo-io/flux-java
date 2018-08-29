@@ -39,9 +39,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.flux.FluxException;
-import io.bonitoo.flux.mapper.FluxColumn;
-import io.bonitoo.flux.mapper.FluxRecord;
-import io.bonitoo.flux.mapper.FluxTable;
+import io.bonitoo.flux.dto.FluxColumn;
+import io.bonitoo.flux.dto.FluxRecord;
+import io.bonitoo.flux.dto.FluxTable;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;

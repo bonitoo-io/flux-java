@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.flux.dto.FluxRecord;
+import io.bonitoo.flux.dto.FluxTable;
 import io.bonitoo.flux.events.AbstractFluxEvent;
-import io.bonitoo.flux.mapper.FluxRecord;
-import io.bonitoo.flux.mapper.FluxTable;
 import io.bonitoo.flux.options.FluxOptions;
 
 import okhttp3.ResponseBody;
