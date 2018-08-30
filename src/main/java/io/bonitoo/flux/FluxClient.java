@@ -73,7 +73,7 @@ public interface FluxClient {
     List<FluxTable> flux(@Nonnull final String query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query  the flux query to execute
      * @param onNext callback to consume result which are matched the query
@@ -82,7 +82,7 @@ public interface FluxClient {
     Cancellable flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> onNext);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
@@ -95,7 +95,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<Boolean> onComplete);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
@@ -110,7 +110,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<? super Throwable> onError);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query   the flux query to execute
      * @param onNext  callback to consume result which are matched the query
@@ -122,7 +122,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<FluxRecord> onNext);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
@@ -137,7 +137,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<Boolean> onComplete);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
@@ -173,7 +173,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final String query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -183,7 +183,7 @@ public interface FluxClient {
     void fluxRaw(@Nonnull final String query, @Nonnull final Consumer<Response<ResponseBody>> onResponse);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -235,7 +235,7 @@ public interface FluxClient {
     List<FluxTable> flux(@Nonnull final Flux query);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query  the flux query to execute
      * @param onNext callback to consume result which are matched the query
@@ -245,7 +245,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<FluxRecord> onNext);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
@@ -258,7 +258,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<Boolean> onComplete);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
@@ -283,7 +283,7 @@ public interface FluxClient {
     List<FluxTable> flux(@Nonnull final Flux query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query   the flux query to execute
      * @param options the options for the query
@@ -295,7 +295,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<FluxRecord> onNext);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param options    the options for the query
@@ -310,7 +310,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<Boolean> onComplete);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param options    the options for the query
@@ -337,7 +337,7 @@ public interface FluxClient {
     List<FluxTable> flux(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -348,7 +348,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<FluxRecord> onNext);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -363,7 +363,7 @@ public interface FluxClient {
                      @Nonnull final Consumer<Boolean> onComplete);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -393,7 +393,7 @@ public interface FluxClient {
                          @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -408,7 +408,7 @@ public interface FluxClient {
 
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -426,7 +426,7 @@ public interface FluxClient {
 
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param properties named properties
@@ -454,7 +454,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final Flux query);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -464,7 +464,7 @@ public interface FluxClient {
     void fluxRaw(@Nonnull final Flux query, @Nonnull final Consumer<Response<ResponseBody>> onResponse);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -488,7 +488,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final Flux query, @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -502,7 +502,7 @@ public interface FluxClient {
 
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -528,7 +528,7 @@ public interface FluxClient {
     Response<ResponseBody> fluxRaw(@Nonnull final Flux query, @Nonnull final Map<String, Object> properties);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -541,7 +541,7 @@ public interface FluxClient {
                  @Nonnull final Consumer<Response<ResponseBody>> onResponse);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -570,7 +570,7 @@ public interface FluxClient {
                                    @Nonnull final FluxOptions options);
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
@@ -586,7 +586,7 @@ public interface FluxClient {
 
 
     /**
-     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code callback}.
+     * Execute a Flux against the Flux service and asynchronous stream HTTP response to {@code onResponse}.
      * <p>
      * The callback is call only once.
      *
