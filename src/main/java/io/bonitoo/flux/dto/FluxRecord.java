@@ -33,20 +33,27 @@ import javax.annotation.Nullable;
 import io.bonitoo.flux.utils.Preconditions;
 
 /**
- * A record is a tuple of values.
+ * A record is a tuple of values. Each record in the table represents a single point in the series.
  *
  * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#record">Specification</a>.
  */
 public final class FluxRecord {
 
-    private final Integer tableIndex;
+    /**
+     * The Index of the table that the record belongs.
+     */
+    private final Integer table;
+
+    /**
+     * The record's values.
+     */
     private LinkedHashMap<String, Object> values = new LinkedHashMap<>();
 
-    public FluxRecord(@Nonnull final Integer tableIndex) {
+    public FluxRecord(@Nonnull final Integer table) {
 
-        Objects.requireNonNull(tableIndex, "Table index is required");
+        Objects.requireNonNull(table, "Table index is required");
 
-        this.tableIndex = tableIndex;
+        this.table = table;
     }
 
     /**
@@ -54,7 +61,7 @@ public final class FluxRecord {
      */
     @Nullable
     public Instant getStart() {
-        return getValueByKey("_start");
+        return (Instant) getValueByKey("_start");
     }
 
     /**
@@ -62,7 +69,7 @@ public final class FluxRecord {
      */
     @Nullable
     public Instant getStop() {
-        return getValueByKey("_stop");
+        return (Instant) getValueByKey("_stop");
     }
 
     /**
@@ -70,7 +77,7 @@ public final class FluxRecord {
      */
     @Nullable
     public Instant getTime() {
-        return getValueByKey("_time");
+        return (Instant) getValueByKey("_time");
     }
 
     /**
@@ -86,7 +93,7 @@ public final class FluxRecord {
      */
     @Nullable
     public String getField() {
-        return getValueByKey("_field");
+        return (String) getValueByKey("_field");
     }
 
     /**
@@ -94,15 +101,15 @@ public final class FluxRecord {
      */
     @Nullable
     public String getMeasurement() {
-        return getValueByKey("_measurement");
+        return (String) getValueByKey("_measurement");
     }
 
     /**
      * @return the index of table which contains the record
      */
     @Nonnull
-    public Integer getTableIndex() {
-        return tableIndex;
+    public Integer getTable() {
+        return table;
     }
 
     /**
@@ -114,33 +121,37 @@ public final class FluxRecord {
     }
 
     /**
+     * Get FluxRecord value by index.
+     *
      * @param index of value in CSV response
      * @return value
      * @see ArrayIndexOutOfBoundsException
      */
     @Nullable
     public Object getValueByIndex(final int index) {
+
+        //noinspection unchecked
         return values.values().toArray()[index];
     }
 
     /**
+     * Get FluxRecord value by key.
+     *
      * @param key of value in CSV response
-     * @param <T> type of value
      * @return value
      */
     @Nullable
-    public <T> T getValueByKey(@Nonnull final String key) {
+    public Object getValueByKey(@Nonnull final String key) {
 
         Preconditions.checkNonEmptyString(key, "key");
 
-        //noinspection unchecked
-        return (T) values.get(key);
+        return values.get(key);
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", FluxRecord.class.getSimpleName() + "[", "]")
-                .add("tableIndex=" + tableIndex)
+                .add("table=" + table)
                 .add("values=" + values.size())
                 .toString();
     }

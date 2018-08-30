@@ -25,26 +25,47 @@ package io.bonitoo.flux.dto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /**
- * This class represents table structure in FluxRequest.
+ * This class represents table structure of Flux CSV Response.
+ *
+ * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#table">Specification</a>.
  */
 public final class FluxTable {
 
-    //column header specification
+    /**
+     * Table column's labels and types.
+     */
     private List<FluxColumn> columns = new ArrayList<>();
 
-    //list of records
+    /**
+     * Table records.
+     */
     private List<FluxRecord> records = new ArrayList<>();
 
+    /**
+     * @see #columns
+     */
+    @Nonnull
     public List<FluxColumn> getColumns() {
         return columns;
     }
 
-    void setColumns(final List<FluxColumn> columns) {
-        this.columns = columns;
+    /**
+     * A table's group key is subset of the entire columns dataset that assigned to the table.
+     * As such, all records within a table will have the same values for each column that is part of the group key.
+     */
+    @Nonnull
+    public List<FluxColumn> getGroupKey() {
+        return columns.stream().filter(FluxColumn::isGroup).collect(Collectors.toList());
     }
 
+    /**
+     * @see #records
+     */
+    @Nonnull
     public List<FluxRecord> getRecords() {
         return records;
     }

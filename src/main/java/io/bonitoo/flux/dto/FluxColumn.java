@@ -27,6 +27,19 @@ import javax.annotation.Nonnull;
 
 /**
  * This class represents column header specification of {@link FluxTable}.
+ * <p>
+ * The mapping data types for a column are:
+ * <ul>
+ * <li>"boolean" to {@link Boolean}</li>
+ * <li>"unsignedLong" to {@link Long}</li>
+ * <li>"long" to {@link Long}</li>
+ * <li>"double" to {@link Double}</li>
+ * <li>"string" to {@link String}</li>
+ * <li>"base64Binary" to {@link byte}s array</li>
+ * <li>"dateTime:RFC3339" to {@link java.time.Instant}</li>
+ * <li>"dateTime:RFC3339Nano" to {@link java.time.Instant}</li>
+ * <li>"duration" to {@link java.time.Duration}</li>
+ * </ul>
  */
 public final class FluxColumn {
 
@@ -35,13 +48,21 @@ public final class FluxColumn {
      */
     private int index;
 
+    /**
+     * The label of column (e.g., "_start", "_stop", "_time").
+     */
     private String label;
+
+    /**
+     * The data type of column (e.g., "string", "long", "dateTime:RFC3339").
+     */
     private String dataType;
 
     /**
      * Boolean flag indicating if the column is part of the table's group key.
      */
     private boolean group;
+
     /**
      * Default value to be used for rows whose string value is the empty string.
      */

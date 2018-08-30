@@ -93,7 +93,7 @@ class FluxCsvParserTest {
         Assertions.assertThat(fluxTable1.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord1 = fluxTable1.getRecords().get(0);
-        Assertions.assertThat(0).isEqualTo(fluxRecord1.getTableIndex());
+        Assertions.assertThat(0).isEqualTo(fluxRecord1.getTable());
         Assertions.assertThat(fluxRecord1.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
@@ -112,7 +112,7 @@ class FluxCsvParserTest {
         Assertions.assertThat(fluxTable2.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord2 = fluxTable2.getRecords().get(0);
-        Assertions.assertThat(1).isEqualTo(fluxRecord2.getTableIndex());
+        Assertions.assertThat(1).isEqualTo(fluxRecord2.getTable());
         Assertions.assertThat(fluxRecord2.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("B"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
@@ -128,7 +128,7 @@ class FluxCsvParserTest {
         Assertions.assertThat(fluxTable3.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord3 = fluxTable3.getRecords().get(0);
-        Assertions.assertThat(2).isEqualTo(fluxRecord3.getTableIndex());
+        Assertions.assertThat(2).isEqualTo(fluxRecord3.getTable());
         Assertions.assertThat(fluxRecord3.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
@@ -144,7 +144,7 @@ class FluxCsvParserTest {
         Assertions.assertThat(fluxTable4.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord4 = fluxTable4.getRecords().get(0);
-        Assertions.assertThat(3).isEqualTo(fluxRecord4.getTableIndex());
+        Assertions.assertThat(3).isEqualTo(fluxRecord4.getTable());
         Assertions.assertThat(fluxRecord4.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
                 .hasEntrySatisfying("region", value -> Assertions.assertThat(value).isEqualTo("west"));
@@ -169,10 +169,10 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
         List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(true);
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isEqualTo(false);
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(2).getValueByKey("value")).isEqualTo(false);
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(3).getValueByKey("value")).isEqualTo(true);
+        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(true);
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value")).isEqualTo(false);
+        Assertions.assertThat(tables.get(0).getRecords().get(2).getValueByKey("value")).isEqualTo(false);
+        Assertions.assertThat(tables.get(0).getRecords().get(3).getValueByKey("value")).isEqualTo(true);
     }
 
     @Test
@@ -188,8 +188,8 @@ class FluxCsvParserTest {
         long expected = Long.parseUnsignedLong("17916881237904312345");
 
         List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(expected);
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
+        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(expected);
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
     }
 
     @Test
@@ -207,11 +207,11 @@ class FluxCsvParserTest {
 
         List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
 
-        byte[] value = tables.get(0).getRecords().get(0).getValueByKey("value");
+        byte[] value = (byte[]) tables.get(0).getRecords().get(0).getValueByKey("value");
         Assertions.assertThat(value).isNotEmpty();
         Assertions.assertThat(new String(value, UTF_8)).isEqualTo(binaryData);
 
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
     }
 
     @Test
@@ -225,8 +225,8 @@ class FluxCsvParserTest {
                 + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
 
         List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(Instant.ofEpochSecond(10));
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
+        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(Instant.ofEpochSecond(10));
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
     }
 
     @Test
@@ -241,9 +241,9 @@ class FluxCsvParserTest {
 
         List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
         
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value"))
+        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByKey("value"))
                 .isEqualTo(Instant.ofEpochSecond(10).plusNanos(999999999));
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value"))
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value"))
                 .isNull();
     }
 
@@ -259,9 +259,25 @@ class FluxCsvParserTest {
 
         List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
 
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(0).getValueByKey("value"))
+        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByKey("value"))
                 .isEqualTo(Duration.ofNanos(125));
-        Assertions.assertThat((Object) tables.get(0).getRecords().get(1).getValueByKey("value"))
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value"))
                 .isNull();
+    }
+
+    @Test
+    void groupKey() throws IOException {
+        
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,duration\n"
+                + "#group,false,false,false,false,true,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,125\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
+
+        Assertions.assertThat(tables.get(0).getColumns()).hasSize(10);
+        Assertions.assertThat(tables.get(0).getGroupKey()).hasSize(2);
     }
 }
