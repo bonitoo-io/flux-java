@@ -131,11 +131,11 @@ fi
 #
 # Fluxd
 #
-rm -rf ./influxd_nightly*
+rm -rf ./influxd-nightly*
 wget http://167.114.231.105/nightlies/influxd_nightly_${archive}.tar.gz -O influxd-nightly.tar.gz
-mkdir influxd_nightly/ || true
-tar zxvf influxd-nightly.tar.gz -C influxd_nightly/
-./influxd_nightly/influxd  &>./influxd_nightly.log &
+mkdir influxd-nightly/ || true
+tar zxvf influxd-nightly.tar.gz -C influxd-nightly/
+./influxd-nightly/influxd  &>./influxd-nightly.log &
 
 # Wait for start Influxd
 echo "Wait 5s to start Influxd"
