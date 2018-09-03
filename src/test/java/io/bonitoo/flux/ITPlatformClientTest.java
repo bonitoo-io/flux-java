@@ -40,16 +40,16 @@ class ITPlatformClientTest {
 
     private static final Logger LOG = Logger.getLogger(ITPlatformClientTest.class.getName());
 
-    private String influxdURL;
+    private String platformURL;
 
     @BeforeEach
     void setUp() {
 
-        String influxdIP = System.getenv().getOrDefault("INFLUXD_IP", "127.0.0.1");
-        String influxdPort = System.getenv().getOrDefault("INFLUXD_PORT_API", "9999");
+        String platformIP = System.getenv().getOrDefault("PLATFORM_IP", "127.0.0.1");
+        String platformPort = System.getenv().getOrDefault("PLATFORM_IP_API", "9999");
 
-        influxdURL = "http://" + influxdIP + ":" + influxdPort;
-        LOG.log(Level.FINEST, "Influxd URL: {0}", influxdURL);
+        platformURL = "http://" + platformIP + ":" + platformPort;
+        LOG.log(Level.FINEST, "Platform URL: {0}", platformURL);
     }
 
     @Test
@@ -58,7 +58,7 @@ class ITPlatformClientTest {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
 
         Request request = new Request.Builder()
-                .url(influxdURL + "/v1/tasks")
+                .url(platformURL + "/v1/tasks")
                 .addHeader("accept", "application/json")
                 .build();
 

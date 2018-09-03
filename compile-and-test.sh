@@ -52,7 +52,7 @@ if [ ! "$RUN_NIGHTLY_BINARY" == "true" ]; then
     #
     docker network create influxdb
     INFLUXDB_IP=influxdb
-    INFLUXD_IP=influxd
+    PLATFORM_IP=influxd
     FLUX_IP=flux
     DOCKER_NET=influxdb
 
@@ -123,27 +123,24 @@ if [ "$RUN_NIGHTLY_BINARY" == "true" ]; then
     ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'
     INFLUXDB_IP=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | grep 10`
     FLUX_IP=${INFLUXDB_IP}
-    INFLUXD_IP=${INFLUXDB_IP}
+    PLATFORM_IP=${INFLUXDB_IP}
     DOCKER_NET=host
-    ps ux
 fi
 
 #
 # Fluxd
 #
-rm -rf ./influxd-nightly*
-wget http://167.114.231.105/nightlies/influxd_nightly_${archive}.tar.gz -O influxd-nightly.tar.gz
-mkdir influxd-nightly/ || true
-ls -ltrh
-gzip -t influxd-nightly.tar.gz
-tar zxvf influxd-nightly.tar.gz -C influxd-nightly/
-./influxd-nightly/influxd  &>./influxd-nightly.log &
+rm -rf ./platform-nightly*
+wget http://167.114.231.105/nightlies/influxd_nightly_${archive}.tar.gz -O platform-nightly.tar.gz
+mkdir platform-nightly/ || true
+tar zxvf platform-nightly.tar.gz -C platform-nightly/
+./platform-nightly/influxd  &>./platform-nightly.log &
 
 # Wait for start Influxd
 echo "Wait 5s to start Influxd"
 sleep 5
 
-echo "INFLUXDB_IP: " ${INFLUXDB_IP} " FLUX_IP: " ${FLUX_IP} " INFLUXD_IP: " ${INFLUXD_IP}
+echo "INFLUXDB_IP: " ${INFLUXDB_IP} " FLUX_IP: " ${FLUX_IP} " PLATFORM_IP: " ${PLATFORM_IP}
 
 docker run -it --rm \
        --volume ${PWD}:/usr/src/mymaven \
@@ -153,7 +150,7 @@ docker run -it --rm \
        --env INFLUXDB_VERSION=${INFLUXDB_VERSION} \
        --env INFLUXDB_IP=${INFLUXDB_IP} \
        --env FLUX_IP=${FLUX_IP} \
-       --env INFLUXD_IP=${INFLUXD_IP} \
+       --env PLATFORM_IP=${PLATFORM_IP} \
        maven:${MAVEN_JAVA_VERSION} mvn clean install -U
 
 docker kill influxdb || true
