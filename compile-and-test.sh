@@ -134,6 +134,8 @@ fi
 rm -rf ./influxd-nightly*
 wget http://167.114.231.105/nightlies/influxd_nightly_${archive}.tar.gz -O influxd-nightly.tar.gz
 mkdir influxd-nightly/ || true
+ls -ltrh
+gzip -t influxd-nightly.tar.gz
 tar zxvf influxd-nightly.tar.gz -C influxd-nightly/
 ./influxd-nightly/influxd  &>./influxd-nightly.log &
 
