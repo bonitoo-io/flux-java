@@ -45,7 +45,7 @@ class SkewFluxTest {
                 .from("telegraf")
                 .skew();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> skew()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> skew()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class SkewFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> skew(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> skew(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class SkewFluxTest {
                 .skew(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> skew(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> skew(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class SkewFluxTest {
                 .skew(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> skew(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> skew(useStartTime: true)");
     }
 }

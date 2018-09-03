@@ -51,7 +51,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
         fluxClient.subscribeEvents(FluxSuccessEvent.class, event -> {
 
-            String expected = "option now = () => 1970-01-01T00:02:00.000000000Z from(db:\"flux_database\")";
+            String expected = "option now = () => 1970-01-01T00:02:00.000000000Z from(bucket:\"flux_database\")";
 
             Assertions.assertThat(event).isNotNull();
             Assertions.assertThat(event.getFluxQuery()).isEqualToIgnoringWhitespace(expected);
@@ -77,7 +77,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
         fluxClient.subscribeEvents(FluxErrorEvent.class, event -> {
 
-            String expected = "option now = () => 1970-01-01T00:02:00.000000000Z from(db:\"flux_database\")";
+            String expected = "option now = () => 1970-01-01T00:02:00.000000000Z from(bucket:\"flux_database\")";
 
             Assertions.assertThat(event).isNotNull();
             Assertions.assertThat(event.getFluxQuery()).isEqualToIgnoringWhitespace(expected);
@@ -104,7 +104,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
         fluxClient.subscribeEvents(FluxErrorEvent.class, event -> {
 
-            String expected = "option now = () => 1970-01-01T00:02:00.000000000Z from(db:\"flux_database\")";
+            String expected = "option now = () => 1970-01-01T00:02:00.000000000Z from(bucket:\"flux_database\")";
 
             Assertions.assertThat(event).isNotNull();
             Assertions.assertThat(event.getFluxQuery()).isEqualToIgnoringWhitespace(expected);

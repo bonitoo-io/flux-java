@@ -44,7 +44,7 @@ class IntegralFluxTest {
                 .from("telegraf")
                 .integral(1L, ChronoUnit.MINUTES);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> integral(unit: 1m)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> integral(unit: 1m)");
     }
 
     @Test
@@ -55,7 +55,7 @@ class IntegralFluxTest {
                 .integral()
                 .withUnit(5L, ChronoUnit.MINUTES);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> integral(unit: 5m)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> integral(unit: 5m)");
     }
 
     @Test
@@ -66,6 +66,6 @@ class IntegralFluxTest {
                 .integral()
                     .withUnit("10m6h");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> integral(unit: 10m6h)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> integral(unit: 10m6h)");
     }
 }

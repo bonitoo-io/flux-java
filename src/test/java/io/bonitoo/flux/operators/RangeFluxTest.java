@@ -48,7 +48,7 @@ class RangeFluxTest {
                 .range(Instant.ofEpochSecond(1_500_000));
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> range(start: 1970-01-18T08:40:00.000000000Z)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> range(start: 1970-01-18T08:40:00.000000000Z)");
     }
 
     @Test
@@ -58,7 +58,7 @@ class RangeFluxTest {
                 .from("telegraf")
                 .range(Instant.ofEpochSecond(1_500_000), Instant.ofEpochSecond(2_000_000));
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "range(start: 1970-01-18T08:40:00.000000000Z, stop: 1970-01-24T03:33:20.000000000Z)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
@@ -72,7 +72,7 @@ class RangeFluxTest {
                 .range(15L, ChronoUnit.SECONDS);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> range(start: 15s)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> range(start: 15s)");
     }
 
     @Test
@@ -83,7 +83,7 @@ class RangeFluxTest {
                 .range(-33L, ChronoUnit.HOURS);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> range(start: -33h)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> range(start: -33h)");
     }
 
     @Test
@@ -94,7 +94,7 @@ class RangeFluxTest {
                 .range(15L, 44L, ChronoUnit.NANOS);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> range(start: 15ns, stop: 44ns)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> range(start: 15ns, stop: 44ns)");
     }
 
     @Test
@@ -107,7 +107,7 @@ class RangeFluxTest {
                     .withStop("10h");
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> range(start: -1h, stop: 10h)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> range(start: -1h, stop: 10h)");
     }
 
     @Test
@@ -122,7 +122,7 @@ class RangeFluxTest {
         parameters.put("startParameter", Instant.ofEpochSecond(1_600_000));
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> range(start: 1970-01-19T12:26:40.000000000Z)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> range(start: 1970-01-19T12:26:40.000000000Z)");
     }
 
     @Test
@@ -138,7 +138,7 @@ class RangeFluxTest {
         parameters.put("startParameter", Instant.ofEpochSecond(1_600_000));
         parameters.put("stopParameter", Instant.ofEpochSecond(1_800_000));
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "range(start: 1970-01-19T12:26:40.000000000Z, stop: 1970-01-21T20:00:00.000000000Z)";
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters))).isEqualToIgnoringWhitespace(expected);

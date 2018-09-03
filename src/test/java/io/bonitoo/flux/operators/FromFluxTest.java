@@ -44,7 +44,7 @@ class FromFluxTest {
 
         Flux flux = Flux.from("telegraf");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\")");
     }
 
     @Test
@@ -65,7 +65,7 @@ class FromFluxTest {
         Flux flux = Flux.from("telegraf", hosts);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\", hosts:[\"fluxdHost\", \"192.168.1.100\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\", hosts:[\"fluxdHost\", \"192.168.1.100\"])");
     }
 
     @Test
@@ -73,7 +73,7 @@ class FromFluxTest {
 
         Flux flux = Flux.from("telegraf", new ArrayList<>());
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\")");
     }
 
     @Test
@@ -90,7 +90,7 @@ class FromFluxTest {
         Flux flux = Flux.from("telegraf", new String[]{"fluxdHost", "192.168.1.100"});
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\", hosts:[\"fluxdHost\", \"192.168.1.100\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\", hosts:[\"fluxdHost\", \"192.168.1.100\"])");
     }
 
     @Test
@@ -98,7 +98,7 @@ class FromFluxTest {
 
         Flux flux = Flux.from("telegraf", new String[]{});
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\")");
     }
 
     @Test

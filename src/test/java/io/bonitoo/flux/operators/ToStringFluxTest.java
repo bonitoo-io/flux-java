@@ -42,6 +42,6 @@ class ToStringFluxTest {
                 .from("telegraf")
                 .toStringConvert();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> toString()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> toString()");
     }
 }

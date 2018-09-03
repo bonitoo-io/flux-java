@@ -34,12 +34,12 @@ import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/tree/master/query#from">from</a> - starting point
- * for all queries. Get data from the specified database.
+ * for all queries. Get data from the specified bucket.
  *
  * <h3>Options</h3>
  * <ul>
- * <li><b>db</b> - The name of the database to query [string]</li>
- * <li><b>hosts</b> - array of strings from(db:"telegraf", hosts:["host1", "host2"])</li>
+ * <li><b>bucket</b> - The name of the bucket to query [string]</li>
+ * <li><b>hosts</b> - array of strings from(bucket:"telegraf", hosts:["host1", "host2"])</li>
  * </ul>
  *
  * <h3>Example</h3>
@@ -59,25 +59,25 @@ public final class FromFlux extends Flux {
     private String db;
     private Collection<String> hosts;
 
-    public FromFlux(@Nonnull final String db) {
-        Preconditions.checkNonEmptyString(db, "Database name");
+    public FromFlux(@Nonnull final String bucket) {
+        Preconditions.checkNonEmptyString(bucket, "Bucket name");
 
-        this.db = db;
+        this.db = bucket;
     }
 
-    public FromFlux(@Nonnull final String db, @Nonnull final String[] hosts) {
-        Preconditions.checkNonEmptyString(db, "Database name");
+    public FromFlux(@Nonnull final String bucket, @Nonnull final String[] hosts) {
+        Preconditions.checkNonEmptyString(bucket, "Bucket name");
         Objects.requireNonNull(hosts, "Hosts are required");
 
-        this.db = db;
+        this.db = bucket;
         this.hosts = Arrays.asList(hosts);
     }
 
-    public FromFlux(@Nonnull final String db, @Nonnull final Collection<String> hosts) {
-        Preconditions.checkNonEmptyString(db, "Database name");
+    public FromFlux(@Nonnull final String bucket, @Nonnull final Collection<String> hosts) {
+        Preconditions.checkNonEmptyString(bucket, "Bucket name");
         Objects.requireNonNull(hosts, "Hosts are required");
 
-        this.db = db;
+        this.db = bucket;
         this.hosts = hosts;
     }
 
@@ -85,10 +85,10 @@ public final class FromFlux extends Flux {
     protected void appendActual(@Nonnull final FluxChain fluxChain) {
 
         //
-        // from(db:"telegraf"
+        // from(bucket:"telegraf"
         //
         StringBuilder fromBuilder = new StringBuilder()
-                .append("from(db:\"")
+                .append("from(bucket:\"")
                 .append(db)
                 .append("\"");
 

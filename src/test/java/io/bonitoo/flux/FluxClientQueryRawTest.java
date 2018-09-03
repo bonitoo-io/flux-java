@@ -141,7 +141,7 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
 
         fluxServer.enqueue(createResponse());
 
-        String query = "from(db:\"telegraf\") |> " +
+        String query = "from(bucket:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
         Response<ResponseBody> result = fluxClient.fluxRaw(query);
@@ -154,7 +154,7 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
 
         fluxServer.enqueue(createResponse());
 
-        String query = "from(db:\"telegraf\") |> " +
+        String query = "from(bucket:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
         fluxClient.fluxRaw(query, result -> {
@@ -171,7 +171,7 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
 
         fluxServer.shutdown();
 
-        String query = "from(db:\"telegraf\") |> " +
+        String query = "from(bucket:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
         fluxClient.fluxRaw(query,
@@ -186,7 +186,7 @@ class FluxClientQueryRawTest extends AbstractFluxClientTest {
 
         fluxServer.enqueue(createErrorResponse());
 
-        Response<ResponseBody> fluxQuery = fluxClient.fluxRaw("from(db: \"telegraf\")");
+        Response<ResponseBody> fluxQuery = fluxClient.fluxRaw("from(bucket: \"telegraf\")");
 
         Assertions.assertThat(fluxQuery.isSuccessful()).isFalse();
     }

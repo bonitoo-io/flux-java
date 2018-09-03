@@ -45,7 +45,7 @@ class SpreadFluxTest {
                 .from("telegraf")
                 .spread();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> spread()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> spread()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class SpreadFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> spread(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> spread(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class SpreadFluxTest {
                 .spread(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> spread(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> spread(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class SpreadFluxTest {
                 .spread(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> spread(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> spread(useStartTime: true)");
     }
 }

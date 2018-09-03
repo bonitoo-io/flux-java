@@ -42,6 +42,6 @@ class ToDurationFluxTest {
                 .from("telegraf")
                 .toDuration();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> toDuration()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> toDuration()");
     }
 }

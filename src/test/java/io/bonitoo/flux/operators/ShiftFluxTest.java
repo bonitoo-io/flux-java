@@ -46,7 +46,7 @@ class ShiftFluxTest {
                 .from("telegraf")
                 .shift(10L, ChronoUnit.HOURS);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> shift(shift: 10h)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> shift(shift: 10h)");
     }
 
     @Test
@@ -57,7 +57,7 @@ class ShiftFluxTest {
                 .shift(10L, ChronoUnit.HOURS, new String[]{"time", "custom"});
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> shift(shift: 10h, columns: [\"time\", \"custom\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> shift(shift: 10h, columns: [\"time\", \"custom\"])");
     }
 
     @Test
@@ -72,7 +72,7 @@ class ShiftFluxTest {
                 .shift(10L, ChronoUnit.HOURS, columns);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> shift(shift: 10h, columns: [\"time\", \"_start\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> shift(shift: 10h, columns: [\"time\", \"_start\"])");
     }
 
     @Test
@@ -84,7 +84,7 @@ class ShiftFluxTest {
                 .withShift(20L, ChronoUnit.DAYS);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> shift(shift: 20d)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> shift(shift: 20d)");
     }
 
     @Test
@@ -96,6 +96,6 @@ class ShiftFluxTest {
                     .withShift("2y");
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> shift(shift: 2y)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> shift(shift: 2y)");
     }
 }

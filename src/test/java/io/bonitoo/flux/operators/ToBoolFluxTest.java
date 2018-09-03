@@ -42,6 +42,6 @@ class ToBoolFluxTest {
                 .from("telegraf")
                 .toBool();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> toBool()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> toBool()");
     }
 }

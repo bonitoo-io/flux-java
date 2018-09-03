@@ -48,7 +48,7 @@ class GroupFluxTest {
                 .groupBy("location");
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> group(by: [\"location\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> group(by: [\"location\"])");
     }
 
     @Test
@@ -63,7 +63,7 @@ class GroupFluxTest {
                 .groupBy(groupBy);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> group(by: [\"region\", \"host\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> group(by: [\"region\", \"host\"])");
     }
 
     @Test
@@ -81,7 +81,7 @@ class GroupFluxTest {
                 .from("telegraf")
                 .groupBy(groupBy, keepBy);
 
-        String expected = "from(db:\"telegraf\") |> group(by: [\"region\", \"host\"], keep: [\"server\", \"state\"])";
+        String expected = "from(bucket:\"telegraf\") |> group(by: [\"region\", \"host\"], keep: [\"server\", \"state\"])";
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
 
@@ -97,7 +97,7 @@ class GroupFluxTest {
         parameters.put("groupByParameter", new String[]{"region", "zip"});
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> group(by: [\"region\", \"zip\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> group(by: [\"region\", \"zip\"])");
     }
 
     @Test
@@ -108,7 +108,7 @@ class GroupFluxTest {
                 .groupBy(new String[]{"region", "value"});
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> group(by: [\"region\", \"value\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> group(by: [\"region\", \"value\"])");
     }
 
 
@@ -119,7 +119,7 @@ class GroupFluxTest {
                 .from("telegraf")
                 .groupBy(new String[]{"region", "value"}, new String[]{"server", "rack"});
 
-        String expected = "from(db:\"telegraf\") |> group(by: [\"region\", \"value\"], keep: [\"server\", \"rack\"])";
+        String expected = "from(bucket:\"telegraf\") |> group(by: [\"region\", \"value\"], keep: [\"server\", \"rack\"])";
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
 
@@ -136,7 +136,7 @@ class GroupFluxTest {
         parameters.put("groupByParameter", new String[]{"region", "zip"});
         parameters.put("keepByParameter", new String[]{"server", "price"});
 
-        String expected = "from(db:\"telegraf\") |> group(by: [\"region\", \"zip\"], keep: [\"server\", \"price\"])";
+        String expected = "from(bucket:\"telegraf\") |> group(by: [\"region\", \"zip\"], keep: [\"server\", \"price\"])";
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters))).isEqualToIgnoringWhitespace(expected);
     }
@@ -153,7 +153,7 @@ class GroupFluxTest {
                 .groupExcept(groupBy);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> group(except: [\"region\", \"host\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> group(except: [\"region\", \"host\"])");
     }
 
     @Test
@@ -171,7 +171,7 @@ class GroupFluxTest {
                 .from("telegraf")
                 .groupExcept(groupBy, keepBy);
 
-        String expected = "from(db:\"telegraf\") |> group(except: [\"region\", \"host\"], keep: [\"server\", \"state\"])";
+        String expected = "from(bucket:\"telegraf\") |> group(except: [\"region\", \"host\"], keep: [\"server\", \"state\"])";
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
 
@@ -187,7 +187,7 @@ class GroupFluxTest {
         parameters.put("groupExceptParameter", new String[]{"region", "zip"});
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> group(except: [\"region\", \"zip\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> group(except: [\"region\", \"zip\"])");
     }
 
     @Test
@@ -198,7 +198,7 @@ class GroupFluxTest {
                 .groupExcept(new String[]{"region", "value"});
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> group(except: [\"region\", \"value\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> group(except: [\"region\", \"value\"])");
     }
 
 
@@ -209,7 +209,7 @@ class GroupFluxTest {
                 .from("telegraf")
                 .groupExcept(new String[]{"region", "value"}, new String[]{"server", "rack"});
 
-        String expected = "from(db:\"telegraf\") |> group(except: [\"region\", \"value\"], keep: [\"server\", \"rack\"])";
+        String expected = "from(bucket:\"telegraf\") |> group(except: [\"region\", \"value\"], keep: [\"server\", \"rack\"])";
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
 
@@ -226,7 +226,7 @@ class GroupFluxTest {
         parameters.put("groupExceptParameter", new String[]{"region", "zip"});
         parameters.put("keepExceptParameter", new String[]{"server", "price"});
 
-        String expected = "from(db:\"telegraf\") |> group(except: [\"region\", \"zip\"], keep: [\"server\", \"price\"])";
+        String expected = "from(bucket:\"telegraf\") |> group(except: [\"region\", \"zip\"], keep: [\"server\", \"price\"])";
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters))).isEqualToIgnoringWhitespace(expected);
     }

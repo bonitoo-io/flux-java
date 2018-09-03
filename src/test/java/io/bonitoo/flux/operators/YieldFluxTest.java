@@ -42,7 +42,7 @@ class YieldFluxTest {
                 .from("telegraf")
                 .yield("0");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> yield(name: \"0\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> yield(name: \"0\")");
     }
 
     @Test
@@ -53,6 +53,6 @@ class YieldFluxTest {
                 .yield()
                 .withName("1");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> yield(name: \"1\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> yield(name: \"1\")");
     }
 }

@@ -45,7 +45,7 @@ class DropFluxTest {
                 .from("telegraf")
                 .drop(new String[]{"host", "_measurement"});
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> drop(columns: [\"host\", \"_measurement\"])");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> drop(columns: [\"host\", \"_measurement\"])");
     }
 
     @Test
@@ -59,7 +59,7 @@ class DropFluxTest {
                 .from("telegraf")
                 .drop(columns);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> drop(columns: [\"host\", \"_value\"])");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> drop(columns: [\"host\", \"_value\"])");
     }
 
     @Test
@@ -69,7 +69,7 @@ class DropFluxTest {
                 .from("telegraf")
                 .drop("col =~ /usage*/");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> drop(fn: (col) => col =~ /usage*/)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> drop(fn: (col) => col =~ /usage*/)");
     }
 
     @Test
@@ -80,6 +80,6 @@ class DropFluxTest {
                 .drop()
                     .withFunction("col =~ /free*/");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> drop(fn: (col) => col =~ /free*/)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> drop(fn: (col) => col =~ /free*/)");
     }
 }

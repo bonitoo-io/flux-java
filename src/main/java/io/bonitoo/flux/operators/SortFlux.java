@@ -47,7 +47,7 @@ import io.bonitoo.flux.Flux;
  *     .from("telegraf")
  *     .sort(new String[]{"region", "value"});
  *
- *     from(db:"telegraf")
+ *     from(bucket:"telegraf")
  *          |&gt; filter(fn: (r) =&gt; r["_measurement"] == "system" AND r["_field"] == "uptime")
  *          |&gt; range(start:-12h)
  *          |&gt; sort(desc: true)

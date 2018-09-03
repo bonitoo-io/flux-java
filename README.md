@@ -46,7 +46,7 @@ There are two possibilities how to create Flux query:
 #### Flux query
 
 ```java
-String query = "from(db:\"telegraf\") |> filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
+String query = "from(bucket:\"telegraf\") |> filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
 List<FluxTable> tables = fluxClient.flux(query);
 ```
@@ -70,7 +70,7 @@ Execute a Flux query against the Flux service and asynchronous stream `FluxRecor
 
 ```java
 
-String query = "from(db:\"telegraf\") |> range(start: -30m) |> group(by: [\"tag_a\", \"tag_b\"])";
+String query = "from(bucket:\"telegraf\") |> range(start: -30m) |> group(by: [\"tag_a\", \"tag_b\"])";
 
 fluxClient.flux(query, fluxRecord -> {
 

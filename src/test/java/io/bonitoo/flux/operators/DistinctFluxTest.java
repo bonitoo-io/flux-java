@@ -46,7 +46,7 @@ class DistinctFluxTest {
                 .groupBy("_measurement")
                 .distinct("_measurement");
 
-        String expected = "from(db:\"telegraf\") |> group(by: [\"_measurement\"]) |> distinct(column: \"_measurement\")";
+        String expected = "from(bucket:\"telegraf\") |> group(by: [\"_measurement\"]) |> distinct(column: \"_measurement\")";
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
 
@@ -62,7 +62,7 @@ class DistinctFluxTest {
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("column", "\"_value\"");
 
-        String expected = "from(db:\"telegraf\") |> group(by: [\"_measurement\"]) |> distinct(column: \"_value\")";
+        String expected = "from(bucket:\"telegraf\") |> group(by: [\"_measurement\"]) |> distinct(column: \"_value\")";
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters))).isEqualToIgnoringWhitespace(expected);
     }
 }

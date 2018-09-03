@@ -45,7 +45,7 @@ class LimitFluxTest {
                 .from("telegraf")
                 .limit(5);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> limit(n: 5)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> limit(n: 5)");
     }
 
     @Test
@@ -67,7 +67,7 @@ class LimitFluxTest {
         parameters.put("limit", 15);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> limit(n: 15)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> limit(n: 15)");
     }
 
     @Test

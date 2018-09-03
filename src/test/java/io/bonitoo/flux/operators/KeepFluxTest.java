@@ -45,7 +45,7 @@ class KeepFluxTest {
                 .from("telegraf")
                 .keep(new String[]{"host", "_measurement"});
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(columns: [\"host\", \"_measurement\"])");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> keep(columns: [\"host\", \"_measurement\"])");
     }
 
     @Test
@@ -59,7 +59,7 @@ class KeepFluxTest {
                 .from("telegraf")
                 .keep(columns);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(columns: [\"host\", \"_value\"])");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> keep(columns: [\"host\", \"_value\"])");
     }
 
     @Test
@@ -69,7 +69,7 @@ class KeepFluxTest {
                 .from("telegraf")
                 .keep("col =~ /usage*/");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(fn: (col) => col =~ /usage*/)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> keep(fn: (col) => col =~ /usage*/)");
     }
 
     @Test
@@ -80,6 +80,6 @@ class KeepFluxTest {
                 .keep()
                 .withFunction("col =~ /inodes*/");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> keep(fn: (col) => col =~ /inodes*/)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> keep(fn: (col) => col =~ /inodes*/)");
     }
 }

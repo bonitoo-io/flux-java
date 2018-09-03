@@ -54,8 +54,8 @@ class JoinFluxText {
         Flux flux = Flux
                 .join("cpu", cpu, "mem", mem, "host", "left");
 
-        String expected = "cpu = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
-                + "mem = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
+        String expected = "cpu = from(bucket:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
+                + "mem = from(bucket:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
                 + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\"], method: \"left\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
@@ -82,8 +82,8 @@ class JoinFluxText {
                 .withOn(tags)
                 .withMethod("cross");
 
-        String expected = "cpu = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
-                + "mem = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
+        String expected = "cpu = from(bucket:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
+                + "mem = from(bucket:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
                 + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\", \"production\"], method: \"cross\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
@@ -110,8 +110,8 @@ class JoinFluxText {
                 .withOn(tags)
                 .withMethod(JoinFlux.MethodType.RIGHT);
 
-        String expected = "cpu = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
-                + "mem = from(db:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
+        String expected = "cpu = from(bucket:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\")) |> range(start: -30m) "
+                + "mem = from(bucket:\"telegraf\") |> filter(fn: (r) => (r[\"_measurement\"] == \"mem\" AND r[\"_field\"] == \"used_percent\")) |> range(start: -30m) "
                 + "join(tables: {cpu:cpu, mem:mem}, on: [\"host\", \"production\"], method: \"right\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);

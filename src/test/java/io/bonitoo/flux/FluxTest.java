@@ -50,7 +50,7 @@ class FluxTest {
                 .count()
                 .print();
 
-        Assertions.assertThat(flux).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count()");
     }
 
     @Test
@@ -68,7 +68,7 @@ class FluxTest {
                 .count()
                 .print(new FluxChain().addOptions(options));
 
-        Assertions.assertThat(flux).isEqualToIgnoringWhitespace("option now = giveMeTime() from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux).isEqualToIgnoringWhitespace("option now = giveMeTime() from(bucket:\"telegraf\") |> count()");
     }
 
     @Test
@@ -96,7 +96,7 @@ class FluxTest {
 
         String expected = "option now = giveMeTime() "
                 + "option task = {name: \"foo\", every: 1h, delay: 10m, cron: \"0 2 * * *\", retry: 5} "
-                + "from(db:\"telegraf\") |> count()";
+                + "from(bucket:\"telegraf\") |> count()";
 
         Assertions.assertThat(flux).isEqualToIgnoringWhitespace(expected);
     }
@@ -121,7 +121,7 @@ class FluxTest {
                 .count()
                 .print(new FluxChain().addOptions(options));
 
-        Assertions.assertThat(flux).isEqualToIgnoringWhitespace("option now = giveMeTime() option location = fixedZone(offset: 10d) from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux).isEqualToIgnoringWhitespace("option now = giveMeTime() option location = fixedZone(offset: 10d) from(bucket:\"telegraf\") |> count()");
     }
 
     @Test
@@ -132,7 +132,7 @@ class FluxTest {
                 .count()
                     .withPropertyValueEscaped("unused", null);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count()");
     }
 
     @Test
@@ -143,7 +143,7 @@ class FluxTest {
                 .count()
                     .withPropertyValue("unused", null);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count()");
     }
 
     @Test
@@ -154,7 +154,7 @@ class FluxTest {
                 .count()
                     .withPropertyValue("unused", null, ChronoUnit.HOURS);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count()");
     }
 
     @Test
@@ -165,6 +165,6 @@ class FluxTest {
                 .count()
                     .withPropertyValue("unused", 10L, null);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count()");
     }
 }

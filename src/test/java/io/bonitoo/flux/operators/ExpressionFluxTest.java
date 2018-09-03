@@ -42,7 +42,7 @@ class ExpressionFluxTest {
                 .expression("map(fn: (r) => r._value * r._value)")
                 .expression("sum()");
 
-        String expected = "from(db:\"telegraf\") |> map(fn: (r) => r._value * r._value) |> sum()";
+        String expected = "from(bucket:\"telegraf\") |> map(fn: (r) => r._value * r._value) |> sum()";
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
 }

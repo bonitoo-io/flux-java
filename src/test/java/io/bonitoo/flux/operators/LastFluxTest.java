@@ -45,7 +45,7 @@ class LastFluxTest {
                 .from("telegraf")
                 .last();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> last()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> last()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class LastFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> last(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> last(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class LastFluxTest {
                 .last(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> last(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> last(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class LastFluxTest {
                 .last(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> last(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> last(useStartTime: true)");
     }
 }

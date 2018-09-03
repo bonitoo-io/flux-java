@@ -42,6 +42,6 @@ class ToIntFluxTest {
                 .from("telegraf")
                 .toInt();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> toInt()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> toInt()");
     }
 }

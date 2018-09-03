@@ -46,7 +46,7 @@ class DerivativeFluxTest {
                 .from("telegraf")
                 .derivative(1L, ChronoUnit.MINUTES);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> derivative(unit: 1m)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> derivative(unit: 1m)");
     }
 
     @Test
@@ -60,7 +60,7 @@ class DerivativeFluxTest {
                 .withColumns(new String[]{"time1", "time2"})
                 .withTimeSrc("_timeMy");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> derivative(unit: 10d, nonNegative: true, columns: [\"time1\", \"time2\"], timeSrc: \"_timeMy\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> derivative(unit: 10d, nonNegative: true, columns: [\"time1\", \"time2\"], timeSrc: \"_timeMy\")");
     }
 
     @Test
@@ -76,7 +76,7 @@ class DerivativeFluxTest {
                 .withUnit(15L, ChronoUnit.DAYS)
                 .withColumns(columns);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> derivative(unit: 15d, columns: [\"time\", \"century\"])");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> derivative(unit: 15d, columns: [\"time\", \"century\"])");
     }
 
     @Test
@@ -87,6 +87,6 @@ class DerivativeFluxTest {
                 .derivative()
                     .withUnit("15s");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> derivative(unit: 15s)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> derivative(unit: 15s)");
     }
 }

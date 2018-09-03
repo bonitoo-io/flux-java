@@ -45,7 +45,7 @@ class MeanFluxTest {
                 .from("telegraf")
                 .mean();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> mean()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> mean()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class MeanFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> mean(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> mean(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class MeanFluxTest {
                 .mean(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> mean(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> mean(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class MeanFluxTest {
                 .mean(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> mean(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> mean(useStartTime: true)");
     }
 }

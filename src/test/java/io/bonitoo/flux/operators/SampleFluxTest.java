@@ -49,7 +49,7 @@ class SampleFluxTest {
                 .range(-1L, ChronoUnit.DAYS)
                 .sample(10);
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_system\")) |> "
                 + "range(start: -1d) |> sample(n: 10)";
 
@@ -64,7 +64,7 @@ class SampleFluxTest {
                 .range(-1L, ChronoUnit.DAYS)
                 .sample(5, 1);
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_system\")) |> "
                 + "range(start: -1d) |> sample(n: 5, pos: 1)";
 
@@ -79,7 +79,7 @@ class SampleFluxTest {
                 .sample()
                 .withN(5);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sample(n: 5)");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sample(n: 5)");
     }
 
     @Test

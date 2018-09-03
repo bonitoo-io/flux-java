@@ -45,7 +45,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(new String[]{"_value", "_oldValue"});
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"])";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"])";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -61,7 +61,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(columns);
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"])";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"])";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -73,7 +73,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(new String[]{"_value", "_oldValue"}, "_covValue");
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"], valueDst: \"_covValue\")";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"], valueDst: \"_covValue\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -89,7 +89,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(columns, "_covValue");
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"], valueDst: \"_covValue\")";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"], valueDst: \"_covValue\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -101,7 +101,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(new String[]{"_value", "_oldValue"}, true, "_covValue");
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"], pearsonr: true, valueDst: \"_covValue\")";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"], pearsonr: true, valueDst: \"_covValue\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -117,7 +117,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(columns, false);
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"], pearsonr: false)";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"], pearsonr: false)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -129,7 +129,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(new String[]{"_value", "_oldValue"}, true);
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"], pearsonr: true)";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_value\", \"_oldValue\"], pearsonr: true)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -145,7 +145,7 @@ class CovarianceFluxTest {
                 .from("telegraf")
                 .covariance(columns, false, "_covValue");
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"], pearsonr: false, valueDst: \"_covValue\")";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"_time\", \"_value\"], pearsonr: false, valueDst: \"_covValue\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -160,7 +160,7 @@ class CovarianceFluxTest {
                 .withPearsonr(true)
                 .withValueDst("_newColumn");
 
-        String expected = "from(db:\"telegraf\") |> covariance(columns: [\"columnA\", \"columnB\"], pearsonr: true, valueDst: \"_newColumn\")";
+        String expected = "from(bucket:\"telegraf\") |> covariance(columns: [\"columnA\", \"columnB\"], pearsonr: true, valueDst: \"_newColumn\")";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }

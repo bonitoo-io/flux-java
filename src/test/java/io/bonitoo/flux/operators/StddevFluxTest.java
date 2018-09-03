@@ -45,7 +45,7 @@ class StddevFluxTest {
                 .from("telegraf")
                 .stddev();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> stddev()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> stddev()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class StddevFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> stddev(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> stddev(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class StddevFluxTest {
                 .stddev(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> stddev(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> stddev(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class StddevFluxTest {
                 .stddev(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> stddev(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> stddev(useStartTime: true)");
     }
 }

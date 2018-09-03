@@ -683,7 +683,7 @@ Flux flux = Flux
 
 The Flux script:
 ```
-from(db:"telegraf")
+from(bucket:"telegraf")
     |> measurement(m: "cpu")
     |> sum()
 ```

@@ -20,28 +20,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.operators;
+package io.bonitoo.flux;
 
-import io.bonitoo.flux.Flux;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 /**
- * @author Jakub Bednar (bednar@github) (26/06/2018 06:39)
+ * @author Jakub Bednar (03/09/2018 12:10)
  */
-@RunWith(JUnitPlatform.class)
-class ToTimeFluxTest {
+class ITPlatformClientTest {
+
+    private static final Logger LOG = Logger.getLogger(ITPlatformClientTest.class.getName());
+
+    private String influxdURL;
+
+    @BeforeEach
+    void setUp() {
+
+        String influxdIP = System.getenv().getOrDefault("INFLUXD_IP", "127.0.0.1");
+        String influxdPort = System.getenv().getOrDefault("INFLUXD_PORT_API", "9999");
+
+        influxdURL = "http://" + influxdIP + ":" + influxdPort;
+        LOG.log(Level.FINEST, "Influxd URL: {0}", influxdURL);
+    }
 
     @Test
-    void toTime() {
+    void connectToPlatform() throws IOException {
 
-        Flux flux = Flux
-                .from("telegraf")
-                .toTime();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> toTime()");
+        Request request = new Request.Builder()
+                .url(influxdURL + "/v1/tasks")
+                .addHeader("accept", "application/json")
+                .build();
+
+        Response response = okHttpClient.newCall(request).execute();
+
+        Assertions.assertThat(response.code()).isEqualTo(200);
     }
 }

@@ -52,7 +52,7 @@ class SortFluxTest {
                 .sort(sortBy);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sort(cols: [\"region\", \"host\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sort(cols: [\"region\", \"host\"])");
     }
 
     @Test
@@ -63,7 +63,7 @@ class SortFluxTest {
                 .sort(new ArrayList<>(), false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sort(desc: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sort(desc: false)");
     }
 
     @Test
@@ -74,7 +74,7 @@ class SortFluxTest {
                 .sort(new String[]{"region", "value"});
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sort(cols: [\"region\", \"value\"])");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sort(cols: [\"region\", \"value\"])");
     }
 
     @Test
@@ -84,7 +84,7 @@ class SortFluxTest {
                 .sort(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sort(desc: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sort(desc: true)");
     }
 
     @Test
@@ -95,7 +95,7 @@ class SortFluxTest {
                 .sort(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sort(desc: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sort(desc: false)");
     }
 
     @Test
@@ -105,7 +105,7 @@ class SortFluxTest {
                 .from("telegraf")
                 .sort(new String[]{"region", "value"}, true);
 
-        String expected = "from(db:\"telegraf\") |> sort(cols: [\"region\", \"value\"], desc: true)";
+        String expected = "from(bucket:\"telegraf\") |> sort(cols: [\"region\", \"value\"], desc: true)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -121,7 +121,7 @@ class SortFluxTest {
                 .from("telegraf")
                 .sort(sortBy, false);
 
-        String expected = "from(db:\"telegraf\") |> sort(cols: [\"region\", \"host\"], desc: false)";
+        String expected = "from(bucket:\"telegraf\") |> sort(cols: [\"region\", \"host\"], desc: false)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -139,7 +139,7 @@ class SortFluxTest {
         parameters.put("columnsParameter", new String[]{"region", "tag"});
         parameters.put("descParameter", false);
 
-        String expected = "from(db:\"telegraf\") |> sort(cols: [\"region\", \"tag\"], desc: false)";
+        String expected = "from(bucket:\"telegraf\") |> sort(cols: [\"region\", \"tag\"], desc: false)";
 
         Assertions
                 .assertThat(flux.print(new FluxChain().addParameters(parameters)))

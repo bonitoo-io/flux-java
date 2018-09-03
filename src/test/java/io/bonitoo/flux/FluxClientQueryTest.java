@@ -64,7 +64,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxClient.flux(Flux.from("flux_database").limit().withPropertyNamed("n"), properties);
 
         Assertions.assertThat(getObjectFromBody("query"))
-                .isEqualToIgnoringWhitespace("from(db:\"flux_database\") |> limit(n: 5)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"flux_database\") |> limit(n: 5)");
     }
 
     @Test
@@ -147,7 +147,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         waitToCallback();
 
         Assertions.assertThat(getObjectFromBody("query"))
-                .isEqualToIgnoringWhitespace("from(db:\"flux_database\") |> limit(n: 5)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"flux_database\") |> limit(n: 5)");
     }
 
     @Test
@@ -248,7 +248,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxServer.enqueue(createResponse());
 
-        String query = "from(db:\"telegraf\") |> " +
+        String query = "from(bucket:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
         List<FluxTable> result = fluxClient.flux(query);
@@ -265,7 +265,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         List<FluxRecord> records = new ArrayList<>();
 
-        String query = "from(db:\"telegraf\") |> " +
+        String query = "from(bucket:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
         fluxClient.flux(query, record -> {
@@ -283,7 +283,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
 
         fluxServer.enqueue(createResponse());
 
-        String query = "from(db:\"telegraf\") |> " +
+        String query = "from(bucket:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
         fluxClient.flux(query);

@@ -44,7 +44,7 @@ class CustomFunction {
                 .withName("cpu")
                 .sum();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> measurement(m:\"cpu\") |> sum()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> measurement(m:\"cpu\") |> sum()");
     }
 
 }

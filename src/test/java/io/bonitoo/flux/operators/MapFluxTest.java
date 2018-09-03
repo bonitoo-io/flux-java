@@ -55,7 +55,7 @@ class MapFluxTest {
                 .range(-12L, ChronoUnit.HOURS)
                 .map("r._value * r._value");
 
-        String expected = "from(db:\"telegraf\") "
+        String expected = "from(bucket:\"telegraf\") "
                 + "|> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_system\" AND r[\"service\"] == \"app-server\")) "
                 + "|> range(start: -12h) "
                 + "|> map(fn: (r) => r._value * r._value)";
@@ -78,7 +78,7 @@ class MapFluxTest {
                 .range(-12L, ChronoUnit.HOURS)
                 .map("{value: r._value, value2:r._value * r._value}");
 
-        String expected = "from(db:\"telegraf\") "
+        String expected = "from(bucket:\"telegraf\") "
                 + "|> filter(fn: (r) => (r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_system\" AND r[\"service\"] == \"app-server\")) "
                 + "|> range(start: -12h) "
                 + "|> map(fn: (r) => {value: r._value, value2:r._value * r._value})";
@@ -98,7 +98,7 @@ class MapFluxTest {
                 .map()
                 .withPropertyNamed("fn: (r)", "function");
 
-        String expected = "from(db:\"telegraf\") "
+        String expected = "from(bucket:\"telegraf\") "
                 + "|> range(start: -12h) "
                 + "|> map(fn: (r) => r._value * 10)";
 

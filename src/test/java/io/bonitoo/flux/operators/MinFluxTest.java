@@ -45,7 +45,7 @@ class MinFluxTest {
                 .from("telegraf")
                 .min();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> min()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> min()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class MinFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> min(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> min(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class MinFluxTest {
                 .min(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> min(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> min(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class MinFluxTest {
                 .min(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> min(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> min(useStartTime: true)");
     }
 }

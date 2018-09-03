@@ -42,6 +42,6 @@ class ToFloatFluxTest {
                 .from("telegraf")
                 .toFloat();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> toFloat()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> toFloat()");
     }
 }

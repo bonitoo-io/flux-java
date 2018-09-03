@@ -45,7 +45,7 @@ class SumFluxTest {
                 .from("telegraf")
                 .sum();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sum()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sum()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class SumFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sum(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sum(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class SumFluxTest {
                 .sum(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sum(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sum(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class SumFluxTest {
                 .sum(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> sum(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sum(useStartTime: true)");
     }
 }

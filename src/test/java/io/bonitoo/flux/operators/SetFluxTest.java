@@ -42,7 +42,7 @@ class SetFluxTest {
                 .from("telegraf")
                 .set("location", "Carolina");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> set(key: \"location\", value: \"Carolina\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> set(key: \"location\", value: \"Carolina\")");
     }
 
     @Test
@@ -53,6 +53,6 @@ class SetFluxTest {
                 .set()
                 .withKeyValue("type", "telegraphs");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> set(key: \"type\", value: \"telegraphs\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> set(key: \"type\", value: \"telegraphs\")");
     }
 }

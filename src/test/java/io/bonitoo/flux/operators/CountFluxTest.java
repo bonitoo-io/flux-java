@@ -45,7 +45,7 @@ class CountFluxTest {
                 .from("telegraf")
                 .count();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class CountFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class CountFluxTest {
                 .count(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class CountFluxTest {
                 .count(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> count(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> count(useStartTime: true)");
     }
 }

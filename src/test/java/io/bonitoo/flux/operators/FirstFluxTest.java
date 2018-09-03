@@ -45,7 +45,7 @@ class FirstFluxTest {
                 .from("telegraf")
                 .first();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> first()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> first()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class FirstFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> first(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> first(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class FirstFluxTest {
                 .first(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> first(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> first(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class FirstFluxTest {
                 .first(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> first(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> first(useStartTime: true)");
     }
 }

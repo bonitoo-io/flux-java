@@ -45,7 +45,7 @@ class MaxFluxTest {
                 .from("telegraf")
                 .max();
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> max()");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> max()");
     }
 
     @Test
@@ -60,7 +60,7 @@ class MaxFluxTest {
         parameters.put("parameter", true);
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters)))
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> max(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> max(useStartTime: true)");
     }
 
     @Test
@@ -71,7 +71,7 @@ class MaxFluxTest {
                 .max(false);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> max(useStartTime: false)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> max(useStartTime: false)");
     }
 
     @Test
@@ -82,6 +82,6 @@ class MaxFluxTest {
                 .max(true);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> max(useStartTime: true)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> max(useStartTime: true)");
     }
 }

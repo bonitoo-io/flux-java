@@ -49,7 +49,7 @@ class RenameFluxTest {
                 .from("telegraf")
                 .rename(map);
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> rename(columns: {host: \"server\", _value: \"val\"})");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> rename(columns: {host: \"server\", _value: \"val\"})");
     }
 
 
@@ -60,7 +60,7 @@ class RenameFluxTest {
                 .from("telegraf")
                 .rename("{col}_new");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> rename(fn: (col) => \"{col}_new\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> rename(fn: (col) => \"{col}_new\")");
     }
 
     @Test
@@ -71,6 +71,6 @@ class RenameFluxTest {
                 .rename()
                 .withFunction("{col}_new");
 
-        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> rename(fn: (col) => \"{col}_new\")");
+        Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> rename(fn: (col) => \"{col}_new\")");
     }
 }

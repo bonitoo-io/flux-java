@@ -49,7 +49,7 @@ class WindowFluxTest {
                 .window(15L, ChronoUnit.MINUTES);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> window(every: 15m)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> window(every: 15m)");
     }
 
     @Test
@@ -72,7 +72,7 @@ class WindowFluxTest {
                 .window(15L, ChronoUnit.MINUTES, 20L, ChronoUnit.SECONDS);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> window(every: 15m, period: 20s)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> window(every: 15m, period: 20s)");
     }
 
     @Test
@@ -83,7 +83,7 @@ class WindowFluxTest {
                 .window(15L, ChronoUnit.HALF_DAYS, 20L, ChronoUnit.SECONDS, -50L, ChronoUnit.DAYS);
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> window(every: 180h, period: 20s, start: -50d)");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> window(every: 180h, period: 20s, start: -50d)");
     }
 
     @Test
@@ -93,7 +93,7 @@ class WindowFluxTest {
                 .from("telegraf")
                 .window(15L, ChronoUnit.MINUTES, 20L, ChronoUnit.SECONDS, Instant.ofEpochSecond(1_750_000));
 
-        String expected = "from(db:\"telegraf\") |> window(every: 15m, period: 20s, offset: 1970-01-21T06:06:40.000000000Z)";
+        String expected = "from(bucket:\"telegraf\") |> window(every: 15m, period: 20s, offset: 1970-01-21T06:06:40.000000000Z)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
     }
@@ -106,7 +106,7 @@ class WindowFluxTest {
                 .window()
                 .withEvery("10s").withPeriod("30m").withOffset("-1d");
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "window(every: 10s, period: 30m, offset: -1d)";
 
         Assertions.assertThat(flux.print()).isEqualToIgnoringWhitespace(expected);
@@ -122,7 +122,7 @@ class WindowFluxTest {
                         -50L, ChronoUnit.DAYS,
                         "time", "superStart", "totalEnd");
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "window(every: 15m, period: 20s, start: -50d, column: \"time\", "
                 + "startCol: \"superStart\", stopCol: \"totalEnd\")";
 
@@ -139,7 +139,7 @@ class WindowFluxTest {
                         Instant.ofEpochSecond(1_750_000),
                         "time", "superStart", "totalEnd");
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "window(every: 15m, period: 20s, offset: 1970-01-21T06:06:40.000000000Z, column: \"time\", "
                 + "startCol: \"superStart\", stopCol: \"totalEnd\")";
 
@@ -163,7 +163,7 @@ class WindowFluxTest {
         parameters.put("start", new TimeInterval(-50L, ChronoUnit.DAYS));
         parameters.put("round", new TimeInterval(1L, ChronoUnit.HOURS));
 
-        String expected = "from(db:\"telegraf\") |> "
+        String expected = "from(bucket:\"telegraf\") |> "
                 + "window(every: 15m, period: 20s, start: -50d, round: 1h)";
 
         Assertions.assertThat(flux.print(new FluxChain().addParameters(parameters))).isEqualToIgnoringWhitespace(expected);
@@ -177,6 +177,6 @@ class WindowFluxTest {
                     .withPropertyValue("intervals", "intervals(every:1mo, period:-1d)");
 
         Assertions.assertThat(flux.print())
-                .isEqualToIgnoringWhitespace("from(db:\"telegraf\") |> window(intervals: intervals(every:1mo, period:-1d))");
+                .isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> window(intervals: intervals(every:1mo, period:-1d))");
     }
 }
