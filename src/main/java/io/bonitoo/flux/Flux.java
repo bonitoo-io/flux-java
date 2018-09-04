@@ -141,44 +141,44 @@ public abstract class Flux {
     /**
      * Get data from the specified database.
      *
-     * @param db database name
+     * @param bucket Bucket name
      * @return {@link FromFlux}
      */
     @Nonnull
-    public static Flux from(@Nonnull final String db) {
-        Preconditions.checkNonEmptyString(db, "Database name");
+    public static Flux from(@Nonnull final String bucket) {
+        Preconditions.checkNonEmptyString(bucket, "Bucket name");
 
-        return new FromFlux(db);
+        return new FromFlux(bucket);
     }
 
     /**
      * Get data from the specified database.
      *
-     * @param db    database name
-     * @param hosts the Fluxd hosts
+     * @param bucket Bucket name
+     * @param hosts  the Fluxd hosts
      * @return {@link FromFlux}
      */
     @Nonnull
-    public static Flux from(@Nonnull final String db, @Nonnull final Collection<String> hosts) {
-        Preconditions.checkNonEmptyString(db, "Database name");
+    public static Flux from(@Nonnull final String bucket, @Nonnull final Collection<String> hosts) {
+        Preconditions.checkNonEmptyString(bucket, "Bucket name");
         Objects.requireNonNull(hosts, "Hosts are required");
 
-        return new FromFlux(db, hosts);
+        return new FromFlux(bucket, hosts);
     }
 
     /**
      * Get data from the specified database.
      *
-     * @param db    database name
-     * @param hosts the Fluxd hosts
+     * @param bucket Bucket name
+     * @param hosts  the Fluxd hosts
      * @return {@link FromFlux}
      */
     @Nonnull
-    public static Flux from(@Nonnull final String db, @Nonnull final String[] hosts) {
-        Preconditions.checkNonEmptyString(db, "Database name");
+    public static Flux from(@Nonnull final String bucket, @Nonnull final String[] hosts) {
+        Preconditions.checkNonEmptyString(bucket, "Database name");
         Objects.requireNonNull(hosts, "Hosts are required");
 
-        return new FromFlux(db, hosts);
+        return new FromFlux(bucket, hosts);
     }
 
     /**

@@ -46,7 +46,7 @@ Flux flux = Flux
 ### from
 
 Starting point for all queries. Get data from the specified database [[doc](https://github.com/influxdata/platform/tree/master/query#from)].
-- `db` - The name of the database to query. [string]
+- `bucket` - The name of the bucket to query. [string]
 - `hosts` - [array of strings]
 
 ```java

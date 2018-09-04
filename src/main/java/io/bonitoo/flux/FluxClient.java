@@ -39,7 +39,7 @@ import retrofit2.Response;
 /**
  * The client for the Flux service.
  * <p>
- * TODO pojo, generate flux result (https://app.quicktype.io/?share=mJzwzhpX4Zb4wczEztfi),
+ * TODO pojo
  *
  * @author Jakub Bednar (bednar@github) (30/07/2018 10:55)
  * @since 1.0.0

@@ -56,20 +56,20 @@ import io.bonitoo.flux.utils.Preconditions;
  */
 public final class FromFlux extends Flux {
 
-    private String db;
+    private String bucket;
     private Collection<String> hosts;
 
     public FromFlux(@Nonnull final String bucket) {
         Preconditions.checkNonEmptyString(bucket, "Bucket name");
 
-        this.db = bucket;
+        this.bucket = bucket;
     }
 
     public FromFlux(@Nonnull final String bucket, @Nonnull final String[] hosts) {
         Preconditions.checkNonEmptyString(bucket, "Bucket name");
         Objects.requireNonNull(hosts, "Hosts are required");
 
-        this.db = bucket;
+        this.bucket = bucket;
         this.hosts = Arrays.asList(hosts);
     }
 
@@ -77,7 +77,7 @@ public final class FromFlux extends Flux {
         Preconditions.checkNonEmptyString(bucket, "Bucket name");
         Objects.requireNonNull(hosts, "Hosts are required");
 
-        this.db = bucket;
+        this.bucket = bucket;
         this.hosts = hosts;
     }
 
@@ -89,7 +89,7 @@ public final class FromFlux extends Flux {
         //
         StringBuilder fromBuilder = new StringBuilder()
                 .append("from(bucket:\"")
-                .append(db)
+                .append(bucket)
                 .append("\"");
 
         //
