@@ -560,7 +560,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         String query = toFluxString(flux, properties, options);
 
         Response<ResponseBody> response = fluxRaw(query, properties, options, false, result -> {
-        }, EMPTY_ON_ERROR);
+        }, EMPTY_ON_ERROR, new DefaultCancellable());
 
         if (response == null) {
             throw new IllegalStateException("Response is null");
@@ -598,7 +598,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
         String queryString = toFluxString(query, properties, options);
 
-        fluxRaw(queryString, properties, options, true, onResponse, onFailure);
+        fluxRaw(queryString, properties, options, true, onResponse, onFailure, new DefaultCancellable());
     }
 
     @Override
@@ -754,7 +754,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 body.close();
             }
 
-        }, onError);
+        }, onError, cancellable);
 
         if (!async && response != null) {
             try {
@@ -795,14 +795,16 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                                            @Nonnull final FluxOptions options,
                                            @Nonnull final Boolean async,
                                            @Nonnull final Consumer<Response<ResponseBody>> callback,
-                                           @Nonnull final Consumer<? super Throwable> onFailure) {
+                                           @Nonnull final Consumer<? super Throwable> onError,
+                                           @Nonnull final DefaultCancellable cancellable) {
 
         Preconditions.checkNonEmptyString(query, "Flux query");
         Objects.requireNonNull(properties, "Properties are required");
         Objects.requireNonNull(options, "FluxOptions are required");
         Objects.requireNonNull(async, "Async configuration is required");
         Objects.requireNonNull(callback, "Callback consumer is required");
-        Objects.requireNonNull(onFailure, "onFailure consumer is required");
+        Objects.requireNonNull(onError, "onError consumer is required");
+        Objects.requireNonNull(cancellable, "cancellable is required");
 
         String orgID = this.fluxConnectionOptions.getOrgID();
 
@@ -819,10 +821,9 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
                 @Override
                 public void onFailure(@Nonnull final Call<ResponseBody> call,
-                                      @Nonnull final Throwable t) {
+                                      @Nonnull final Throwable throwable) {
 
-                    publish(new UnhandledErrorEvent(t));
-                    onFailure.accept(t);
+                    propagateError(onError, cancellable, throwable, new UnhandledErrorEvent(throwable));
                 }
             });
         } else {
@@ -835,7 +836,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
                 FluxException throwable = FluxException.fromCause(e);
 
                 publish(new UnhandledErrorEvent(throwable));
-                onFailure.accept(e);
+                onError.accept(e);
 
                 throw throwable;
             }
@@ -863,13 +864,22 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
             exception = new FluxException("Unsuccessful response: " + response);
         }
 
-        cancellable.wasError = true;
-        onError.accept(exception);
-        publish(new FluxErrorEvent(fluxConnectionOptions, query, exception));
+        FluxErrorEvent errorEvent = new FluxErrorEvent(fluxConnectionOptions, query, exception);
+        propagateError(onError, cancellable, exception, errorEvent);
 
         if (!async) {
             throw exception;
         }
+    }
+
+    private void propagateError(@Nonnull final Consumer<? super Throwable> onError,
+                                @Nonnull final DefaultCancellable cancellable,
+                                @Nonnull final Throwable throwable,
+                                @Nonnull final AbstractFluxEvent errorEvent) {
+
+        cancellable.wasError = true;
+        onError.accept(throwable);
+        publish(errorEvent);
     }
 
     private void publish(@Nonnull final AbstractFluxEvent event) {

@@ -52,7 +52,7 @@ class FromFluxTest {
 
         Assertions.assertThatThrownBy(() -> FromFlux.from(""))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Expecting a non-empty string for Database name");
+                .hasMessage("Expecting a non-empty string for Bucket name");
     }
 
     @Test

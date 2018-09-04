@@ -36,6 +36,7 @@ import io.bonitoo.flux.dto.FluxColumn;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
 import io.bonitoo.flux.operators.restriction.Restrictions;
+import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxDialect;
 import io.bonitoo.flux.options.FluxOptions;
 
@@ -290,6 +291,29 @@ class ITFluxClient extends AbstractITFluxClient {
 
         waitToCallback();
         assertFluxRecords(records);
+    }
+
+    @Test
+    void callbackWhenConnectionRefuse() {
+
+        FluxConnectionOptions options = FluxConnectionOptions.builder()
+                .url("http://localhost:8003")
+                .orgID("00")
+                .build();
+
+        FluxClient fluxClient = FluxClientFactory.connect(options);
+        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("telegraf").last(),
+                record -> {
+                },
+                success -> {
+                },
+                throwable -> countDownLatch.countDown());
+
+        waitToCallback();
+
+        Assertions.assertThat(cancellable.isDone()).isTrue();
+
+        fluxClient.close();
     }
 
     // TODO ping

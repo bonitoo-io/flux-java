@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
+import java.util.logging.Logger;
 
 import io.bonitoo.flux.dto.FluxColumn;
 import io.bonitoo.flux.dto.FluxRecord;
@@ -46,6 +47,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 @RunWith(JUnitPlatform.class)
 class FluxCsvParserTest {
+
+    private static final Logger LOG = Logger.getLogger(FluxCsvParserTest.class.getName());
 
     private FluxCsvParser parser;
 
@@ -74,7 +77,10 @@ class FluxCsvParserTest {
 
         List<FluxColumn> columnHeaders = tables.get(0).getColumns();
         Assertions.assertThat(columnHeaders).hasSize(11);
-        Assertions.assertThat(columnHeaders.get(0).isGroup()).isFalse();
+        FluxColumn fluxColumn1 = columnHeaders.get(0);
+        LOG.info("FluxColumn1: " + fluxColumn1);
+
+        Assertions.assertThat(fluxColumn1.isGroup()).isFalse();
         Assertions.assertThat(columnHeaders.get(1).isGroup()).isFalse();
         Assertions.assertThat(columnHeaders.get(2).isGroup()).isTrue();
         Assertions.assertThat(columnHeaders.get(3).isGroup()).isTrue();
@@ -90,9 +96,13 @@ class FluxCsvParserTest {
 
         // Record 1
         FluxTable fluxTable1 = tables.get(0);
+        LOG.info("FluxTable1: " + fluxTable1);
+
         Assertions.assertThat(fluxTable1.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord1 = fluxTable1.getRecords().get(0);
+        LOG.info("FluxRecord1: " + fluxRecord1);
+
         Assertions.assertThat(0).isEqualTo(fluxRecord1.getTable());
         Assertions.assertThat(fluxRecord1.getValues())
                 .hasEntrySatisfying("host", value -> Assertions.assertThat(value).isEqualTo("A"))
@@ -109,6 +119,8 @@ class FluxCsvParserTest {
 
         // Record 2
         FluxTable fluxTable2 = tables.get(1);
+        LOG.info("FluxTable2: " + fluxTable2);
+
         Assertions.assertThat(fluxTable2.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord2 = fluxTable2.getRecords().get(0);
@@ -125,6 +137,8 @@ class FluxCsvParserTest {
 
         // Record 3
         FluxTable fluxTable3 = tables.get(2);
+        LOG.info("FluxTable3: " + fluxTable3);
+
         Assertions.assertThat(fluxTable3.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord3 = fluxTable3.getRecords().get(0);
@@ -141,6 +155,8 @@ class FluxCsvParserTest {
 
         // Record 4
         FluxTable fluxTable4 = tables.get(3);
+        LOG.info("FluxTable4: " + fluxTable4);
+
         Assertions.assertThat(fluxTable4.getRecords()).hasSize(1);
 
         FluxRecord fluxRecord4 = fluxTable4.getRecords().get(0);
