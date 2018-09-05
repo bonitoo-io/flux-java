@@ -27,7 +27,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import io.bonitoo.flux.utils.Preconditions;
+import io.bonitoo.Preconditions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

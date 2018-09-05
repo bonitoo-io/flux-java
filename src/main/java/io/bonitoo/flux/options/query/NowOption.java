@@ -29,7 +29,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import io.bonitoo.flux.utils.Preconditions;
+import io.bonitoo.Preconditions;
 
 /**
  * The now option is a function that returns a time value to be used as a proxy for the current system time.

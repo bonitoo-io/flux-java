@@ -24,8 +24,8 @@ package io.bonitoo.flux.operators.restriction;
 
 import javax.annotation.Nonnull;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.operators.properties.OperatorProperties;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * The column restrictions.

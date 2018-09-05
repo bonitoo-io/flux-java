@@ -27,8 +27,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.operators.properties.TimeInterval;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * The location option is used to set the default time zone of all times in the script.

@@ -20,44 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.events;
+package io.bonitoo.platform;
 
-import java.util.Objects;
-import javax.annotation.Nonnull;
-
-import io.bonitoo.Preconditions;
-import io.bonitoo.flux.options.FluxConnectionOptions;
+import okhttp3.logging.HttpLoggingInterceptor;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 
 /**
- * @author Jakub Bednar (bednar@github) (30/07/2018 14:59)
+ * @author Jakub Bednar (bednar@github) (05/09/2018 14:00)
  */
-public abstract class AbstractQueryEvent extends AbstractFluxEvent {
+@RunWith(JUnitPlatform.class)
+class PlatformClientTest extends AbstractPlatformClientTest {
 
-    private final FluxConnectionOptions options;
-    private final String fluxQuery;
+    @Test
+    void defaultLogLevel() {
 
-    AbstractQueryEvent(@Nonnull final FluxConnectionOptions options, @Nonnull final String fluxQuery) {
-
-        Objects.requireNonNull(options, "FluxConnectionOptions are required");
-        Preconditions.checkNonEmptyString(fluxQuery, "Flux query");
-
-        this.options = options;
-        this.fluxQuery = fluxQuery;
+        Assertions.assertThat(platformClient.getLogLevel()).isEqualTo(HttpLoggingInterceptor.Level.NONE);
     }
 
-    /**
-     * @return {@link FluxConnectionOptions} that was used in query
-     */
-    @Nonnull
-    public FluxConnectionOptions getOptions() {
-        return options;
-    }
+    @Test
+    void logLevel() {
 
-    /**
-     * @return Flux query sent to Flux server
-     */
-    @Nonnull
-    public String getFluxQuery() {
-        return fluxQuery;
+        PlatformClient platformClient = this.platformClient.setLogLevel(HttpLoggingInterceptor.Level.HEADERS);
+
+        Assertions.assertThat(platformClient).isEqualTo(this.platformClient);
+        Assertions.assertThat(platformClient.getLogLevel()).isEqualTo(HttpLoggingInterceptor.Level.HEADERS);
     }
 }

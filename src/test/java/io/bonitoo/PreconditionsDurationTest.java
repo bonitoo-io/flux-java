@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.utils;
+package io.bonitoo;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

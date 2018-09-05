@@ -27,8 +27,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/tree/master/query#range">range</a> - Filters the results by

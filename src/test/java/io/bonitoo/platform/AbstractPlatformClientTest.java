@@ -20,50 +20,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux;
+package io.bonitoo.platform;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 import javax.annotation.Nonnull;
 
-import org.assertj.core.api.Assertions;
+import io.bonitoo.AbstractTest;
+import io.bonitoo.platform.options.PlatformOptions;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
- * @author Jakub Bednar (bednar@github) (31/07/2018 10:21)
+ * @author Jakub Bednar (bednar@github) (05/09/2018 12:29)
  */
-abstract class AbstractTest {
+public class AbstractPlatformClientTest extends AbstractTest {
 
-    CountDownLatch countDownLatch;
+    MockWebServer platformServer;
+    PlatformClient platformClient;
 
     @BeforeEach
-    protected void prepare() {
-        countDownLatch = new CountDownLatch(1);
-    }
+    protected void setUp() {
 
-    void waitToCallback() {
-        waitToCallback(10);
-    }
-
-    void waitToCallback(final int seconds) {
-        waitToCallback(countDownLatch, seconds);
-    }
-
-    void waitToCallback(@Nonnull final CountDownLatch countDownLatch, final int seconds) {
+        platformServer = new MockWebServer();
         try {
-            Assertions.assertThat(countDownLatch.await(seconds, TimeUnit.SECONDS))
-                    .overridingErrorMessage("The countDown wasn't counted to zero. Before elapsed: %s seconds.", seconds)
-                    .isTrue();
-        } catch (InterruptedException e) {
-            Assertions.fail("Unexpected exception", e);
-        }
-    }
-
-    void holdTheProcessing() {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
+            platformServer.start();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        PlatformOptions platformOptions = PlatformOptions.builder()
+                .url(platformServer.url("/").url().toString())
+                .build();
+
+        platformClient = PlatformClientFactory.connect(platformOptions);
+    }
+
+    @AfterEach
+    protected void after() throws IOException {
+        platformServer.shutdown();
+    }
+
+    @Nonnull
+    protected MockResponse createResponse(final String data) {
+        return createResponse(data, "application/json", false);
     }
 }

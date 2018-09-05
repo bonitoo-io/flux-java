@@ -20,44 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.events;
+package io.bonitoo.platform.impl;
 
-import java.util.Objects;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.Preconditions;
-import io.bonitoo.flux.options.FluxConnectionOptions;
+import io.bonitoo.platform.dto.Task;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.Headers;
+import retrofit2.http.POST;
 
 /**
- * @author Jakub Bednar (bednar@github) (30/07/2018 14:59)
+ * @author Jakub Bednar (bednar@github) (05/09/2018 13:30)
  */
-public abstract class AbstractQueryEvent extends AbstractFluxEvent {
+interface PlatformService {
 
-    private final FluxConnectionOptions options;
-    private final String fluxQuery;
-
-    AbstractQueryEvent(@Nonnull final FluxConnectionOptions options, @Nonnull final String fluxQuery) {
-
-        Objects.requireNonNull(options, "FluxConnectionOptions are required");
-        Preconditions.checkNonEmptyString(fluxQuery, "Flux query");
-
-        this.options = options;
-        this.fluxQuery = fluxQuery;
-    }
-
-    /**
-     * @return {@link FluxConnectionOptions} that was used in query
-     */
+    @POST("/v1/tasks")
     @Nonnull
-    public FluxConnectionOptions getOptions() {
-        return options;
-    }
-
-    /**
-     * @return Flux query sent to Flux server
-     */
-    @Nonnull
-    public String getFluxQuery() {
-        return fluxQuery;
-    }
+    @Headers("Content-Type: application/json")
+    Call<Task> createTask(@Nonnull @Body final RequestBody task);
 }

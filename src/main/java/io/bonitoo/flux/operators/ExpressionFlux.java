@@ -24,9 +24,9 @@ package io.bonitoo.flux.operators;
 
 import javax.annotation.Nonnull;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * The custom Flux expression.

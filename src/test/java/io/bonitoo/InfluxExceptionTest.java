@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux;
+package io.bonitoo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,16 +39,16 @@ import retrofit2.Response;
  * @author Jakub Bednar (bednar@github) (02/08/2018 08:58)
  */
 @RunWith(JUnitPlatform.class)
-class FluxExceptionTest {
+class InfluxExceptionTest {
 
     @Test
     void unExpectedError() {
 
         Assertions
                 .assertThatThrownBy(() -> {
-                    throw FluxException.fromCause(new IllegalStateException("unExpectedError"));
+                    throw InfluxException.fromCause(new IllegalStateException("unExpectedError"));
                 })
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasCauseInstanceOf(IllegalStateException.class)
                 .hasMessage("java.lang.IllegalStateException: unExpectedError");
     }
@@ -59,9 +59,9 @@ class FluxExceptionTest {
         Assertions
                 .assertThatThrownBy(() -> {
 
-                    throw FluxException.fromCause(new HttpException(errorResponse("Wrong query")));
+                    throw InfluxException.fromCause(new HttpException(errorResponse("Wrong query")));
                 })
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasCauseInstanceOf(HttpException.class)
                 .hasMessage("Wrong query");
     }
@@ -72,9 +72,9 @@ class FluxExceptionTest {
         Assertions
                 .assertThatThrownBy(() -> {
 
-                    throw FluxException.fromCause(new HttpException(errorResponse("")));
+                    throw InfluxException.fromCause(new HttpException(errorResponse("")));
                 })
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasCauseInstanceOf(HttpException.class)
                 .hasMessage("retrofit2.HttpException: HTTP 500 Response.error()");
     }

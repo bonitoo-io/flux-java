@@ -20,44 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux.events;
+package io.bonitoo;
 
-import java.util.Objects;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.Preconditions;
-import io.bonitoo.flux.options.FluxConnectionOptions;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 /**
- * @author Jakub Bednar (bednar@github) (30/07/2018 14:59)
+ * @author Jakub Bednar (bednar@github) (05/09/2018 14:06)
  */
-public abstract class AbstractQueryEvent extends AbstractFluxEvent {
+public abstract class AbstractRestClient {
+    private static final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json");
 
-    private final FluxConnectionOptions options;
-    private final String fluxQuery;
-
-    AbstractQueryEvent(@Nonnull final FluxConnectionOptions options, @Nonnull final String fluxQuery) {
-
-        Objects.requireNonNull(options, "FluxConnectionOptions are required");
-        Preconditions.checkNonEmptyString(fluxQuery, "Flux query");
-
-        this.options = options;
-        this.fluxQuery = fluxQuery;
-    }
-
-    /**
-     * @return {@link FluxConnectionOptions} that was used in query
-     */
     @Nonnull
-    public FluxConnectionOptions getOptions() {
-        return options;
-    }
+    protected RequestBody createBody(@Nonnull final String body) {
 
-    /**
-     * @return Flux query sent to Flux server
-     */
-    @Nonnull
-    public String getFluxQuery() {
-        return fluxQuery;
+        Preconditions.checkNonEmptyString(body, "body");
+
+        return RequestBody.create(CONTENT_TYPE_JSON, body);
     }
 }

@@ -28,8 +28,8 @@ import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.operators.properties.TimeInterval;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * The task option is used by a scheduler to schedule the execution of a Flux query.
@@ -46,11 +46,11 @@ public final class TaskOption extends AbstractOption {
         Objects.requireNonNull(builder, "TaskOption.Builder is required");
 
         StringJoiner joiner = new StringJoiner(",\n", "{\n", "\n}")
-                .add(keyValue("name", builder.name));
+                .add(keyValueEscaped("name", builder.name));
 
         // every
         if (builder.every != null) {
-            joiner.add(keyValue("every", new TimeInterval(builder.every, builder.everyUnit)));
+            joiner.add(keyValue("every", builder.every));
         }
         // delay
         if (builder.delay != null) {
@@ -58,7 +58,7 @@ public final class TaskOption extends AbstractOption {
         }
         // cron
         if (builder.cron != null) {
-            joiner.add(keyValue("cron", builder.cron));
+            joiner.add(keyValueEscaped("cron", builder.cron));
         }
         // retry
         if (builder.retry != null) {
@@ -83,17 +83,21 @@ public final class TaskOption extends AbstractOption {
     }
 
     @Nonnull
+    private CharSequence keyValueEscaped(@Nonnull final String key, @Nonnull final String value) {
+
+        Preconditions.checkNonEmptyString(key, "Key");
+        Preconditions.checkNonEmptyString(value, "Value");
+
+        return keyValue(key, String.format("\"%s\"", value));
+    }
+
+    @Nonnull
     private CharSequence keyValue(@Nonnull final String key, @Nonnull final Object value) {
 
         Preconditions.checkNonEmptyString(key, "Key");
         Objects.requireNonNull(value, "Value");
 
-        Object formatted = value;
-        if (value instanceof String) {
-            formatted = "\"" + value + "\"";
-        }
-
-        return String.format("\t%s: %s", key, formatted);
+        return String.format("\t%s: %s", key, value.toString());
     }
 
     /**
@@ -106,8 +110,7 @@ public final class TaskOption extends AbstractOption {
 
         private String name;
 
-        private Long every;
-        private ChronoUnit everyUnit;
+        private String every;
 
         private Long delay;
         private ChronoUnit delayUnit;
@@ -129,7 +132,6 @@ public final class TaskOption extends AbstractOption {
          * @param every     task should be run at this interval
          * @param everyUnit a {@code ChronoUnit} determining how to interpret the {@code every}
          * @return {@code this}
-         * @since 1.0.0
          */
         @Nonnull
         public TaskOption.Builder every(@Nonnull final Long every,
@@ -138,8 +140,23 @@ public final class TaskOption extends AbstractOption {
             Objects.requireNonNull(every, "Every is required");
             Objects.requireNonNull(everyUnit, "Every ChronoUnit is required");
 
+            this.every = new TimeInterval(every, everyUnit).toString();
+
+            return this;
+        }
+
+        /**
+         * Set interval that task should be run.
+         *
+         * @param every     task should be run at this interval
+         * @return {@code this}
+         */
+        @Nonnull
+        public TaskOption.Builder every(@Nonnull final String every) {
+
+            Preconditions.checkNonEmptyString(every, "every duration");
+
             this.every = every;
-            this.everyUnit = everyUnit;
 
             return this;
         }

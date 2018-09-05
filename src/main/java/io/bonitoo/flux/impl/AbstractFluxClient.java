@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.AbstractRestClient;
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxOptions;
 import io.bonitoo.flux.utils.GzipRequestInterceptor;
-import io.bonitoo.flux.utils.Preconditions;
 
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -44,9 +44,7 @@ import retrofit2.Retrofit;
  * @param <T> type of Retrofit Service
  * @author Jakub Bednar (bednar@github) (30/07/2018 14:01)
  */
-public abstract class AbstractFluxClient<T> {
-
-    private static final MediaType CONTENT_TYPE_JSON = MediaType.parse("application/json");
+public abstract class AbstractFluxClient<T> extends AbstractRestClient {
 
     protected final FluxResultMapper mapper = new FluxResultMapper();
     protected final FluxConnectionOptions fluxConnectionOptions;
@@ -112,7 +110,7 @@ public abstract class AbstractFluxClient<T> {
                 .put("dialect", options.getDialect().getJson())
                 .toString();
 
-        return RequestBody.create(CONTENT_TYPE_JSON, body);
+        return createBody(body);
     }
 
     class StringFlux extends Flux {

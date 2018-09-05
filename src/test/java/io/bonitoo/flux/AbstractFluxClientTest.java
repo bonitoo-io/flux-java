@@ -26,14 +26,12 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.AbstractTest;
 import io.bonitoo.flux.impl.FluxClientImpl;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.assertj.core.api.Assertions;
-import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -42,8 +40,8 @@ import org.junit.jupiter.api.BeforeEach;
  */
 public abstract class AbstractFluxClientTest extends AbstractTest {
 
-    protected MockWebServer fluxServer;
-    protected FluxClientImpl fluxClient;
+    MockWebServer fluxServer;
+    FluxClientImpl fluxClient;
 
     @BeforeEach
     protected void setUp() {
@@ -70,7 +68,7 @@ public abstract class AbstractFluxClientTest extends AbstractTest {
     }
 
     @Nonnull
-    protected MockResponse createResponse() {
+    MockResponse createResponse() {
 
         String data =
                 "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,string\n"
@@ -86,48 +84,12 @@ public abstract class AbstractFluxClientTest extends AbstractTest {
     }
 
     @Nonnull
-    protected MockResponse createResponse(final String data) {
-
-        return new MockResponse()
-                .setHeader("Content-Type", "text/csv; charset=utf-8")
-                .setHeader("Date", "Tue, 26 Jun 2018 13:15:01 GMT")
-                .setChunkedBody(data, data.length());
-    }
-
-    @Nonnull
-    protected MockResponse createErrorResponse(@Nullable final String influxDBError) {
-        return createErrorResponse(influxDBError, false);
-    }
-
-    @Nonnull
-    protected MockResponse createErrorResponse(@Nullable final String influxDBError, final boolean chunked) {
-
-        String body = String.format("{\"error\":\"%s\"}", influxDBError);
-
-        MockResponse mockResponse = new MockResponse()
-                .setResponseCode(500)
-                .addHeader("X-Influx-Error", influxDBError);
-
-        if (chunked) {
-            return mockResponse.setChunkedBody(body, body.length());
-        }
-
-        return mockResponse.setBody(body);
+    MockResponse createResponse(final String data) {
+        return createResponse(data, "text/csv", true);
     }
 
     @Nullable
-    protected String getObjectFromBody(@Nonnull final String key) {
-
-        Assertions.assertThat(key).isNotBlank();
-
-        RecordedRequest recordedRequest = null;
-        try {
-            recordedRequest = fluxServer.takeRequest();
-        } catch (InterruptedException e) {
-            Assertions.fail("Unexpected exception", e);
-        }
-        String body = recordedRequest.getBody().readUtf8();
-
-        return new JSONObject(body).get(key).toString();
+    String getObjectFromBody(@Nonnull final String key) {
+        return getRequestBody(fluxServer).get(key).toString();
     }
 }

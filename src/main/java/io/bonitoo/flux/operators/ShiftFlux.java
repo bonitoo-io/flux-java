@@ -27,8 +27,8 @@ import java.util.Collection;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/blob/master/query/docs/SPEC.md#shift">shift</a> -

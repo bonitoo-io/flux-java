@@ -42,6 +42,31 @@ platformClient.close();
 
 ### Tasks
 
+#### Create
+The task can be created with `cron` or `every` expression that specify task repetition. 
+
+The required `Task` attributes are:
+- `name` - the description of the task
+- `flux` - the Flux script to run
+- `userID` - the ID of the user that owns this Task
+- `organizationID` - the ID of the organization that owns this Task
+
+##### Cron
+```java
+String flux = "from(bucket: \"telegraf\") |> last()";
+
+Task task = platformClient.createTaskCron("task name", flux, "0 2 * * *", "01", "01");
+...
+```
+
+##### Every
+```java
+String flux = "from(bucket: \"telegraf\") |> last()";
+
+Task task = platformClient.createTaskEvery("task name", flux, "0 2 * * *", "10m", "01");
+...
+```
+
 ## Flux - Data Scripting Language
 Java client for the Flux. The [Flux](https://github.com/influxdata/platform/tree/master/query#flux---influx-data-language) is centered on querying and manipulating time series data.
 

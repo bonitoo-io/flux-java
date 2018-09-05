@@ -30,9 +30,9 @@ import java.util.StringJoiner;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/tree/master/query#join">join</a> -

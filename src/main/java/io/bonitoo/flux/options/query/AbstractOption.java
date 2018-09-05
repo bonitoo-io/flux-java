@@ -26,7 +26,7 @@ import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
-import io.bonitoo.flux.utils.Preconditions;
+import io.bonitoo.Preconditions;
 
 /**
  * @author Jakub Bednar (bednar@github) (26/07/2018 12:35)

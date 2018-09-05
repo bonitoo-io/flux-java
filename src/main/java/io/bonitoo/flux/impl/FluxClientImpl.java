@@ -37,9 +37,10 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.InfluxException;
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxClient;
-import io.bonitoo.flux.FluxException;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
 import io.bonitoo.flux.events.AbstractFluxEvent;
@@ -48,7 +49,6 @@ import io.bonitoo.flux.events.FluxSuccessEvent;
 import io.bonitoo.flux.events.UnhandledErrorEvent;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxOptions;
-import io.bonitoo.flux.utils.Preconditions;
 
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -779,7 +779,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
             } catch (Exception e) {
 
-                FluxException exception = FluxException.fromCause(e);
+                InfluxException exception = InfluxException.fromCause(e);
                 publish(new UnhandledErrorEvent(exception));
 
                 throw exception;
@@ -833,7 +833,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
             } catch (Exception e) {
 
-                FluxException throwable = FluxException.fromCause(e);
+                InfluxException throwable = InfluxException.fromCause(e);
 
                 publish(new UnhandledErrorEvent(throwable));
                 onError.accept(e);
@@ -855,13 +855,13 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
         Objects.requireNonNull(response, "Response is required");
         Objects.requireNonNull(async, "Async is required");
 
-        String error = FluxException.getErrorMessage(response);
+        String error = InfluxException.getErrorMessage(response);
 
-        FluxException exception;
+        InfluxException exception;
         if (error != null) {
-            exception = new FluxException(error);
+            exception = new InfluxException(error);
         } else {
-            exception = new FluxException("Unsuccessful response: " + response);
+            exception = new InfluxException("Unsuccessful response: " + response);
         }
 
         FluxErrorEvent errorEvent = new FluxErrorEvent(fluxConnectionOptions, query, exception);

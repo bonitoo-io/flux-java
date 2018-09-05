@@ -24,8 +24,8 @@ package io.bonitoo.flux.operators;
 
 import javax.annotation.Nonnull;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/tree/master/query#set">set</a> - Yield a query results

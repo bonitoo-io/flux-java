@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux;
+package io.bonitoo;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -33,25 +33,25 @@ import retrofit2.Response;
  * @author Jakub Bednar (bednar@github) (31/07/2018 11:53)
  * @since 1.0.0
  */
-public class FluxException extends RuntimeException {
+public class InfluxException extends RuntimeException {
 
-    public FluxException(@Nullable final String message) {
+    public InfluxException(@Nullable final String message) {
         super(message);
     }
 
-    private FluxException(@Nullable final Throwable cause) {
+    private InfluxException(@Nullable final Throwable cause) {
         super(cause);
     }
 
-    private FluxException(@Nullable final String message, @Nullable final Throwable cause) {
+    private InfluxException(@Nullable final String message, @Nullable final Throwable cause) {
         super(message, cause);
     }
 
     @Nonnull
-    public static FluxException fromCause(@Nullable final Throwable cause) {
+    public static InfluxException fromCause(@Nullable final Throwable cause) {
 
-        if (cause instanceof FluxException) {
-            return (FluxException) cause;
+        if (cause instanceof InfluxException) {
+            return (InfluxException) cause;
         }
 
         if (cause instanceof HttpException) {
@@ -60,11 +60,11 @@ public class FluxException extends RuntimeException {
             String errorHeader = getErrorMessage(response);
 
             if (errorHeader != null && !errorHeader.isEmpty()) {
-                return new FluxException(errorHeader, cause);
+                return new InfluxException(errorHeader, cause);
             }
         }
 
-        return new FluxException(cause);
+        return new InfluxException(cause);
     }
 
     @Nullable

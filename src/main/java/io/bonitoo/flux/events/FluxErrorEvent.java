@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.flux.FluxException;
+import io.bonitoo.InfluxException;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 
 /**
@@ -40,15 +40,15 @@ public class FluxErrorEvent extends AbstractQueryEvent {
 
     private static final Logger LOG = Logger.getLogger(FluxErrorEvent.class.getName());
 
-    private final FluxException exception;
+    private final InfluxException exception;
 
     public FluxErrorEvent(@Nonnull final FluxConnectionOptions options,
                           @Nonnull final String fluxQuery,
-                          @Nonnull final FluxException exception) {
+                          @Nonnull final InfluxException exception) {
 
         super(options, fluxQuery);
 
-        Objects.requireNonNull(exception, "FluxException is required");
+        Objects.requireNonNull(exception, "InfluxException is required");
 
         this.exception = exception;
     }
@@ -57,7 +57,7 @@ public class FluxErrorEvent extends AbstractQueryEvent {
      * @return the exception that was throw
      */
     @Nonnull
-    public FluxException getException() {
+    public InfluxException getException() {
         return exception;
     }
 

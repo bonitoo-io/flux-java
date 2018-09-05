@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.InfluxException;
 import io.bonitoo.flux.dto.FluxColumn;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
@@ -261,7 +262,7 @@ class ITFluxClient extends AbstractITFluxClient {
     void errorWithStatusOK() {
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from(DATABASE_NAME)))
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasMessage("failed to create physical plan: invalid time bounds from procedure from: bounds contain zero time");
     }
 

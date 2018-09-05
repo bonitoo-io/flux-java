@@ -25,6 +25,7 @@ package io.bonitoo.flux;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import io.bonitoo.AbstractTest;
 import io.bonitoo.flux.impl.FluxClientImpl;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 

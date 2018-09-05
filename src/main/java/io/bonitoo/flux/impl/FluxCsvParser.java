@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.bonitoo.flux.FluxException;
+import io.bonitoo.InfluxException;
 import io.bonitoo.flux.dto.FluxColumn;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
@@ -184,7 +184,7 @@ class FluxCsvParser {
             }
 
             //
-            // Throw FluxException with error response
+            // Throw InfluxException with error response
             //
             if (ParsingState.IN_ERROR.equals(parsingState)) {
                 String error = csvRecord.get(0);
@@ -194,7 +194,7 @@ class FluxCsvParser {
                     error += String.format(" [reference: %s]", reference);
                 }
 
-                throw new FluxException(error);
+                throw new InfluxException(error);
             }
 
             String token = csvRecord.get(0);

@@ -26,7 +26,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import io.bonitoo.flux.utils.Preconditions;
+import io.bonitoo.Preconditions;
 
 import okhttp3.OkHttpClient;
 

@@ -30,6 +30,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.operators.AbstractParametrizedFlux;
 import io.bonitoo.flux.operators.CountFlux;
 import io.bonitoo.flux.operators.CovarianceFlux;
@@ -72,7 +73,6 @@ import io.bonitoo.flux.operators.WindowFlux;
 import io.bonitoo.flux.operators.YieldFlux;
 import io.bonitoo.flux.operators.properties.OperatorProperties;
 import io.bonitoo.flux.operators.restriction.Restrictions;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * <a href="https://github.com/influxdata/platform/tree/master/query#basic-syntax">Flux</a> - Data Scripting Language.

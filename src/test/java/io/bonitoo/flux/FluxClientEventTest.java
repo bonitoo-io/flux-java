@@ -25,6 +25,7 @@ package io.bonitoo.flux;
 import java.time.Instant;
 import java.util.function.Consumer;
 
+import io.bonitoo.InfluxException;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.events.FluxErrorEvent;
 import io.bonitoo.flux.events.FluxSuccessEvent;
@@ -91,7 +92,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
                 .build();
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database"), fluxOptions))
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasMessage("rpc error: code = Unavailable desc = all SubConns are in Transie");
 
         waitToCallback();
@@ -136,7 +137,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
 
             Assertions.assertThat(event).isNotNull();
             Assertions.assertThat(event.getThrowable())
-                    .isInstanceOf(FluxException.class)
+                    .isInstanceOf(InfluxException.class)
                     .hasCauseInstanceOf(FluxResultMapperException.class)
                     .hasMessageContaining("Unable to parse CSV response. FluxTable definition was not found. Record: 1");
 
@@ -148,7 +149,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
                 .build();
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database"), fluxOptions))
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasMessage("io.bonitoo.flux.impl.FluxResultMapperException: Unable to parse CSV response. FluxTable definition was not found. Record: 1");
 
         waitToCallback();

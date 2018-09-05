@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
-import io.bonitoo.flux.utils.Preconditions;
 
 /**
  * The operator properties. Support named-property, property with values.

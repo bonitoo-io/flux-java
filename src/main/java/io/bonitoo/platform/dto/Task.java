@@ -24,6 +24,8 @@ package io.bonitoo.platform.dto;
 
 import java.io.Serializable;
 
+import com.squareup.moshi.Json;
+
 /**
  * Task is a task.
  *
@@ -39,9 +41,14 @@ public final class Task implements Serializable {
     private String name;
 
     /**
+     * The {@link User} that owns this Task.
+     */
+    private User owner;
+
+    /**
      * The ID of the organization that owns this Task.
      */
-    private String organization;
+    private String organizationId;
 
     /**
      * The current status of the task. When updated to 'disabled', cancels all queued jobs of this task.
@@ -52,7 +59,11 @@ public final class Task implements Serializable {
      * @see Task#status
      */
     public enum TaskStatus {
+
+        @Json(name = "enabled")
         ENABLED,
+
+        @Json(name = "disabled")
         DISABLED
     }
 
@@ -89,12 +100,21 @@ public final class Task implements Serializable {
         return this;
     }
 
-    public String getOrganization() {
-        return organization;
+    public User getOwner() {
+        return owner;
     }
 
-    public Task setOrganization(final String organization) {
-        this.organization = organization;
+    public Task setOwner(final User owner) {
+        this.owner = owner;
+        return this;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public Task setOrganizationId(final String organizationId) {
+        this.organizationId = organizationId;
         return this;
     }
 

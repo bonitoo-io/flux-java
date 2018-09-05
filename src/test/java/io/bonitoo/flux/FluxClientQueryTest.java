@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.InfluxException;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
 import io.bonitoo.flux.events.FluxErrorEvent;
@@ -73,7 +74,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxServer.enqueue(createErrorResponse("Flux query is not valid"));
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasMessage("Flux query is not valid");
     }
 
@@ -85,7 +86,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxServer.enqueue(createResponse(error));
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasMessage("Failed to parse query [reference: 897]");
     }
 
@@ -97,7 +98,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxServer.enqueue(createResponse(error));
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
-                .isInstanceOf(FluxException.class)
+                .isInstanceOf(InfluxException.class)
                 .hasMessage("Failed to parse query");
     }
 
