@@ -106,9 +106,9 @@ class FluxCsvParser {
     /**
      * Asynchronously parse Flux CSV response to {@link FluxColumn}s.
      *
-     * @param reader    with data
-     * @param consumer  of response
-     * @param  requiredNext it the supplier return {@link Boolean#FALSE} than the processing of record end
+     * @param reader       with data
+     * @param consumer     of response
+     * @param requiredNext it the supplier return {@link Boolean#FALSE} than the processing of record end
      * @throws IOException throw by {@link CSVParser}
      */
     void parseFluxResponse(@Nonnull final Reader reader,
@@ -301,8 +301,6 @@ class FluxCsvParser {
                 return Long.parseLong(strValue);
             case "double":
                 return Double.parseDouble(strValue);
-            case "string":
-                return strValue;
             case "base64Binary":
                 return Base64.getDecoder().decode(strValue);
             case "dateTime:RFC3339":
@@ -312,7 +310,8 @@ class FluxCsvParser {
             case "duration":
                 return Duration.ofNanos(Long.parseUnsignedLong(strValue));
             default:
-                throw new FluxResultMapperException("Unsupported datatype: " + dataType);
+            case "string":
+                return strValue;
         }
     }
 
@@ -341,11 +340,7 @@ class FluxCsvParser {
 
         for (int i = 0; i < groups.size(); i++) {
 
-            FluxColumn fluxColumn = table.getColumns().get(i);
-            if (fluxColumn == null) {
-                String message = "Unable to parse response, inconsistent  #datatypes and #group header";
-                throw new FluxResultMapperException(message);
-            }
+            FluxColumn fluxColumn = getFluxColumn(i, table);
 
             String group = groups.get(i);
             fluxColumn.setGroup(Boolean.valueOf(group));
@@ -360,11 +355,7 @@ class FluxCsvParser {
 
         for (int i = 0; i < defaultEmptyValues.size(); i++) {
 
-            FluxColumn fluxColumn = table.getColumns().get(i);
-            if (fluxColumn == null) {
-                String message = "Unable to parse response, inconsistent  #datatypes and #group header";
-                throw new FluxResultMapperException(message);
-            }
+            FluxColumn fluxColumn = getFluxColumn(i, table);
 
             String defaultValue = defaultEmptyValues.get(i);
             fluxColumn.setDefaultValue(defaultValue);
@@ -382,14 +373,24 @@ class FluxCsvParser {
 
         for (int i = 0; i < size; i++) {
 
-            FluxColumn fluxColumn = table.getColumns().get(i);
-            if (fluxColumn == null) {
-                String message = "Unable to parse response, inconsistent  #datatypes and #group header";
-                throw new FluxResultMapperException(message);
-            }
+            FluxColumn fluxColumn = getFluxColumn(i, table);
 
             String columnName = columnNames.get(i);
             fluxColumn.setLabel(columnName);
         }
+    }
+
+    @Nonnull
+    private FluxColumn getFluxColumn(final int columnIndex, final @Nonnull FluxTable table) {
+
+        Objects.requireNonNull(table, "FluxTable is required");
+
+        FluxColumn fluxColumn = table.getColumns().get(columnIndex);
+        if (fluxColumn == null) {
+            String message = "Unable to parse response, inconsistent  #datatypes and #group header";
+            throw new FluxResultMapperException(message);
+        }
+
+        return fluxColumn;
     }
 }

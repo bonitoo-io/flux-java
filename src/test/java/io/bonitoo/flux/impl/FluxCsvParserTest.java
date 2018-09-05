@@ -209,6 +209,21 @@ class FluxCsvParserTest {
     }
 
     @Test
+    void mappingDouble() throws IOException {
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,double\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,12.25\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
+        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo(12.25D);
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
+    }
+
+    @Test
     void mappingBase64Binary() throws IOException {
 
         String binaryData = "test value";
@@ -295,5 +310,20 @@ class FluxCsvParserTest {
 
         Assertions.assertThat(tables.get(0).getColumns()).hasSize(10);
         Assertions.assertThat(tables.get(0).getGroupKey()).hasSize(2);
+    }
+
+    @Test
+    void unknownTypeAsString() throws IOException {
+
+        String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,unknown\n"
+                + "#group,false,false,false,false,false,false,false,false,false,true\n"
+                + "#default,_result,,,,,,,,,\n"
+                + ",result,table,_start,_stop,_time,_value,_field,_measurement,host,value\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,12.25\n"
+                + ",,0,1970-01-01T00:00:10Z,1970-01-01T00:00:20Z,1970-01-01T00:00:10Z,10,free,mem,A,\n";
+
+        List<FluxTable> tables = parser.parseFluxResponse(new StringReader(data));
+        Assertions.assertThat(tables.get(0).getRecords().get(0).getValueByKey("value")).isEqualTo("12.25");
+        Assertions.assertThat(tables.get(0).getRecords().get(1).getValueByKey("value")).isNull();
     }
 }

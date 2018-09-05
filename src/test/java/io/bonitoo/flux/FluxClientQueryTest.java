@@ -87,7 +87,18 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
                 .isInstanceOf(FluxException.class)
                 .hasMessage("Failed to parse query [reference: 897]");
+    }
 
+    @Test
+    void queryErrorSuccessResponseWithoutReference() {
+
+        String error = "error,reference\n" + "Failed to parse query,";
+
+        fluxServer.enqueue(createResponse(error));
+
+        Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
+                .isInstanceOf(FluxException.class)
+                .hasMessage("Failed to parse query");
     }
 
     @Test
