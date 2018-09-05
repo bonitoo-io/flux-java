@@ -125,7 +125,7 @@ class PreconditionsTest {
     @Test
     void checkOneCharStringNull() {
 
-        Assertions.assertThatThrownBy(() -> Preconditions.checkOneCharString("", "property"))
+        Assertions.assertThatThrownBy(() -> Preconditions.checkOneCharString(null, "property"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Expecting a one char string for property");
     }

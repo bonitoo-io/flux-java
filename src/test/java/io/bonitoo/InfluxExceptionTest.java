@@ -65,9 +65,22 @@ class InfluxExceptionTest {
                 .hasCauseInstanceOf(HttpException.class)
                 .hasMessage("Wrong query");
     }
-    
+
     @Test
     void retrofitHttpExceptionEmptyError() {
+
+        Assertions
+                .assertThatThrownBy(() -> {
+
+                    throw InfluxException.fromCause(new HttpException(errorResponse("")));
+                })
+                .isInstanceOf(InfluxException.class)
+                .hasCauseInstanceOf(HttpException.class)
+                .hasMessage("retrofit2.HttpException: HTTP 500 Response.error()");
+    }
+
+    @Test
+    void retrofitHttpExceptionNullError() {
 
         Assertions
                 .assertThatThrownBy(() -> {
@@ -86,8 +99,11 @@ class InfluxExceptionTest {
                 .code(500)
                 .message("Response.error()")
                 .protocol(Protocol.HTTP_1_1)
-                .request(new Request.Builder().url("http://localhost/").build())
-                .addHeader("X-Influx-Error", influxError);
+                .request(new Request.Builder().url("http://localhost/").build());
+
+        if (influxError != null) {
+            builder.addHeader("X-Influx-Error", influxError);
+        }
 
         return Response.error(new RealResponseBody(null, 0, null), builder.build());
     }
