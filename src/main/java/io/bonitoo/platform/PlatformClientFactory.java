@@ -20,56 +20,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux;
+package io.bonitoo.platform;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.flux.impl.FluxClientImpl;
-import io.bonitoo.flux.options.FluxConnectionOptions;
+import io.bonitoo.platform.impl.PlatformClientImpl;
+import io.bonitoo.platform.options.PlatformOptions;
 
 /**
- * The Factory that create a instance of a Flux client.
+ * The Factory that create a instance of a Platform client.
  *
- * @author Jakub Bednar (bednar@github) (31/07/2018 13:11)
+ * @author Jakub Bednar (bednar@github) (05/09/2018 10:04)
  * @since 1.0.0
  */
-public final class FluxClientFactory {
+public final class PlatformClientFactory {
 
-    private FluxClientFactory() {
+    private PlatformClientFactory() {
     }
 
     /**
-     * Create a instance of the Flux client.
+     * Create a instance of the Platform client.
      *
-     * @param orgID the organization id required by Flux
-     * @param url   the url to connect to Flux.
+     * @param url the url to connect to Platform.
      * @return client
-     * @see FluxConnectionOptions.Builder#orgID(String)
-     * @see FluxConnectionOptions.Builder#url(String)
+     * @see PlatformOptions.Builder#url(String)
      */
     @Nonnull
-    public static FluxClient connect(@Nonnull final String orgID, @Nonnull final String url) {
+    public static PlatformClient connect(@Nonnull final String url) {
 
-        FluxConnectionOptions options = FluxConnectionOptions.builder()
+        PlatformOptions options = PlatformOptions.builder()
                 .url(url)
-                .orgID(orgID)
                 .build();
 
         return connect(options);
     }
 
     /**
-     * Create a instance of the Flux client.
+     * Create a instance of the Platform client.
      *
      * @param options the connection configuration
      * @return client
      */
     @Nonnull
-    public static FluxClient connect(@Nonnull final FluxConnectionOptions options) {
+    public static PlatformClient connect(@Nonnull final PlatformOptions options) {
 
-        Objects.requireNonNull(options, "FluxConnectionOptions are required");
+        Objects.requireNonNull(options, "PlatformOptions are required");
 
-        return new FluxClientImpl(options);
+        return new PlatformClientImpl(options);
     }
 }

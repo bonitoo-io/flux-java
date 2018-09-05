@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux;
+package io.bonitoo.platform;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,16 +28,16 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
 /**
- * @author Jakub Bednar (bednar@github) (31/07/2018 13:12)
+ * @author Jakub Bednar (bednar@github) (05/09/2018 10:59)
  */
 @RunWith(JUnitPlatform.class)
-class FluxClientFactoryTest {
+class PlatformClientFactoryTest {
 
     @Test
-    void connect() {
+    void createInstance() {
 
-        FluxClient fluxClient = FluxClientFactory.connect("0", "http://localhost:8093");
+        PlatformClient client = PlatformClientFactory.connect("http://localhost:9999");
 
-        Assertions.assertThat(fluxClient).isNotNull();
+        Assertions.assertThat(client).isNotNull();
     }
 }

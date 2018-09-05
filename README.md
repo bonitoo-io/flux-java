@@ -10,6 +10,38 @@
 [![GitHub issues](https://img.shields.io/github/issues-raw/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/bonitoo-io/flux-java.svg)](https://github.com/bonitoo-io/flux-java/pulls)
 
+The Java client for:
+
+* [InfluxData Platform](#influxdata-platform-client)
+* [Flux](#flux---data-scripting-language)
+
+## InfluxData Platform
+The Java client for the **InfluxData Platform for Time Series** that implement HTTP API defined by [Influx API Service](https://github.com/influxdata/platform/blob/master/http/swagger.yml).
+
+### Factory
+
+The `PlatformClientFactory` creates the instance of a Platform client and can be configured by `PlatformOptions`.
+
+#### Platform configuration
+- `url` -  the url to connect to Platform
+- `okHttpClient` - the HTTP client to use for communication with Platform (optional)
+
+```java
+// Connection configuration
+PlatformOptions options = PlatformOptions.builder()
+    .url("http://localhost:9999")
+    .build();
+
+// Platform client
+PlatformClient platformClient = PlatformOptions.connect(options);
+
+...
+
+platformClient.close();
+```
+
+### Tasks
+
 ## Flux - Data Scripting Language
 Java client for the Flux. The [Flux](https://github.com/influxdata/platform/tree/master/query#flux---influx-data-language) is centered on querying and manipulating time series data.
 

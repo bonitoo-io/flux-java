@@ -20,24 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux;
+package io.bonitoo.platform.options;
 
+import okhttp3.OkHttpClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
 /**
- * @author Jakub Bednar (bednar@github) (31/07/2018 13:12)
+ * @author Jakub Bednar (bednar@github) (05/09/2018 10:38)
  */
 @RunWith(JUnitPlatform.class)
-class FluxClientFactoryTest {
+class PlatformOptionsTest {
 
     @Test
-    void connect() {
+    void defaultValue() {
 
-        FluxClient fluxClient = FluxClientFactory.connect("0", "http://localhost:8093");
+        PlatformOptions options = PlatformOptions.builder().url("http://localhost:9999").build();
 
-        Assertions.assertThat(fluxClient).isNotNull();
+        Assertions.assertThat(options.getUrl()).isEqualTo("http://localhost:9999");
+        Assertions.assertThat(options.getOkHttpClient()).isNotNull();
+    }
+
+    @Test
+    void okHttpBuilder() {
+
+        OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
+        PlatformOptions options = PlatformOptions.builder().url("http://localhost:9999").okHttpClient(okHttpClient).build();
+
+        Assertions.assertThat(options.getOkHttpClient()).isEqualTo(okHttpClient);
+    }
+
+    @Test
+    void urlRequired() {
+
+        PlatformOptions.Builder builder = PlatformOptions.builder();
+
+        Assertions.assertThatThrownBy(builder::build)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("The url to connect to Platform has to be defined.");
     }
 }

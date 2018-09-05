@@ -20,24 +20,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.flux;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
+package io.bonitoo.platform.dto;
 
 /**
- * @author Jakub Bednar (bednar@github) (31/07/2018 13:12)
+ * Organization is a organization.
+ *
+ * @author Jakub Bednar (bednar@github) (05/09/2018 07:32)
  */
-@RunWith(JUnitPlatform.class)
-class FluxClientFactoryTest {
+public final class Organization {
 
-    @Test
-    void connect() {
+    private String id;
+    private String name;
 
-        FluxClient fluxClient = FluxClientFactory.connect("0", "http://localhost:8093");
+    public String getId() {
+        return id;
+    }
 
-        Assertions.assertThat(fluxClient).isNotNull();
+    public Organization setId(final String id) {
+        this.id = id;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Organization setName(final String name) {
+        this.name = name;
+        return this;
     }
 }
