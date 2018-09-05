@@ -93,11 +93,14 @@ import io.bonitoo.flux.utils.Preconditions;
  * <li>{@link FilterFlux}</li>
  * <li>{@link FirstFlux}</li>
  * <li>{@link GroupFlux}</li>
+ * <li>TODO - histogram</li>
  * <li>{@link IntegralFlux}</li>
  * <li>{@link JoinFlux}</li>
  * <li>{@link KeepFlux}</li>
  * <li>{@link LastFlux}</li>
  * <li>{@link LimitFlux}</li>
+ * <li>TODO - LinearBuckets</li>
+ * <li>TODO - LogrithmicBuckets</li>
  * <li>{@link MapFlux}</li>
  * <li>{@link MaxFlux}</li>
  * <li>{@link MeanFlux}</li>
