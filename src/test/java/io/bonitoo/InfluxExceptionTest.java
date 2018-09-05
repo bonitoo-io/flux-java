@@ -85,7 +85,7 @@ class InfluxExceptionTest {
         Assertions
                 .assertThatThrownBy(() -> {
 
-                    throw InfluxException.fromCause(new HttpException(errorResponse("")));
+                    throw InfluxException.fromCause(new HttpException(errorResponse(null)));
                 })
                 .isInstanceOf(InfluxException.class)
                 .hasCauseInstanceOf(HttpException.class)
