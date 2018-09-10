@@ -71,7 +71,7 @@ class ITPlatformClientTest {
         Assertions.assertThat(task.getStatus()).isEqualTo(Task.TaskStatus.ENABLED);
         Assertions.assertThat(task.getEvery()).isEqualTo("1h0m0s");
         Assertions.assertThat(task.getCron()).isNull();
-        Assertions.assertThat(task.getFlux()).isEqualToIgnoringWhitespace("option task = {name: \"" + taskName + "\", every: 1h} from(bucket:\"telegraf\") |> sum()");
+        Assertions.assertThat(task.getFlux()).isEqualToIgnoringWhitespace("from(bucket:\"telegraf\") |> sum()");
     }
 
     @Test
@@ -95,7 +95,7 @@ class ITPlatformClientTest {
         Assertions.assertThat(taskByID.getCron()).isEqualTo(task.getCron());
         Assertions.assertThat(taskByID.getFlux()).isEqualTo(task.getFlux());
 
-        // TODO remove after fix https://github.com/influxdata/platform/issues/799
+        // TODO enable after fix https://github.com/influxdata/platform/issues/799
         // Assertions.assertThat(taskByID.getStatus()).isEqualTo(Task.TaskStatus.ENABLED);
     }
 
@@ -155,6 +155,32 @@ class ITPlatformClientTest {
 
         foundTask = platformClient.findTaskByID(createdTask.getId());
         Assertions.assertThat(foundTask).isNull();
+    }
+
+    @Test
+    void updateTask() {
+
+        Task cronTask = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        cronTask.setEvery("2m");
+        cronTask.setCron(null);
+        cronTask.setFlux("from(bucket:\"telegraf\") |> last()");
+        cronTask.setStatus(Task.TaskStatus.DISABLED);
+
+        Task updatedTask = platformClient.updateTask(cronTask);
+
+        Assertions.assertThat(updatedTask).isNotNull();
+        Assertions.assertThat(updatedTask.getId()).isEqualTo(cronTask.getId());
+        Assertions.assertThat(updatedTask.getOwner()).isNotNull();
+        Assertions.assertThat(updatedTask.getOwner().getName()).isEqualTo(cronTask.getOwner().getName());
+        Assertions.assertThat(updatedTask.getEvery()).isEqualTo("2m0s");
+        Assertions.assertThat(updatedTask.getCron()).isNull();
+        Assertions.assertThat(updatedTask.getFlux()).isEqualTo("from(bucket:\"telegraf\") |> last()");
+        Assertions.assertThat(updatedTask.getStatus()).isEqualTo(Task.TaskStatus.DISABLED);
+
+        // TODO enable after fix TODOs in https://github.com/influxdata/platform/blob/master/task/platform_adapter.go#L89
+        // Assertions.assertThat(updatedTask.getOwner().getId()).isEqualTo(cronTask.getOwner().getId());
+        // Assertions.assertThat(updatedTask.getOrganizationId()).isEqualTo(cronTask.getOrganizationId());
+        // Assertions.assertThat(updatedTask.getName()).isEqualTo(cronTask.getName());
     }
 
     @Nonnull

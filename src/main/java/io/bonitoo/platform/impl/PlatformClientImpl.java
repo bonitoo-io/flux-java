@@ -72,7 +72,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
                 .build();
 
 
-        Moshi moshi = new Moshi.Builder().add(new TaskStatusAdapter()).build();
+        Moshi moshi = new Moshi.Builder().add(new TaskAdapter()).build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(options.getUrl())
@@ -205,7 +205,19 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     @Nonnull
     @Override
     public Task updateTask(@Nonnull final Task task) {
-        return null;
+
+        Objects.requireNonNull(task, "Task is required");
+
+        JSONObject jsonTaskBody = getJsonTaskBody(task.getName(), new Flux() {
+            @Override
+            protected void appendActual(@Nonnull final FluxChain fluxChain) {
+                fluxChain.append(task.getFlux());
+            }
+        }, task.getEvery(), task.getCron(), task.getOwner().getId(), task.getOrganizationId(), task.getStatus());
+
+        Call<Task> taskCall = platformService.updateTask(task.getId(), createBody(jsonTaskBody.toString()));
+
+        return execute(taskCall);
     }
 
     @Override
@@ -238,28 +250,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
         Preconditions.checkNonEmptyString(userID, "User ID");
         Preconditions.checkNonEmptyString(organizationID, "Organization ID");
 
-
-        TaskOption.Builder taskOptionBuilder = TaskOption.builder(name);
-        if (cron != null) {
-            taskOptionBuilder.cron(cron);
-        } else if (every != null) {
-            taskOptionBuilder.every(every);
-        }
-
-        List<AbstractOption> options = new ArrayList<>();
-        options.add(taskOptionBuilder.build());
-
-        FluxChain fluxChain = new FluxChain().addOptions(options);
-
-        JSONObject user = new JSONObject()
-                .put("id", userID);
-
-        JSONObject body = new JSONObject()
-                .put("name", name)
-                .put("organizationId", organizationID)
-                .put("owner", user)
-                .put("status", Task.TaskStatus.ENABLED.name().toLowerCase())
-                .put("flux", flux.print(fluxChain));
+        JSONObject body = getJsonTaskBody(name, flux, every, cron, userID, organizationID, Task.TaskStatus.ENABLED);
 
         Call<Task> task = platformService.createTask(createBody(body.toString()));
 
@@ -301,14 +292,52 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
         }
     }
 
-    /**
-     * TODO remove after fix https://github.com/influxdata/platform/issues/799.
-     */
-    private final class TaskStatusAdapter {
+    @Nonnull
+    private JSONObject getJsonTaskBody(@Nonnull final String name,
+                                       @Nonnull final Flux flux,
+                                       @Nullable final String every,
+                                       @Nullable final String cron,
+                                       @Nonnull final String userID,
+                                       @Nonnull final String organizationID,
+                                       @Nonnull final Task.TaskStatus status) {
 
+        Preconditions.checkNonEmptyString(name, "name of the task");
+        Objects.requireNonNull(flux, "Flux script to run");
+        Preconditions.checkNonEmptyString(userID, "User ID");
+        Preconditions.checkNonEmptyString(organizationID, "Organization ID");
+        Objects.requireNonNull(status, "Task.TaskStatus is required");
+
+        TaskOption.Builder taskOptionBuilder = TaskOption.builder(name);
+        if (cron != null) {
+            taskOptionBuilder.cron(cron);
+        } else if (every != null) {
+            taskOptionBuilder.every(every);
+        }
+
+        List<AbstractOption> options = new ArrayList<>();
+        options.add(taskOptionBuilder.build());
+
+        FluxChain fluxChain = new FluxChain().addOptions(options);
+
+        JSONObject user = new JSONObject()
+                .put("id", userID);
+
+        return new JSONObject()
+                .put("name", name)
+                .put("organizationId", organizationID)
+                .put("owner", user)
+                .put("status", status.name().toLowerCase())
+                .put("flux", flux.print(fluxChain));
+    }
+
+    private final class TaskAdapter {
+
+        /**
+         * TODO remove after fix https://github.com/influxdata/platform/issues/799.
+         */
         @FromJson
         @Nullable
-        public Task.TaskStatus fromJson(final JsonReader jsonReader, final JsonAdapter<Task.TaskStatus> delegate)
+        public Task.TaskStatus toTaskStatus(final JsonReader jsonReader, final JsonAdapter<Task.TaskStatus> delegate)
                 throws IOException {
 
             String statusValue = jsonReader.nextString();
@@ -317,6 +346,24 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
             } else {
                 return delegate.fromJsonValue(statusValue);
             }
+        }
+
+        @FromJson
+        @Nullable
+        public String toFlux(final JsonReader jsonReader, final JsonAdapter<String> delegate)
+                throws IOException {
+
+            if ("$.flux".equals(jsonReader.getPath())) {
+
+                String flux = delegate.fromJson(jsonReader);
+                if (flux == null) {
+                    return null;
+                }
+
+                return flux.substring(flux.indexOf("}") + 1).trim();
+            }
+
+            return delegate.fromJson(jsonReader);
         }
     }
 }

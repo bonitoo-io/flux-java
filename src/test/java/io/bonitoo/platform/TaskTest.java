@@ -24,6 +24,7 @@ package io.bonitoo.platform;
 
 import io.bonitoo.InfluxException;
 import io.bonitoo.platform.dto.Task;
+import io.bonitoo.platform.dto.User;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -38,6 +39,29 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JUnitPlatform.class)
 class TaskTest extends AbstractPlatformClientTest {
+
+    @Test
+    void mappingTaskNullFlux() {
+
+        String data = "{\n"
+                + "    \"organizationId\": \"01\",\n"
+                + "    \"owner\": {\n"
+                + "        \"name\": \"Frank Radler\",\n"
+                + "        \"id\": \"02\"\n"
+                + "    },\n"
+                + "    \"name\": \"test task\",\n"
+                + "    \"flux\": null,\n"
+                + "    \"id\": \"0c\",\n"
+                + "    \"every\": \"1m0s\",\n"
+                + "    \"status\": \"enabled\"\n"
+                + "}";
+
+        platformServer.enqueue(createResponse(data));
+
+        Task task = platformClient.findTaskByID("0c");
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getFlux()).isEqualTo(null);
+    }
 
     @Test
     void createTaskCronRequest() {
@@ -154,6 +178,45 @@ class TaskTest extends AbstractPlatformClientTest {
     }
 
     @Test
+    void updateTask() {
+
+        String data = "{\n"
+                + "    \"organizationId\": \"01\",\n"
+                + "    \"owner\": {\n"
+                + "        \"name\": \"Frank Radler\",\n"
+                + "        \"id\": \"02\"\n"
+                + "    },\n"
+                + "    \"name\": \"test task\",\n"
+                + "    \"flux\": \"option task = {name: \\\"test task\\\",every: 1m} from(bucket:\\\"test\\\") |> range(start:-1h)\",\n"
+                + "    \"id\": \"0c\",\n"
+                + "    \"every\": \"1m0s\",\n"
+                + "    \"status\": \"disabled\"\n"
+                + "}";
+
+        User owner = new User();
+        owner.setId("02") ;
+        owner.setName("Frank Radler");
+
+        Task task = new Task();
+        task.setId("0c");
+        task.setStatus(Task.TaskStatus.DISABLED);
+        task.setEvery("1m");
+        task.setName("test task");
+        task.setOrganizationId("01");
+        task.setOwner(owner);
+        task.setFlux("from(bucket:\\\"test\\\") |> range(start:-1h)");
+
+        platformServer.enqueue(createResponse(data));
+
+        platformClient.updateTask(task);
+
+        JSONObject requestBody = getRequestBody(platformServer);
+        Assertions.assertThat(requestBody.getString("flux"))
+                .isEqualToIgnoringWhitespace("option task = {name: \"test task\", every: 1m} from(bucket:\\\"test\\\") |> range(start:-1h)");
+        Assertions.assertThat(requestBody.getString("status")).isEqualTo("disabled");
+    }
+
+    @Test
     void errorResponse() {
 
         platformServer.enqueue(createErrorResponse("task name already in use by current user or target organization"));
@@ -172,7 +235,7 @@ class TaskTest extends AbstractPlatformClientTest {
         Assertions.assertThat(task.getOwner().getName()).isEqualTo("Frank Radler");
         Assertions.assertThat(task.getOrganizationId()).isEqualTo("01");
         Assertions.assertThat(task.getStatus()).isEqualTo(Task.TaskStatus.ENABLED);
-        Assertions.assertThat(task.getFlux()).isEqualTo("option task = {name: \"test task\",every: 1m} from(bucket:\"test\") |> range(start:-1h)");
+        Assertions.assertThat(task.getFlux()).isEqualTo("from(bucket:\"test\") |> range(start:-1h)");
         Assertions.assertThat(task.getEvery()).isEqualTo("1m0s");
         Assertions.assertThat(task.getCron()).isNull();
     }
