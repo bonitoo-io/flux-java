@@ -219,6 +219,10 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     @Override
     public void deleteTask(@Nonnull final String taskID) {
 
+        Preconditions.checkNonEmptyString(taskID, "taskID");
+
+        Call<Void> call = platformService.deleteTask(taskID);
+        execute(call);
     }
 
     @Nonnull

@@ -31,6 +31,7 @@ import io.bonitoo.platform.dto.Task;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
@@ -46,6 +47,9 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<Task> createTask(@Nonnull @Body final RequestBody task);
+
+    @DELETE("/v1/tasks/{id}")
+    Call<Void> deleteTask(@Nonnull @Path("id") final String taskID);
 
     @GET("/v1/tasks/")
     @Nonnull

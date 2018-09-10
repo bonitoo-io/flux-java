@@ -23,6 +23,7 @@
 package io.bonitoo.platform.dto;
 
 import java.io.Serializable;
+import java.util.StringJoiner;
 
 /**
  * User is a user.
@@ -50,5 +51,13 @@ public final class User implements Serializable {
     public User setName(final String name) {
         this.name = name;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", User.class.getSimpleName() + "[", "]")
+                .add("id='" + id + "'")
+                .add("name='" + name + "'")
+                .toString();
     }
 }

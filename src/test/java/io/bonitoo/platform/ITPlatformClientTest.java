@@ -58,7 +58,7 @@ class ITPlatformClientTest {
     void createTask() {
 
         String taskName = generateName("it task");
-        
+
         Task task = platformClient.createTaskEvery(taskName, "from(bucket:\"telegraf\") |> sum()", "1h", "01", "01");
 
         Assertions.assertThat(task).isNotNull();
@@ -82,6 +82,7 @@ class ITPlatformClientTest {
         Task task = platformClient.createTaskCron(taskName, "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
 
         Task taskByID = platformClient.findTaskByID(task.getId());
+        LOG.info("TaskByID: " + task);
 
         Assertions.assertThat(taskByID).isNotNull();
         Assertions.assertThat(taskByID.getId()).isEqualTo(task.getId());
@@ -138,6 +139,22 @@ class ITPlatformClientTest {
 
         Assertions.assertThat(tasks).hasSize(1);
         Assertions.assertThat(tasks.get(0).getId()).isEqualTo(task2.getId());
+    }
+
+    @Test
+    void deleteTask() {
+
+        Task createdTask = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        Assertions.assertThat(createdTask).isNotNull();
+
+        Task foundTask = platformClient.findTaskByID(createdTask.getId());
+        Assertions.assertThat(foundTask).isNotNull();
+
+        // delete task
+        platformClient.deleteTask(createdTask);
+
+        foundTask = platformClient.findTaskByID(createdTask.getId());
+        Assertions.assertThat(foundTask).isNull();
     }
 
     @Nonnull

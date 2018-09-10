@@ -25,6 +25,8 @@ package io.bonitoo.platform;
 import io.bonitoo.InfluxException;
 import io.bonitoo.platform.dto.Task;
 
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -124,6 +126,31 @@ class TaskTest extends AbstractPlatformClientTest {
 
         Task task = platformClient.findTaskByID("00");
         Assertions.assertThat(task).isNull();
+    }
+
+    @Test
+    void deleteTask() throws InterruptedException {
+
+        platformServer.enqueue(new MockResponse().setResponseCode(202));
+
+        Task task = new Task();
+        task.setId("00");
+
+        platformClient.deleteTask(task);
+
+        RecordedRequest request = platformServer.takeRequest();
+        Assertions.assertThat(request.getMethod()).isEqualTo("DELETE");
+        Assertions.assertThat(request.getPath()).endsWith("/00");
+    }
+
+    @Test
+    void deleteTaskNotExist() {
+
+        platformServer.enqueue(createErrorResponse("task not claimed"));
+
+        Assertions.assertThatThrownBy(() -> platformClient.deleteTask("00"))
+                .isInstanceOf(InfluxException.class)
+                .hasMessage("task not claimed");
     }
 
     @Test

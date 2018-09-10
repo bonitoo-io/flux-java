@@ -23,6 +23,7 @@
 package io.bonitoo.platform.dto;
 
 import java.io.Serializable;
+import java.util.StringJoiner;
 
 import com.squareup.moshi.Json;
 
@@ -152,5 +153,19 @@ public final class Task implements Serializable {
     public Task setCron(final String cron) {
         this.cron = cron;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Task.class.getSimpleName() + "[", "]")
+                .add("id='" + id + "'")
+                .add("name='" + name + "'")
+                .add("owner=" + owner)
+                .add("organizationId='" + organizationId + "'")
+                .add("status=" + status)
+                .add("flux='" + flux + "'")
+                .add("every='" + every + "'")
+                .add("cron='" + cron + "'")
+                .toString();
     }
 }
