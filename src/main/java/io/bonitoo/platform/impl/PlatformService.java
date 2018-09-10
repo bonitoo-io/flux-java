@@ -22,7 +22,9 @@
  */
 package io.bonitoo.platform.impl;
 
+import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import io.bonitoo.platform.dto.Task;
 
@@ -33,6 +35,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * @author Jakub Bednar (bednar@github) (05/09/2018 13:30)
@@ -43,6 +46,13 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<Task> createTask(@Nonnull @Body final RequestBody task);
+
+    @GET("/v1/tasks/")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<List<Task>> findTasks(@Nullable @Query("after") final String after,
+                               @Nullable @Query("user") final String user,
+                               @Nullable @Query("organization") final String organization);
 
     @GET("/v1/tasks/{id}")
     @Nonnull

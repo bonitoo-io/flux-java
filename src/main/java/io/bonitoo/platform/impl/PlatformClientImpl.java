@@ -118,7 +118,10 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     public List<Task> findTasks(@Nullable final String afterID,
                                 @Nullable final String userID,
                                 @Nullable final String organizationID) {
-        return null;
+
+        Call<List<Task>> task = platformService.findTasks(afterID, userID, organizationID);
+
+        return execute(task);
     }
 
     @Nonnull

@@ -22,8 +22,10 @@
  */
 package io.bonitoo.platform;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
 
 import io.bonitoo.platform.dto.Task;
 
@@ -55,7 +57,7 @@ class ITPlatformClientTest {
     @Test
     void createTask() {
 
-        String taskName = "it task" + System.currentTimeMillis();
+        String taskName = generateName("it task");
         
         Task task = platformClient.createTaskEvery(taskName, "from(bucket:\"telegraf\") |> sum()", "1h", "01", "01");
 
@@ -75,7 +77,7 @@ class ITPlatformClientTest {
     @Test
     void findTaskByID() {
 
-        String taskName = "it task" + System.currentTimeMillis();
+        String taskName = generateName("it task");
 
         Task task = platformClient.createTaskCron(taskName, "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
 
@@ -94,5 +96,55 @@ class ITPlatformClientTest {
 
         // TODO remove after fix https://github.com/influxdata/platform/issues/799
         // Assertions.assertThat(taskByID.getStatus()).isEqualTo(Task.TaskStatus.ENABLED);
+    }
+
+    @Test
+    void findTasks() {
+
+        int size = platformClient.findTasks().size();
+
+        platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+
+        List<Task> tasks = platformClient.findTasks();
+        Assertions.assertThat(tasks).hasSize(size + 1);
+    }
+
+    @Test
+    void findTasksByUserID() {
+
+        String user = generateName("0");
+        platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", user, "01");
+
+        List<Task> tasks = platformClient.findTasksByUserID(user);
+        Assertions.assertThat(tasks).hasSize(1);
+    }
+
+    @Test
+    void findTasksByOrganizationID() {
+        String org = generateName("0");
+        platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", org);
+
+        List<Task> tasks = platformClient.findTasksByOrganizationID(org);
+        Assertions.assertThat(tasks).hasSize(1);
+    }
+
+    @Test
+    void findTasksAfterSpecifiedID() {
+
+        Task task1 = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        Task task2 = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+
+        List<Task> tasks = platformClient.findTasks(task1.getId(), null, null);
+
+        Assertions.assertThat(tasks).hasSize(1);
+        Assertions.assertThat(tasks.get(0).getId()).isEqualTo(task2.getId());
+    }
+
+    @Nonnull
+    private String generateName(@Nonnull final String prefix) {
+
+        Assertions.assertThat(prefix).isNotBlank();
+
+        return prefix + System.currentTimeMillis();
     }
 }
