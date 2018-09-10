@@ -40,6 +40,10 @@ import io.bonitoo.platform.PlatformClient;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.options.PlatformOptions;
 
+import com.squareup.moshi.FromJson;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonReader;
+import com.squareup.moshi.Moshi;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.json.JSONObject;
@@ -67,10 +71,13 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
                 .addInterceptor(loggingInterceptor)
                 .build();
 
+
+        Moshi moshi = new Moshi.Builder().add(new TaskStatusAdapter()).build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(options.getUrl())
                 .client(okHttpClient)
-                .addConverterFactory(MoshiConverterFactory.create().asLenient())
+                .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
                 .build();
 
         this.platformService = retrofit.create(PlatformService.class);
@@ -79,7 +86,12 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     @Nullable
     @Override
     public Task findTaskByID(@Nonnull final String taskID) {
-        return null;
+
+        Preconditions.checkNonEmptyString(taskID, "taskID");
+
+        Call<Task> task = platformService.findTaskByID(taskID);
+
+        return execute(task);
     }
 
     @Nonnull
@@ -279,6 +291,25 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
             }
         } catch (IOException e) {
             throw InfluxException.fromCause(e);
+        }
+    }
+
+    /**
+     * TODO remove after fix https://github.com/influxdata/platform/issues/799.
+     */
+    private final class TaskStatusAdapter {
+
+        @FromJson
+        @Nullable
+        public Task.TaskStatus fromJson(final JsonReader jsonReader, final JsonAdapter<Task.TaskStatus> delegate)
+                throws IOException {
+
+            String statusValue = jsonReader.nextString();
+            if (statusValue.isEmpty()) {
+                return null;
+            } else {
+                return delegate.fromJsonValue(statusValue);
+            }
         }
     }
 }

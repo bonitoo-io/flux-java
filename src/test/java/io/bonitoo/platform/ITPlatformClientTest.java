@@ -71,4 +71,28 @@ class ITPlatformClientTest {
         Assertions.assertThat(task.getCron()).isNull();
         Assertions.assertThat(task.getFlux()).isEqualToIgnoringWhitespace("option task = {name: \"" + taskName + "\", every: 1h} from(bucket:\"telegraf\") |> sum()");
     }
+
+    @Test
+    void findTaskByID() {
+
+        String taskName = "it task" + System.currentTimeMillis();
+
+        Task task = platformClient.createTaskCron(taskName, "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+
+        Task taskByID = platformClient.findTaskByID(task.getId());
+
+        Assertions.assertThat(taskByID).isNotNull();
+        Assertions.assertThat(taskByID.getId()).isEqualTo(task.getId());
+        Assertions.assertThat(taskByID.getName()).isEqualTo(task.getName());
+        Assertions.assertThat(taskByID.getOwner()).isNotNull();
+        Assertions.assertThat(taskByID.getOwner().getId()).isEqualTo(task.getOwner().getId());
+        Assertions.assertThat(taskByID.getOwner().getName()).isEqualTo(task.getOwner().getName());
+        Assertions.assertThat(taskByID.getOrganizationId()).isEqualTo(task.getOrganizationId());
+        Assertions.assertThat(taskByID.getEvery()).isNull();
+        Assertions.assertThat(taskByID.getCron()).isEqualTo(task.getCron());
+        Assertions.assertThat(taskByID.getFlux()).isEqualTo(task.getFlux());
+
+        // TODO remove after fix https://github.com/influxdata/platform/issues/799
+        // Assertions.assertThat(taskByID.getStatus()).isEqualTo(Task.TaskStatus.ENABLED);
+    }
 }

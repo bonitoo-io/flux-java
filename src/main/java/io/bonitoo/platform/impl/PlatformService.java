@@ -29,8 +29,10 @@ import io.bonitoo.platform.dto.Task;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 /**
  * @author Jakub Bednar (bednar@github) (05/09/2018 13:30)
@@ -41,4 +43,9 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<Task> createTask(@Nonnull @Body final RequestBody task);
+
+    @GET("/v1/tasks/{id}")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Task> findTaskByID(@Nonnull @Path("id") final String taskID);
 }

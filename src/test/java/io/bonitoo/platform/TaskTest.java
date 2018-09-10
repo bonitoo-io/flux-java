@@ -42,7 +42,8 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse("{}"));
 
-        platformClient.createTaskCron("task name", "from(bucket: \"telegraf\") |> last()", "0 2 * * *", "10", "15");
+        Task task = platformClient.createTaskCron("task name", "from(bucket: \"telegraf\") |> last()", "0 2 * * *", "10", "15");
+        Assertions.assertThat(task).isNotNull();
 
         JSONObject body = getRequestBody(platformServer);
 
@@ -89,6 +90,53 @@ class TaskTest extends AbstractPlatformClientTest {
 
         Task task = platformClient.createTaskEvery("test task", "from(bucket: \"test\") |> range(start:-1h)", "1m", "02", "01");
 
+        assertTask(task);
+    }
+
+    @Test
+    void findTaskByIDExist() {
+
+        String data = "{\n"
+                + "    \"organizationId\": \"01\",\n"
+                + "    \"owner\": {\n"
+                + "        \"name\": \"Frank Radler\",\n"
+                + "        \"id\": \"02\"\n"
+                + "    },\n"
+                + "    \"name\": \"test task\",\n"
+                + "    \"flux\": \"option task = {name: \\\"test task\\\",every: 1m} from(bucket:\\\"test\\\") |> range(start:-1h)\",\n"
+                + "    \"id\": \"0c\",\n"
+                + "    \"every\": \"1m0s\",\n"
+                + "    \"status\": \"enabled\"\n"
+                + "}";
+
+        platformServer.enqueue(createResponse(data));
+
+        Task task = platformClient.findTaskByID("0c");
+        assertTask(task);
+    }
+
+    @Test
+    void findTaskByIDNotExist() {
+
+        String data = "null\n";
+
+        platformServer.enqueue(createResponse(data));
+
+        Task task = platformClient.findTaskByID("00");
+        Assertions.assertThat(task).isNull();
+    }
+
+    @Test
+    void errorResponse() {
+
+        platformServer.enqueue(createErrorResponse("task name already in use by current user or target organization"));
+
+        Assertions.assertThatThrownBy(() -> platformClient.createTaskEvery("test task", "from(bucket: \"test\") |> range(start:-1h)", "1m", "02", "01"))
+                .isInstanceOf(InfluxException.class)
+                .hasMessage("task name already in use by current user or target organization");
+    }
+
+    private void assertTask(Task task) {
         Assertions.assertThat(task).isNotNull();
         Assertions.assertThat(task.getId()).isEqualTo("0c");
         Assertions.assertThat(task.getName()).isEqualTo("test task");
@@ -100,15 +148,5 @@ class TaskTest extends AbstractPlatformClientTest {
         Assertions.assertThat(task.getFlux()).isEqualTo("option task = {name: \"test task\",every: 1m} from(bucket:\"test\") |> range(start:-1h)");
         Assertions.assertThat(task.getEvery()).isEqualTo("1m0s");
         Assertions.assertThat(task.getCron()).isNull();
-    }
-
-    @Test
-    void errorResponse() {
-
-        platformServer.enqueue(createErrorResponse("task name already in use by current user or target organization"));
-
-        Assertions.assertThatThrownBy(() -> platformClient.createTaskEvery("test task", "from(bucket: \"test\") |> range(start:-1h)", "1m", "02", "01"))
-                .isInstanceOf(InfluxException.class)
-                .hasMessage("task name already in use by current user or target organization");
     }
 }
