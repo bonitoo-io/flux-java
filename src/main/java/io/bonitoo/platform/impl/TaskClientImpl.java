@@ -22,7 +22,6 @@
  */
 package io.bonitoo.platform.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +29,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
-import io.bonitoo.InfluxException;
 import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
@@ -41,12 +39,11 @@ import io.bonitoo.platform.dto.Task;
 
 import org.json.JSONObject;
 import retrofit2.Call;
-import retrofit2.Response;
 
 /**
  * @author Jakub Bednar (bednar@github) (11/09/2018 07:59)
  */
-class TaskClientImpl extends AbstractRestClient implements TaskClient {
+final class TaskClientImpl extends AbstractRestClient implements TaskClient {
 
     private final PlatformService platformService;
 
@@ -186,7 +183,7 @@ class TaskClientImpl extends AbstractRestClient implements TaskClient {
             }
         }, task.getEvery(), task.getCron(), task.getOwner().getId(), task.getOrganizationId(), task.getStatus());
 
-        Call<Task> taskCall = platformService.updateTask(task.getId(), createBody(jsonTaskBody.toString()));
+        Call<Task> taskCall = platformService.updateTask(task.getId(), createBody(jsonTaskBody));
 
         return execute(taskCall);
     }
@@ -223,27 +220,9 @@ class TaskClientImpl extends AbstractRestClient implements TaskClient {
 
         JSONObject body = getJsonTaskBody(name, flux, every, cron, userID, organizationID, Task.TaskStatus.ENABLED);
 
-        Call<Task> task = platformService.createTask(createBody(body.toString()));
+        Call<Task> task = platformService.createTask(createBody(body));
 
         return execute(task);
-    }
-
-    private <T> T execute(@Nonnull final Call<T> call) throws InfluxException {
-
-        Objects.requireNonNull(call, "call is required");
-
-        try {
-            Response<T> response = call.execute();
-            if (response.isSuccessful()) {
-                return response.body();
-            } else {
-                String error = InfluxException.getErrorMessage(response);
-
-                throw new InfluxException(error);
-            }
-        } catch (IOException e) {
-            throw InfluxException.fromCause(e);
-        }
     }
 
     @Nonnull

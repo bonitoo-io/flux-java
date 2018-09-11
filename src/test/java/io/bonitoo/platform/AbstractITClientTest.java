@@ -22,40 +22,39 @@
  */
 package io.bonitoo.platform;
 
-import okhttp3.logging.HttpLoggingInterceptor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
- * @author Jakub Bednar (bednar@github) (05/09/2018 14:00)
+ * @author Jakub Bednar (bednar@github) (11/09/2018 10:29)
  */
-@RunWith(JUnitPlatform.class)
-class PlatformClientTest extends AbstractPlatformClientTest {
+abstract class AbstractITClientTest {
 
-    @Test
-    void defaultLogLevel() {
+    private static final Logger LOG = Logger.getLogger(ITTaskClientTest.class.getName());
 
-        Assertions.assertThat(platformClient.getLogLevel()).isEqualTo(HttpLoggingInterceptor.Level.NONE);
+    PlatformClient platformService;
+
+    @BeforeEach
+    void setUp() {
+
+        String platformIP = System.getenv().getOrDefault("PLATFORM_IP", "127.0.0.1");
+        String platformPort = System.getenv().getOrDefault("PLATFORM_IP_API", "9999");
+
+        String platformURL = "http://" + platformIP + ":" + platformPort;
+        LOG.log(Level.FINEST, "Platform URL: {0}", platformURL);
+
+        platformService = PlatformClientFactory.connect(platformURL);
     }
 
-    @Test
-    void logLevel() {
+    @Nonnull
+    protected String generateName(@Nonnull final String prefix) {
 
-        PlatformClient platformClient = this.platformClient.setLogLevel(HttpLoggingInterceptor.Level.HEADERS);
+        Assertions.assertThat(prefix).isNotBlank();
 
-        Assertions.assertThat(platformClient).isEqualTo(this.platformClient);
-        Assertions.assertThat(platformClient.getLogLevel()).isEqualTo(HttpLoggingInterceptor.Level.HEADERS);
-    }
-
-    @Test
-    void userClient() {
-        Assertions.assertThat(platformClient.getUserClient()).isNotNull();
-    }
-
-    @Test
-    void taskClient() {
-        Assertions.assertThat(platformClient.getTaskClient()).isNotNull();
+        return prefix + System.currentTimeMillis();
     }
 }

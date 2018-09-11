@@ -154,7 +154,7 @@ public interface TaskClient {
                          @Nonnull final String organizationID);
 
     /**
-     * Update a task. Update a task. This will cancel all queued runs.
+     * Update a task. This will cancel all queued runs.
      *
      * @param task task update to apply
      * @return task updated

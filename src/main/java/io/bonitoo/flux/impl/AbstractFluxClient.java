@@ -105,10 +105,9 @@ public abstract class AbstractFluxClient<T> extends AbstractRestClient {
         Preconditions.checkNonEmptyString(query, "query");
         Objects.requireNonNull(options, "FluxOptions are required");
 
-        String body = new JSONObject()
+        JSONObject body = new JSONObject()
                 .put("query", query)
-                .put("dialect", options.getDialect().getJson())
-                .toString();
+                .put("dialect", options.getDialect().getJson());
 
         return createBody(body);
     }

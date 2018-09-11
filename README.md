@@ -42,6 +42,16 @@ platformClient.close();
 
 ### Tasks
 
+The `TaskClient` supports:
+1. [creating tasks](#create)
+2. find tasks
+3. update task
+4. delete task
+
+```java
+TaskClient taskClient = platformService.getTaskClient();
+```
+
 #### Create
 The task can be created with `cron` or `every` expression that specify task repetition. 
 
@@ -55,7 +65,7 @@ The required `Task` attributes are:
 ```java
 String flux = "from(bucket: \"telegraf\") |> last()";
 
-Task task = platformClient.createTaskCron("task name", flux, "0 2 * * *", "01", "01");
+Task task = taskClient.createTaskCron("task name", flux, "0 2 * * *", "01", "01");
 ...
 ```
 
@@ -63,8 +73,37 @@ Task task = platformClient.createTaskCron("task name", flux, "0 2 * * *", "01", 
 ```java
 String flux = "from(bucket: \"telegraf\") |> last()";
 
-Task task = platformClient.createTaskEvery("task name", flux, "0 2 * * *", "10m", "01");
+Task task = taskClient.createTaskEvery("task name", flux, "0 2 * * *", "10m", "01");
 ...
+```
+
+### Users
+
+The `UserClient` supports:
+1. creating users
+2. find users
+3. update user
+4. delete user
+
+```java
+UserClient userClient = platformService.getTaskClient();
+
+// Creates a new user with name 'John Ryzen'
+User user = userClient.createUser("John Ryzen");
+
+// Update a user
+user.setName("Tom Push");
+userClient.updateUser(user);
+
+// Delete a user
+User createdUser = ...;
+userClient.deleteUser(createdUser);
+
+// Retrieve a user by ID
+User user = userClient.findUserByID("00");
+
+// List all users
+List<User> users = userClient.findUsers();
 ```
 
 ## Flux - Data Scripting Language

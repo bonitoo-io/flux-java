@@ -22,50 +22,63 @@
  */
 package io.bonitoo.platform;
 
+import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import io.bonitoo.flux.FluxClient;
-
-import okhttp3.logging.HttpLoggingInterceptor;
+import io.bonitoo.platform.dto.User;
 
 /**
- * The client of the InfluxData Platform for Time Series that implement HTTP API defined by
- * <a href="https://github.com/influxdata/platform/blob/master/http/swagger.yml">Influx API Service swagger.yml</a>.
- *
- * @author Jakub Bednar (bednar@github) (05/09/2018 07:20)
- * @see FluxClient
- * @since 1.0.0
+ * @author Jakub Bednar (bednar@github) (11/09/2018 10:05)
  */
-public interface PlatformClient {
+public interface UserClient {
 
     /**
-     * Get client for User API.
+     * Retrieve a user.
      *
-     * @return the client for User API
+     * @param userID ID of user to get
+     * @return user details
      */
-    @Nonnull
-    UserClient getUserClient();
+    @Nullable
+    User findUserByID(@Nonnull final String userID);
 
     /**
-     * Get client for Task API.
+     * List all users.
      *
-     * @return the client for Task API
+     * @return List all users
      */
     @Nonnull
-    TaskClient getTaskClient();
+    List<User> findUsers();
 
     /**
-     * @return the {@link HttpLoggingInterceptor.Level} that is used for logging requests and responses
-     */
-    @Nonnull
-    HttpLoggingInterceptor.Level getLogLevel();
-
-    /**
-     * Set the log level for the request and response information.
+     * Creates a new user and sets {@link User#id} with the new identifier.
      *
-     * @param logLevel the log level to set.
-     * @return the PlatformClient instance to be able to use it in a fluent manner.
+     * @param name name of the user
+     * @return User created
      */
     @Nonnull
-    PlatformClient setLogLevel(@Nonnull final HttpLoggingInterceptor.Level logLevel);
+    User createUser(@Nonnull final String name);
+
+    /**
+     * Update a user.
+     *
+     * @param user user update to apply
+     * @return user updated
+     */
+    @Nonnull
+    User updateUser(@Nonnull final User user);
+
+    /**
+     * Delete a user.
+     *
+     * @param user user to delete
+     */
+    void deleteUser(@Nonnull final User user);
+
+    /**
+     * Delete a user.
+     *
+     * @param userID ID of user to delete
+     */
+    void deleteUser(@Nonnull final String userID);
 }

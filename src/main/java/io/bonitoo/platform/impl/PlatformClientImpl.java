@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import io.bonitoo.AbstractRestClient;
 import io.bonitoo.platform.PlatformClient;
 import io.bonitoo.platform.TaskClient;
+import io.bonitoo.platform.UserClient;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.options.PlatformOptions;
 
@@ -47,6 +48,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
  */
 public final class PlatformClientImpl extends AbstractRestClient implements PlatformClient {
 
+    private final UserClientImpl userClient;
     private final TaskClientImpl taskClient;
 
     private final HttpLoggingInterceptor loggingInterceptor;
@@ -73,6 +75,13 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
         PlatformService platformService = retrofit.create(PlatformService.class);
 
         this.taskClient = new TaskClientImpl(platformService);
+        this.userClient = new UserClientImpl(platformService);
+    }
+
+    @Nonnull
+    @Override
+    public UserClient getUserClient() {
+        return userClient;
     }
 
     @Nonnull

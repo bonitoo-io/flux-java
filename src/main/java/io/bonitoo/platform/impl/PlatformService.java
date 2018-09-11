@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.platform.dto.Task;
+import io.bonitoo.platform.dto.User;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -44,6 +45,33 @@ import retrofit2.http.Query;
  */
 interface PlatformService {
 
+    //
+    // User
+    //
+    @POST("/v1/users")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<User> createUser(@Nonnull @Body final RequestBody user);
+
+    @DELETE("/v1/users/{id}")
+    Call<Void> deleteUser(@Nonnull @Path("id") final String userID);
+
+    @PATCH("/v1/users/{id}")
+    Call<User> updateUser(@Nonnull @Path("id") final String userID, @Nonnull @Body final RequestBody task);
+
+    @GET("/v1/users/{id}")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<User> findUserByID(@Nonnull @Path("id") final String userID);
+
+    @GET("/v1/users/")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<List<User>> findUsers();
+
+    //
+    // Task
+    //
     @POST("/v1/tasks")
     @Nonnull
     @Headers("Content-Type: application/json")

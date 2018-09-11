@@ -23,9 +23,7 @@
 package io.bonitoo.platform;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 
 import io.bonitoo.platform.dto.Task;
 
@@ -36,7 +34,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Jakub Bednar (bednar@github) (05/09/2018 15:54)
  */
-class ITTaskClientTest {
+class ITTaskClientTest extends AbstractITClientTest {
 
     private static final Logger LOG = Logger.getLogger(ITTaskClientTest.class.getName());
 
@@ -45,13 +43,9 @@ class ITTaskClientTest {
     @BeforeEach
     void setUp() {
 
-        String platformIP = System.getenv().getOrDefault("PLATFORM_IP", "127.0.0.1");
-        String platformPort = System.getenv().getOrDefault("PLATFORM_IP_API", "9999");
+        super.setUp();
 
-        String platformURL = "http://" + platformIP + ":" + platformPort;
-        LOG.log(Level.FINEST, "Platform URL: {0}", platformURL);
-
-        taskClient = PlatformClientFactory.connect(platformURL).getTaskClient();
+        taskClient = platformService.getTaskClient();
     }
 
     @Test
@@ -181,13 +175,5 @@ class ITTaskClientTest {
         // Assertions.assertThat(updatedTask.getOwner().getId()).isEqualTo(cronTask.getOwner().getId());
         // Assertions.assertThat(updatedTask.getOrganizationId()).isEqualTo(cronTask.getOrganizationId());
         // Assertions.assertThat(updatedTask.getName()).isEqualTo(cronTask.getName());
-    }
-
-    @Nonnull
-    private String generateName(@Nonnull final String prefix) {
-
-        Assertions.assertThat(prefix).isNotBlank();
-
-        return prefix + System.currentTimeMillis();
     }
 }
