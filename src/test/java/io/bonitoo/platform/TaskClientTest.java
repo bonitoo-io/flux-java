@@ -30,6 +30,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
@@ -38,7 +39,16 @@ import org.junit.runner.RunWith;
  * @author Jakub Bednar (bednar@github) (05/09/2018 12:31)
  */
 @RunWith(JUnitPlatform.class)
-class TaskTest extends AbstractPlatformClientTest {
+class TaskClientTest extends AbstractPlatformClientTest {
+
+    private TaskClient taskClient;
+
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+
+        taskClient = platformClient.getTaskClient();
+    }
 
     @Test
     void mappingTaskNullFlux() {
@@ -58,7 +68,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse(data));
 
-        Task task = platformClient.findTaskByID("0c");
+        Task task = taskClient.findTaskByID("0c");
         Assertions.assertThat(task).isNotNull();
         Assertions.assertThat(task.getFlux()).isEqualTo(null);
     }
@@ -68,7 +78,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse("{}"));
 
-        Task task = platformClient.createTaskCron("task name", "from(bucket: \"telegraf\") |> last()", "0 2 * * *", "10", "15");
+        Task task = taskClient.createTaskCron("task name", "from(bucket: \"telegraf\") |> last()", "0 2 * * *", "10", "15");
         Assertions.assertThat(task).isNotNull();
 
         JSONObject body = getRequestBody(platformServer);
@@ -85,7 +95,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse("{}"));
 
-        platformClient.createTaskEvery("task name", "from(bucket: \"telegraf\") |> last()", "10m", "10", "15");
+        taskClient.createTaskEvery("task name", "from(bucket: \"telegraf\") |> last()", "10m", "10", "15");
 
         JSONObject body = getRequestBody(platformServer);
 
@@ -114,7 +124,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse(data));
 
-        Task task = platformClient.createTaskEvery("test task", "from(bucket: \"test\") |> range(start:-1h)", "1m", "02", "01");
+        Task task = taskClient.createTaskEvery("test task", "from(bucket: \"test\") |> range(start:-1h)", "1m", "02", "01");
 
         assertTask(task);
     }
@@ -137,7 +147,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse(data));
 
-        Task task = platformClient.findTaskByID("0c");
+        Task task = taskClient.findTaskByID("0c");
         assertTask(task);
     }
 
@@ -148,7 +158,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse(data));
 
-        Task task = platformClient.findTaskByID("00");
+        Task task = taskClient.findTaskByID("00");
         Assertions.assertThat(task).isNull();
     }
 
@@ -160,7 +170,7 @@ class TaskTest extends AbstractPlatformClientTest {
         Task task = new Task();
         task.setId("00");
 
-        platformClient.deleteTask(task);
+        taskClient.deleteTask(task);
 
         RecordedRequest request = platformServer.takeRequest();
         Assertions.assertThat(request.getMethod()).isEqualTo("DELETE");
@@ -172,7 +182,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createErrorResponse("task not claimed"));
 
-        Assertions.assertThatThrownBy(() -> platformClient.deleteTask("00"))
+        Assertions.assertThatThrownBy(() -> taskClient.deleteTask("00"))
                 .isInstanceOf(InfluxException.class)
                 .hasMessage("task not claimed");
     }
@@ -194,7 +204,7 @@ class TaskTest extends AbstractPlatformClientTest {
                 + "}";
 
         User owner = new User();
-        owner.setId("02") ;
+        owner.setId("02");
         owner.setName("Frank Radler");
 
         Task task = new Task();
@@ -208,7 +218,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createResponse(data));
 
-        platformClient.updateTask(task);
+        taskClient.updateTask(task);
 
         JSONObject requestBody = getRequestBody(platformServer);
         Assertions.assertThat(requestBody.getString("flux"))
@@ -221,7 +231,7 @@ class TaskTest extends AbstractPlatformClientTest {
 
         platformServer.enqueue(createErrorResponse("task name already in use by current user or target organization"));
 
-        Assertions.assertThatThrownBy(() -> platformClient.createTaskEvery("test task", "from(bucket: \"test\") |> range(start:-1h)", "1m", "02", "01"))
+        Assertions.assertThatThrownBy(() -> taskClient.createTaskEvery("test task", "from(bucket: \"test\") |> range(start:-1h)", "1m", "02", "01"))
                 .isInstanceOf(InfluxException.class)
                 .hasMessage("task name already in use by current user or target organization");
     }

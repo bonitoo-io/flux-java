@@ -36,11 +36,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Jakub Bednar (bednar@github) (05/09/2018 15:54)
  */
-class ITPlatformClientTest {
+class ITTaskClientTest {
 
-    private static final Logger LOG = Logger.getLogger(ITPlatformClientTest.class.getName());
+    private static final Logger LOG = Logger.getLogger(ITTaskClientTest.class.getName());
 
-    private PlatformClient platformClient;
+    private TaskClient taskClient;
 
     @BeforeEach
     void setUp() {
@@ -51,7 +51,7 @@ class ITPlatformClientTest {
         String platformURL = "http://" + platformIP + ":" + platformPort;
         LOG.log(Level.FINEST, "Platform URL: {0}", platformURL);
 
-        platformClient = PlatformClientFactory.connect(platformURL);
+        taskClient = PlatformClientFactory.connect(platformURL).getTaskClient();
     }
 
     @Test
@@ -59,7 +59,7 @@ class ITPlatformClientTest {
 
         String taskName = generateName("it task");
 
-        Task task = platformClient.createTaskEvery(taskName, "from(bucket:\"telegraf\") |> sum()", "1h", "01", "01");
+        Task task = taskClient.createTaskEvery(taskName, "from(bucket:\"telegraf\") |> sum()", "1h", "01", "01");
 
         Assertions.assertThat(task).isNotNull();
         Assertions.assertThat(task.getId()).isNotBlank();
@@ -79,9 +79,9 @@ class ITPlatformClientTest {
 
         String taskName = generateName("it task");
 
-        Task task = platformClient.createTaskCron(taskName, "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        Task task = taskClient.createTaskCron(taskName, "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
 
-        Task taskByID = platformClient.findTaskByID(task.getId());
+        Task taskByID = taskClient.findTaskByID(task.getId());
         LOG.info("TaskByID: " + task);
 
         Assertions.assertThat(taskByID).isNotNull();
@@ -102,11 +102,11 @@ class ITPlatformClientTest {
     @Test
     void findTasks() {
 
-        int size = platformClient.findTasks().size();
+        int size = taskClient.findTasks().size();
 
-        platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        taskClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
 
-        List<Task> tasks = platformClient.findTasks();
+        List<Task> tasks = taskClient.findTasks();
         Assertions.assertThat(tasks).hasSize(size + 1);
     }
 
@@ -114,28 +114,28 @@ class ITPlatformClientTest {
     void findTasksByUserID() {
 
         String user = generateName("0");
-        platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", user, "01");
+        taskClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", user, "01");
 
-        List<Task> tasks = platformClient.findTasksByUserID(user);
+        List<Task> tasks = taskClient.findTasksByUserID(user);
         Assertions.assertThat(tasks).hasSize(1);
     }
 
     @Test
     void findTasksByOrganizationID() {
         String org = generateName("0");
-        platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", org);
+        taskClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", org);
 
-        List<Task> tasks = platformClient.findTasksByOrganizationID(org);
+        List<Task> tasks = taskClient.findTasksByOrganizationID(org);
         Assertions.assertThat(tasks).hasSize(1);
     }
 
     @Test
     void findTasksAfterSpecifiedID() {
 
-        Task task1 = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
-        Task task2 = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        Task task1 = taskClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        Task task2 = taskClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
 
-        List<Task> tasks = platformClient.findTasks(task1.getId(), null, null);
+        List<Task> tasks = taskClient.findTasks(task1.getId(), null, null);
 
         Assertions.assertThat(tasks).hasSize(1);
         Assertions.assertThat(tasks.get(0).getId()).isEqualTo(task2.getId());
@@ -144,29 +144,29 @@ class ITPlatformClientTest {
     @Test
     void deleteTask() {
 
-        Task createdTask = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        Task createdTask = taskClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
         Assertions.assertThat(createdTask).isNotNull();
 
-        Task foundTask = platformClient.findTaskByID(createdTask.getId());
+        Task foundTask = taskClient.findTaskByID(createdTask.getId());
         Assertions.assertThat(foundTask).isNotNull();
 
         // delete task
-        platformClient.deleteTask(createdTask);
+        taskClient.deleteTask(createdTask);
 
-        foundTask = platformClient.findTaskByID(createdTask.getId());
+        foundTask = taskClient.findTaskByID(createdTask.getId());
         Assertions.assertThat(foundTask).isNull();
     }
 
     @Test
     void updateTask() {
 
-        Task cronTask = platformClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
+        Task cronTask = taskClient.createTaskCron(generateName("it task"), "from(bucket:\"telegraf\") |> sum()", "0 2 * * *", "01", "01");
         cronTask.setEvery("2m");
         cronTask.setCron(null);
         cronTask.setFlux("from(bucket:\"telegraf\") |> last()");
         cronTask.setStatus(Task.TaskStatus.DISABLED);
 
-        Task updatedTask = platformClient.updateTask(cronTask);
+        Task updatedTask = taskClient.updateTask(cronTask);
 
         Assertions.assertThat(updatedTask).isNotNull();
         Assertions.assertThat(updatedTask.getId()).isEqualTo(cronTask.getId());

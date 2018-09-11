@@ -48,4 +48,10 @@ class PlatformClientTest extends AbstractPlatformClientTest {
         Assertions.assertThat(platformClient).isEqualTo(this.platformClient);
         Assertions.assertThat(platformClient.getLogLevel()).isEqualTo(HttpLoggingInterceptor.Level.HEADERS);
     }
+
+    @Test
+    void taskClient() {
+
+        Assertions.assertThat(platformClient.getTaskClient()).isNotNull();
+    }
 }

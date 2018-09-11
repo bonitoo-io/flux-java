@@ -22,13 +22,9 @@
  */
 package io.bonitoo.platform;
 
-import java.util.List;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxClient;
-import io.bonitoo.platform.dto.Task;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -43,143 +39,12 @@ import okhttp3.logging.HttpLoggingInterceptor;
 public interface PlatformClient {
 
     /**
-     * Retrieve an task.
+     * Get client for Task API.
      *
-     * @param taskID ID of task to get
-     * @return task details
-     */
-    @Nullable
-    Task findTaskByID(@Nonnull final String taskID);
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @return A list of tasks
+     * @return the client for Task API
      */
     @Nonnull
-    List<Task> findTasks();
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @param userID filter tasks to a specific user id
-     * @return A list of tasks
-     */
-    @Nonnull
-    List<Task> findTasksByUserID(@Nullable final String userID);
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @param organizationID filter tasks to a specific organization id
-     * @return A list of tasks
-     */
-    @Nonnull
-    List<Task> findTasksByOrganizationID(@Nullable final String organizationID);
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @param afterID        returns tasks after specified ID
-     * @param userID         filter tasks to a specific user id
-     * @param organizationID filter tasks to a specific organization id
-     * @return A list of tasks
-     */
-    @Nonnull
-    List<Task> findTasks(@Nullable final String afterID,
-                         @Nullable final String userID,
-                         @Nullable final String organizationID);
-
-    /**
-     * Creates a new task with task repetition by cron.
-     *
-     * @param name           description of the task
-     * @param flux           the Flux script to run for this task
-     * @param cron           a task repetition schedule in the form '* * * * * *'
-     * @param userID         an id of the user that owns this Task
-     * @param organizationID an id of the organization that owns this Task
-     * @return Task created
-     */
-    @Nonnull
-    Task createTaskCron(@Nonnull final String name,
-                        @Nonnull final String flux,
-                        @Nonnull final String cron,
-                        @Nonnull final String userID,
-                        @Nonnull final String organizationID);
-
-    /**
-     * Creates a new task with task repetition by cron.
-     *
-     * @param name           description of the task
-     * @param flux           the Flux script to run for this task
-     * @param cron           a task repetition schedule in the form '* * * * * *'
-     * @param userID         an id of the user that owns this Task
-     * @param organizationID an id of the organization that owns this Task
-     * @return Task created
-     */
-    @Nonnull
-    Task createTaskCron(@Nonnull final String name,
-                        @Nonnull final Flux flux,
-                        @Nonnull final String cron,
-                        @Nonnull final String userID,
-                        @Nonnull final String organizationID);
-
-    /**
-     * Creates a new task with task repetition by duration expression ("1h", "30s").
-     *
-     * @param name           description of the task
-     * @param flux           the Flux script to run for this task
-     * @param every          a task repetition by duration expression
-     * @param userID         an id of the user that owns this Task
-     * @param organizationID an id of the organization that owns this Task
-     * @return Task created
-     */
-    @Nonnull
-    Task createTaskEvery(@Nonnull final String name,
-                         @Nonnull final String flux,
-                         @Nonnull final String every,
-                         @Nonnull final String userID,
-                         @Nonnull final String organizationID);
-
-    /**
-     * Creates a new task with task repetition by duration expression ("1h", "30s").
-     *
-     * @param name           description of the task
-     * @param flux           the Flux script to run for this task
-     * @param every          a task repetition by duration expression
-     * @param userID         an id of the user that owns this Task
-     * @param organizationID an id of the organization that owns this Task
-     * @return Task created
-     */
-    @Nonnull
-    Task createTaskEvery(@Nonnull final String name,
-                         @Nonnull final Flux flux,
-                         @Nonnull final String every,
-                         @Nonnull final String userID,
-                         @Nonnull final String organizationID);
-
-    /**
-     * Update a task. Update a task. This will cancel all queued runs.
-     *
-     * @param task task update to apply
-     * @return task updated
-     */
-    @Nonnull
-    Task updateTask(@Nonnull final Task task);
-
-    /**
-     * Delete a task. Deletes a task and all associated records.
-     *
-     * @param task task to delete
-     */
-    void deleteTask(@Nonnull final Task task);
-
-    /**
-     * Delete a task. Deletes a task and all associated records.
-     *
-     * @param taskID ID of task to delete
-     */
-    void deleteTask(@Nonnull final String taskID);
+    TaskClient getTaskClient();
 
     /**
      * @return the {@link HttpLoggingInterceptor.Level} that is used for logging requests and responses
@@ -195,6 +60,4 @@ public interface PlatformClient {
      */
     @Nonnull
     PlatformClient setLogLevel(@Nonnull final HttpLoggingInterceptor.Level logLevel);
-
-    // TODO FindLogs, FindLogByID, FindRuns, FindRunByID, RetryRun
 }
