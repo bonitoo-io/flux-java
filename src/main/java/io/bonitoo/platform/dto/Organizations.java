@@ -22,58 +22,49 @@
  */
 package io.bonitoo.platform.dto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
 /**
- * Organization is a organization.
+ * The wrapper for "/v1/orgs" response.
  *
- * @author Jakub Bednar (bednar@github) (05/09/2018 07:32)
+ * @author Jakub Bednar (bednar@github) (12/09/2018 10:12)
  */
-public final class Organization {
-
-    private String id;
-    private String name;
+public final class Organizations {
 
     /**
      * The URIs of resources.
      */
     private Map<String, String> links = new HashMap<>();
 
-    public String getId() {
-        return id;
-    }
-
-    public Organization setId(final String id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Organization setName(final String name) {
-        this.name = name;
-        return this;
-    }
+    private List<Organization> orgs = new ArrayList<>();
 
     public Map<String, String> getLinks() {
         return links;
     }
 
-    public Organization setLinks(final Map<String, String> links) {
+    public Organizations setLinks(final Map<String, String> links) {
         this.links = links;
+        return this;
+    }
+
+    public List<Organization> getOrgs() {
+        return orgs;
+    }
+
+    public Organizations setOrgs(final List<Organization> orgs) {
+        this.orgs = orgs;
         return this;
     }
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", Organization.class.getSimpleName() + "[", "]")
-                .add("id='" + id + "'")
-                .add("name='" + name + "'")
+        return new StringJoiner(", ", Organizations.class.getSimpleName() + "[", "]")
                 .add("links=" + links)
+                .add("orgs=" + orgs)
                 .toString();
     }
 }

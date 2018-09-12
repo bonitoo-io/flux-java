@@ -26,6 +26,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.platform.dto.Organization;
+import io.bonitoo.platform.dto.Organizations;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.dto.User;
 
@@ -57,7 +59,7 @@ interface PlatformService {
     Call<Void> deleteUser(@Nonnull @Path("id") final String userID);
 
     @PATCH("/v1/users/{id}")
-    Call<User> updateUser(@Nonnull @Path("id") final String userID, @Nonnull @Body final RequestBody task);
+    Call<User> updateUser(@Nonnull @Path("id") final String userID, @Nonnull @Body final RequestBody user);
 
     @GET("/v1/users/{id}")
     @Nonnull
@@ -68,6 +70,32 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<List<User>> findUsers();
+
+
+    //
+    // Organizations
+    //
+    @POST("/v1/orgs")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Organization> createOrganization(@Nonnull @Body final RequestBody organization);
+
+    @DELETE("/v1/orgs/{id}")
+    Call<Void> deleteOrganization(@Nonnull @Path("id") final String organizationID);
+
+    @PATCH("/v1/orgs/{id}")
+    Call<Organization> updateOrganization(@Nonnull @Path("id") final String organizationID,
+                                  @Nonnull @Body final RequestBody organization);
+
+    @GET("/v1/orgs/{id}")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Organization> findOrganizationByID(@Nonnull @Path("id") final String organizationID);
+
+    @GET("/v1/orgs")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Organizations> findOrganizations();
 
     //
     // Task

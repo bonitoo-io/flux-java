@@ -55,6 +55,14 @@ public interface PlatformClient {
     TaskClient getTaskClient();
 
     /**
+     * Get client for Organization API.
+     *
+     * @return the client for Organization API
+     */
+    @Nonnull
+    OrganizationClient getOrganizationClient();
+
+    /**
      * @return the {@link HttpLoggingInterceptor.Level} that is used for logging requests and responses
      */
     @Nonnull

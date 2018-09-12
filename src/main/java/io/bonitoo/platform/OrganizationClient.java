@@ -26,62 +26,64 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.bonitoo.platform.dto.User;
+import io.bonitoo.platform.dto.Organization;
 
 /**
- * The client of the InfluxData Platform for Time Series that implement User HTTP API endpoint.
+ * The client of the InfluxData Platform for Time Series that implement Organization HTTP API endpoint.
  *
- * @author Jakub Bednar (bednar@github) (11/09/2018 10:05)
+ * @author Jakub Bednar (bednar@github) (11/09/2018 14:58)
  * @since 1.0.0
  */
-public interface UserClient {
+public interface OrganizationClient {
 
     /**
-     * Retrieve a user.
+     * Retrieve a organization.
      *
-     * @param userID ID of user to get
-     * @return user details
+     * @param organizationID ID of organization to get
+     * @return organization details
      */
     @Nullable
-    User findUserByID(@Nonnull final String userID);
+    Organization findOrganizationByID(@Nonnull final String organizationID);
 
     /**
-     * List all users.
+     * List all organizations.
      *
-     * @return List all users
+     * @return List all organizations
      */
     @Nonnull
-    List<User> findUsers();
+    List<Organization> findOrganizations();
 
     /**
-     * Creates a new user and sets {@link User#id} with the new identifier.
+     * Creates a new organization and sets {@link Organization#id} with the new identifier.
      *
-     * @param name name of the user
-     * @return User created
+     * @param name name of the organization
+     * @return Organization created
      */
     @Nonnull
-    User createUser(@Nonnull final String name);
+    Organization createOrganization(@Nonnull final String name);
 
     /**
-     * Update a user.
+     * Update a organization.
      *
-     * @param user user update to apply
-     * @return user updated
+     * @param organization organization update to apply
+     * @return organization updated
      */
     @Nonnull
-    User updateUser(@Nonnull final User user);
+    Organization updateOrganization(@Nonnull final Organization organization);
 
     /**
-     * Delete a user.
+     * Delete a organization.
      *
-     * @param user user to delete
+     * @param organization organization to delete
      */
-    void deleteUser(@Nonnull final User user);
+    void deleteOrganization(@Nonnull final Organization organization);
 
     /**
-     * Delete a user.
+     * Delete a organization.
      *
-     * @param userID ID of user to delete
+     * @param organizationID ID of organization to delete
      */
-    void deleteUser(@Nonnull final String userID);
+    void deleteOrganization(@Nonnull final String organizationID);
+
+    // TODO getUsers, addUser, deleteUser
 }

@@ -106,6 +106,35 @@ User user = userClient.findUserByID("00");
 List<User> users = userClient.findUsers();
 ```
 
+### Organizations
+
+The `OrganizationClient` supports:
+1. creating organizations
+2. find organizations
+3. update organization
+4. delete organization
+
+```java
+OrganizationClient organizationClient = platformService.getOrganizationClient();
+
+// Creates a new organization with name 'TechnologiesRT'
+Organization organization = organizationClient.createOrganization("TechnologiesRT");
+
+// Update a organization
+organization.setName("THT Dia");
+organizationClient.updateOrganization(organization);
+
+// Delete a organization
+Organization createdOrganization = ...;
+organizationClient.deleteOrganization(createdOrganization);
+
+// Retrieve a organization by ID
+Organization organization = organizationClient.findOrganizationByID("00");
+
+// List all organizations
+List<Organization> organizations = organizationClient.findOrganizations();
+```
+
 ## Flux - Data Scripting Language
 Java client for the Flux. The [Flux](https://github.com/influxdata/platform/tree/master/query#flux---influx-data-language) is centered on querying and manipulating time series data.
 
