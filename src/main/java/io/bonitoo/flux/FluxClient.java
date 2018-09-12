@@ -38,18 +38,19 @@ import retrofit2.Response;
 
 /**
  * The client for the Flux service.
- * <p>
- * TODO pojo
  *
  * @author Jakub Bednar (bednar@github) (30/07/2018 10:55)
  * @since 1.0.0
  */
 public interface FluxClient {
 
+    // TODO biconsumer
     Consumer<FluxRecord> EMPTY_ON_NEXT = fluxRecord -> {
     };
+    // TODO log
     Consumer<Boolean> EMPTY_ON_COMPLETE = canceled -> {
     };
+    // TODO throw errors
     Consumer<? super Throwable> EMPTY_ON_ERROR = (Consumer<Throwable>) throwable -> {
     };
 
