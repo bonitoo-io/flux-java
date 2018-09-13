@@ -126,7 +126,7 @@ class ITFluxClient extends AbstractITFluxClient {
                 .filter(Restrictions.measurement().equal("chunked"))
                 .range().withStart(Instant.EPOCH);
 
-        fluxClient.flux(flux, fluxRecord -> {
+        fluxClient.flux(flux, (cancellable, fluxRecord) -> {
 
             // +1 record
             countDownLatch.countDown();
@@ -152,7 +152,7 @@ class ITFluxClient extends AbstractITFluxClient {
                 .window()
                 .withEvery("10m");
 
-        fluxClient.flux(flux, fluxRecord -> {
+        fluxClient.flux(flux, (cancellable, fluxRecord) -> {
 
             // +1 record
             countDownLatch.countDown();
@@ -181,7 +181,7 @@ class ITFluxClient extends AbstractITFluxClient {
         countDownLatch = new CountDownLatch(10_000);
         CountDownLatch cancelCountDown = new CountDownLatch(1);
 
-        FluxClient.Cancellable cancellable = fluxClient.flux(flux, fluxRecord -> {
+        fluxClient.flux(flux, (cancellable, fluxRecord) -> {
 
             // +1 record
             countDownLatch.countDown();
@@ -189,23 +189,18 @@ class ITFluxClient extends AbstractITFluxClient {
             if (countDownLatch.getCount() % 1_000 == 0 && this.countDownLatch.getCount() != 0) {
                 LOG.info(String.format("Remaining parsed: %s records", this.countDownLatch.getCount()));
             }
-        }, success -> {
-            Assertions.assertThat(success).isFalse();
-            cancelCountDown.countDown();
-        });
 
-        // Not canceled
-        Assertions.assertThat(cancellable.isCancelled()).isFalse();
+            if (countDownLatch.getCount() == 9_000)            {
+                cancellable.cancel();
+                cancelCountDown.countDown();
+            }
+        }, () -> {});
 
-        // After ten Records cancel
-        waitToCallback(30);
-        cancellable.cancel();
+        // wait to cancel
+        waitToCallback(cancelCountDown, 30);
 
-        // wait to cancel callback
-        waitToCallback(cancelCountDown, 1);
-
-        // Canceled
-        Assertions.assertThat(cancellable.isCancelled()).isTrue();
+        //
+        Assertions.assertThat(countDownLatch.getCount()).isEqualTo(9_000);
     }
 
     @Test
@@ -280,13 +275,12 @@ class ITFluxClient extends AbstractITFluxClient {
                 .filter(restriction)
                 .sum();
 
-        fluxClient.flux(flux, record -> {
+        fluxClient.flux(flux, (cancellable, record) -> {
 
             records.add(record);
 
             countDownLatch.countDown();
-        }, success -> {
-            Assertions.assertThat(success).isTrue();
+        }, () -> {
             countDownLatch.countDown();
         });
 
@@ -303,16 +297,14 @@ class ITFluxClient extends AbstractITFluxClient {
                 .build();
 
         FluxClient fluxClient = FluxClientFactory.connect(options);
-        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("telegraf").last(),
-                record -> {
+        fluxClient.flux(Flux.from("telegraf").last(),
+                (cancellable, record) -> {
                 },
-                success -> {
+                () -> {
                 },
                 throwable -> countDownLatch.countDown());
 
         waitToCallback();
-
-        Assertions.assertThat(cancellable.isDone()).isTrue();
 
         fluxClient.close();
     }

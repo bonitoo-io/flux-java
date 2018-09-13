@@ -26,7 +26,6 @@ import java.time.Instant;
 import java.util.function.Consumer;
 
 import io.bonitoo.InfluxException;
-import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.events.FluxErrorEvent;
 import io.bonitoo.flux.events.FluxSuccessEvent;
 import io.bonitoo.flux.events.UnhandledErrorEvent;
@@ -118,11 +117,7 @@ class FluxClientEventTest extends AbstractFluxClientTest {
                 .addOption(NowOption.builder().time(Instant.ofEpochSecond(120)).build())
                 .build();
 
-        fluxClient.flux(Flux.from("flux_database"), fluxOptions, new Consumer<FluxRecord>() {
-            @Override
-            public void accept(FluxRecord fluxRecord) {
-
-            }
+        fluxClient.flux(Flux.from("flux_database"), fluxOptions, (cancellable, fluxRecord) -> {
         });
 
         waitToCallback();

@@ -197,7 +197,7 @@ Execute a Flux query against the Flux service and asynchronous stream `FluxRecor
 
 String query = "from(bucket:\"telegraf\") |> range(start: -30m) |> group(by: [\"tag_a\", \"tag_b\"])";
 
-fluxClient.flux(query, fluxRecord -> {
+fluxClient.flux(query, (cancellable, fluxRecord) -> {
 
     // FluxRecord
     logFluxRecord(fluxRecord);
@@ -205,12 +205,12 @@ fluxClient.flux(query, fluxRecord -> {
 ```
 
 ##### OnComplete notification
-The callback to consume a completion notification. If the query was cancelled than return `TRUE`.
+The callback to consume a notification about successfully end of stream.
 
 ```java
 fluxClient.flux(query, 
-    fluxRecord -> logFluxRecord(fluxRecord), 
-    canceled -> {
+    (cancellable, fluxRecord) -> logFluxRecord(fluxRecord), 
+    () -> {
         // callback to consume a completion notification 
         System.out.println("End of response");   
     });
@@ -232,11 +232,17 @@ fluxClient.flux(query,
 The `Cancellable` object has the cancel method to stop asynchronous query.
 
 ```java
-Cancellable cancellable = fluxClient.flux(query, fluxRecord -> logFluxRecord(fluxRecord));
-
-...
-
-cancellable.cancel();
+fluxClient.flux(query, (cancellable, fluxRecord) -> {
+                  
+    // found what I'm looking for ?
+    if (foundRequest(fluxRecord)) {
+      // yes => cancel query
+      cancellable.cancel();
+    }
+    
+    // no => process next result
+    processResult(fluxRecord);
+});
 ```
 
 #### Handling server response

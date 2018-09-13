@@ -110,7 +110,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxServer.enqueue(createResponse());
 
         List<FluxRecord> records = new ArrayList<>();
-        fluxClient.flux(Flux.from("flux_database"), result -> {
+        fluxClient.flux(Flux.from("flux_database"), (cancellable, result) -> {
             records.add(result);
 
             countDownLatch.countDown();
@@ -129,13 +129,11 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxServer.enqueue(createResponse());
 
         List<FluxRecord> records = new ArrayList<>();
-        fluxClient.flux(Flux.from("flux_database"), result -> {
+        fluxClient.flux(Flux.from("flux_database"), (cancellable, result) -> {
             records.add(result);
 
             countDownLatch.countDown();
-        }, success -> {
-
-            Assertions.assertThat(success).isTrue();
+        }, () -> {
 
             countDownLatch.countDown();
         });
@@ -154,7 +152,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         properties.put("n", 5);
 
         Flux query = Flux.from("flux_database").limit().withPropertyNamed("n");
-        fluxClient.flux(query, properties, result -> countDownLatch.countDown());
+        fluxClient.flux(query, properties, (cancellable, result) -> countDownLatch.countDown());
 
         waitToCallback();
 
@@ -168,7 +166,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxServer.enqueue(createErrorResponse("Flux query is not valid", true));
 
         fluxClient.subscribeEvents(FluxErrorEvent.class, fluxErrorEvent -> countDownLatch.countDown());
-        fluxClient.flux(Flux.from("flux_database"), result -> {
+        fluxClient.flux(Flux.from("flux_database"), (cancellable, result) -> {
 
             Assertions.fail("Unreachable");
         });
@@ -185,74 +183,12 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxServer.enqueue(createErrorResponse("Flux query is not valid", true));
 
         fluxClient.subscribeEvents(FluxErrorEvent.class, fluxErrorEvent -> countDownLatch.countDown());
-        fluxClient.flux(Flux.from("flux_database"), result -> {
+        fluxClient.flux(Flux.from("flux_database"), (cancellable, result) -> {
 
             Assertions.fail("Unreachable");
         }, FluxClient.EMPTY_ON_COMPLETE, throwable -> countDownLatch.countDown());
 
         waitToCallback();
-    }
-
-    @Test
-    void queryCallbackCancellableDoneSuccess() {
-
-        countDownLatch = new CountDownLatch(5);
-
-        fluxServer.enqueue(createResponse());
-
-        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("flux_database"),
-                result -> countDownLatch.countDown(),
-                success -> countDownLatch.countDown());
-
-        Assertions.assertThat(cancellable.isDone()).isFalse();
-
-        waitToCallback();
-
-        Assertions.assertThat(cancellable.isDone()).isTrue();
-    }
-
-    @Test
-    void queryCallbackCancellableDoneError() {
-
-        countDownLatch = new CountDownLatch(1);
-
-        fluxServer.enqueue(createErrorResponse("Flux query is not valid", true));
-
-        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("flux_database"),
-                result -> Assertions.fail("Unreachable"),
-                FluxClient.EMPTY_ON_COMPLETE,
-                throwable -> {
-                    holdTheProcessing();
-                    countDownLatch.countDown();
-                });
-
-        Assertions.assertThat(cancellable.isDone()).isFalse();
-
-        waitToCallback();
-
-        Assertions.assertThat(cancellable.isDone()).isTrue();
-    }
-
-    @Test
-    void queryCallbackCancellableDoneCancel() {
-
-        countDownLatch = new CountDownLatch(4);
-
-        fluxServer.enqueue(createResponse());
-
-        FluxClient.Cancellable cancellable = fluxClient.flux(Flux.from("flux_database"), result -> {
-
-            holdTheProcessing();
-            countDownLatch.countDown();
-        });
-
-        Assertions.assertThat(cancellable.isDone()).isFalse();
-        Assertions.assertThat(cancellable.isCancelled()).isFalse();
-
-        cancellable.cancel();
-
-        Assertions.assertThat(cancellable.isDone()).isTrue();
-        Assertions.assertThat(cancellable.isCancelled()).isTrue();
     }
 
     @Test
@@ -280,7 +216,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         String query = "from(bucket:\"telegraf\") |> " +
                 "filter(fn: (r) => r[\"_measurement\"] == \"cpu\" AND r[\"_field\"] == \"usage_user\") |> sum()";
 
-        fluxClient.flux(query, record -> {
+        fluxClient.flux(query, (cancellable, record) -> {
             records.add(record);
 
             countDownLatch.countDown();

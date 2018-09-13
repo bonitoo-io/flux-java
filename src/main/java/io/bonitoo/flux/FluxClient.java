@@ -24,6 +24,7 @@ package io.bonitoo.flux;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
@@ -44,11 +45,11 @@ import retrofit2.Response;
  */
 public interface FluxClient {
 
-    // TODO biconsumer
-    Consumer<FluxRecord> EMPTY_ON_NEXT = fluxRecord -> {
+    BiConsumer<Cancellable, FluxRecord> EMPTY_ON_NEXT = (cancellable, fluxRecord) -> {
     };
+
     // TODO log
-    Consumer<Boolean> EMPTY_ON_COMPLETE = canceled -> {
+    Runnable EMPTY_ON_COMPLETE = () -> {
     };
     // TODO throw errors
     Consumer<? super Throwable> EMPTY_ON_ERROR = (Consumer<Throwable>) throwable -> {
@@ -78,81 +79,78 @@ public interface FluxClient {
      *
      * @param query  the flux query to execute
      * @param onNext callback to consume result which are matched the query
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *               with capability to discontinue a streaming query
      */
-    Cancellable flux(@Nonnull final String query, @Nonnull final Consumer<FluxRecord> onNext);
+    void flux(@Nonnull final String query, @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      */
-    Cancellable flux(@Nonnull final String query,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete);
+    void flux(@Nonnull final String query,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      * @param onError    callback to consume any error notification
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
      */
-    Cancellable flux(@Nonnull final String query,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete,
-                     @Nonnull final Consumer<? super Throwable> onError);
+    void flux(@Nonnull final String query,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query   the flux query to execute
      * @param onNext  callback to consume result which are matched the query
+     *                with capability to discontinue a streaming query
      * @param options the options for the query
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
      */
-    Cancellable flux(@Nonnull final String query,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext);
+    void flux(@Nonnull final String query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
+     *                   with capability to discontinue a streaming query
      * @param options    the options for the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     * @param onComplete callback to consume a notification about successfully end of stream
      */
-    Cancellable flux(@Nonnull final String query,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete);
+    void flux(@Nonnull final String query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
+     *                   with capability to discontinue a streaming query
      * @param options    the options for the query
-     * @param onComplete callback to consume a completion notification,
+     * @param onComplete callback to consume a notification about successfully end of stream,
      * @param onError    callback to consume any error notification
      *                   {@link Boolean#TRUE} if query successfully finish
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
      */
-    Cancellable flux(@Nonnull final String query,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete,
-                     @Nonnull final Consumer<? super Throwable> onError);
+    void flux(@Nonnull final String query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and return the Flux server HTTP response.
@@ -240,38 +238,35 @@ public interface FluxClient {
      *
      * @param query  the flux query to execute
      * @param onNext callback to consume result which are matched the query
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *               with capability to discontinue a streaming query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Consumer<FluxRecord> onNext);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
      *
      * @param query      the flux query to execute
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
+     * @param onComplete callback to consume a notification about successfully end of stream
      * @param onError    callback to consume any error notification
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete,
-                     @Nonnull final Consumer<? super Throwable> onError);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
@@ -289,11 +284,11 @@ public interface FluxClient {
      * @param query   the flux query to execute
      * @param options the options for the query
      * @param onNext  callback to consume result which are matched the query
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *                with capability to discontinue a streaming query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
@@ -301,14 +296,13 @@ public interface FluxClient {
      * @param query      the flux query to execute
      * @param options    the options for the query
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
@@ -316,16 +310,15 @@ public interface FluxClient {
      * @param query      the flux query to execute
      * @param options    the options for the query
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      * @param onError    callback to consume any error notification
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete,
-                     @Nonnull final Consumer<? super Throwable> onError);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
@@ -343,10 +336,11 @@ public interface FluxClient {
      * @param query      the flux query to execute
      * @param properties named properties
      * @param onNext     callback to consume result which are matched the query
+     *                   with capability to discontinue a streaming query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Map<String, Object> properties,
-                     @Nonnull final Consumer<FluxRecord> onNext);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
@@ -354,14 +348,13 @@ public interface FluxClient {
      * @param query      the flux query to execute
      * @param properties named properties
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Map<String, Object> properties,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete);
 
     /**
      * Execute a Flux against the Flux service and asynchronous stream {@link FluxRecord}s to {@code onNext}.
@@ -369,16 +362,15 @@ public interface FluxClient {
      * @param query      the flux query to execute
      * @param properties named properties
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      * @param onError    callback to consume any error notification
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Map<String, Object> properties,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete,
-                     @Nonnull final Consumer<? super Throwable> onError);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and synchronously map whole response to {@link FluxTable}s.
@@ -400,12 +392,12 @@ public interface FluxClient {
      * @param properties named properties
      * @param options    the options for the query
      * @param onNext     callback to consume result which are matched the query
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *                   with capability to discontinue a streaming query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Map<String, Object> properties,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext);
 
 
     /**
@@ -415,15 +407,14 @@ public interface FluxClient {
      * @param properties named properties
      * @param options    the options for the query
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Map<String, Object> properties,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete);
 
 
     /**
@@ -433,17 +424,16 @@ public interface FluxClient {
      * @param properties named properties
      * @param options    the options for the query
      * @param onNext     callback to consume result which are matched the query
-     * @param onComplete callback to consume a completion notification,
-     *                   {@link Boolean#TRUE} if query successfully finish
+     *                   with capability to discontinue a streaming query
+     * @param onComplete callback to consume a notification about successfully end of stream
      * @param onError    callback to consume any error notification
-     * @return {@code Cancellable} that provide the cancel method to stop asynchronous query
      */
-    Cancellable flux(@Nonnull final Flux query,
-                     @Nonnull final Map<String, Object> properties,
-                     @Nonnull final FluxOptions options,
-                     @Nonnull final Consumer<FluxRecord> onNext,
-                     @Nonnull final Consumer<Boolean> onComplete,
-                     @Nonnull final Consumer<? super Throwable> onError);
+    void flux(@Nonnull final Flux query,
+              @Nonnull final Map<String, Object> properties,
+              @Nonnull final FluxOptions options,
+              @Nonnull final BiConsumer<Cancellable, FluxRecord> onNext,
+              @Nonnull final Runnable onComplete,
+              @Nonnull final Consumer<? super Throwable> onError);
 
     /**
      * Execute a Flux against the Flux service and return the Flux server HTTP response.
@@ -684,12 +674,8 @@ public interface FluxClient {
 
         /**
          * Attempt to cancel execution of this query.
-         * This attempt will fail if the query has already completed or cancelled.
-         *
-         * @return {@link Boolean#FALSE} if the query could not be cancelled, typically because is has already
-         * completed normally; {@link Boolean#TRUE} otherwise
          */
-        boolean cancel();
+        void cancel();
 
         /**
          * Returns {@link Boolean#TRUE} if query was cancelled.
@@ -697,13 +683,5 @@ public interface FluxClient {
          * @return {@link Boolean#TRUE} if query was cancelled
          */
         boolean isCancelled();
-
-        /**
-         * Returns {@link Boolean#TRUE} if query completed. Completion may be due to normal termination,
-         * an exception, or cancellation -- in all of these cases, this method will return true.
-         *
-         * @return {@link Boolean#TRUE} if this query completed
-         */
-        boolean isDone();
     }
 }
