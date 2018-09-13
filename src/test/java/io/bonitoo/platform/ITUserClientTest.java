@@ -29,10 +29,13 @@ import io.bonitoo.platform.dto.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 
 /**
  * @author Jakub Bednar (bednar@github) (11/09/2018 11:26)
  */
+@RunWith(JUnitPlatform.class)
 class ITUserClientTest extends AbstractITClientTest {
 
     private UserClient userClient;

@@ -26,6 +26,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.platform.dto.Bucket;
+import io.bonitoo.platform.dto.Buckets;
 import io.bonitoo.platform.dto.Organization;
 import io.bonitoo.platform.dto.Organizations;
 import io.bonitoo.platform.dto.Task;
@@ -96,6 +98,32 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<Organizations> findOrganizations();
+
+    //
+    // Bucket
+    //
+    @POST("/v1/buckets")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Bucket> createBucket(@Nonnull @Query("org") final String organizationName,
+                              @Nonnull @Body final RequestBody bucket);
+
+    @DELETE("/v1/buckets/{id}")
+    Call<Void> deleteBucket(@Nonnull @Path("id") final String bucketID);
+
+    @PATCH("/v1/buckets/{id}")
+    Call<Bucket> updateBucket(@Nonnull @Path("id") final String bucketID, @Nonnull @Body final RequestBody bucket);
+
+    @GET("/v1/buckets/{id}")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Bucket> findBucketByID(@Nonnull @Path("id") final String bucketID);
+
+    @GET("/v1/buckets")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Buckets> findBuckets(@Nullable @Query("org") final String organizationName);
+
 
     //
     // Task

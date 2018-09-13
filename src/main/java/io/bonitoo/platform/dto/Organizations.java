@@ -23,9 +23,7 @@
 package io.bonitoo.platform.dto;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 
 /**
@@ -33,23 +31,9 @@ import java.util.StringJoiner;
  *
  * @author Jakub Bednar (bednar@github) (12/09/2018 10:12)
  */
-public final class Organizations {
-
-    /**
-     * The URIs of resources.
-     */
-    private Map<String, String> links = new HashMap<>();
+public final class Organizations extends AbstractHasLinks {
 
     private List<Organization> orgs = new ArrayList<>();
-
-    public Map<String, String> getLinks() {
-        return links;
-    }
-
-    public Organizations setLinks(final Map<String, String> links) {
-        this.links = links;
-        return this;
-    }
 
     public List<Organization> getOrgs() {
         return orgs;
@@ -62,7 +46,7 @@ public final class Organizations {
     @Override
     public String toString() {
         return new StringJoiner(", ", Organizations.class.getSimpleName() + "[", "]")
-                .add("links=" + links)
+                .add("links=" + getLinks())
                 .add("orgs=" + orgs)
                 .toString();
     }

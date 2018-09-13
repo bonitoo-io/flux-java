@@ -40,43 +40,6 @@ PlatformClient platformClient = PlatformOptions.connect(options);
 platformClient.close();
 ```
 
-### Tasks
-
-The `TaskClient` supports:
-1. [creating tasks](#create)
-2. find tasks
-3. update task
-4. delete task
-
-```java
-TaskClient taskClient = platformService.getTaskClient();
-```
-
-#### Create
-The task can be created with `cron` or `every` expression that specify task repetition. 
-
-The required `Task` attributes are:
-- `name` - the description of the task
-- `flux` - the Flux script to run
-- `userID` - the ID of the user that owns this Task
-- `organizationID` - the ID of the organization that owns this Task
-
-##### Cron
-```java
-String flux = "from(bucket: \"telegraf\") |> last()";
-
-Task task = taskClient.createTaskCron("task name", flux, "0 2 * * *", "01", "01");
-...
-```
-
-##### Every
-```java
-String flux = "from(bucket: \"telegraf\") |> last()";
-
-Task task = taskClient.createTaskEvery("task name", flux, "0 2 * * *", "10m", "01");
-...
-```
-
 ### Users
 
 The `UserClient` supports:
@@ -133,6 +96,76 @@ Organization organization = organizationClient.findOrganizationByID("00");
 
 // List all organizations
 List<Organization> organizations = organizationClient.findOrganizations();
+```
+
+### Buckets
+
+The `BucketClient` supports:
+1. creating buckets
+2. find buckets
+3. update bucket
+4. delete bucket
+
+```java
+BucketClient bucketClient = platformService.getBucketClient();
+
+// Creates a new bucket with name 'robot-sensors' and retention 50_000
+Bucket bucket = bucketClient.createBucket("robot-sensors", 50_000L, organization);
+
+// Update a bucket
+bucket.setName("robots-sensors-speed");
+bucket.setRetentionPeriod(10_000L);
+bucketClient.updateBucket(bucket);
+
+// Delete a bucket
+Bucket createdBucket = ...;
+bucketClient.deleteBucket(createdBucket);
+
+// Retrieve a bucket by ID
+Bucket bucket = bucketClient.findBucketByID("00");
+
+// Retrieve a buckets by Organization
+List<Bucket> buckets = bucketClient.findBucketsByOrganization(organization);
+
+// List all buckets
+List<Bucket> buckets = bucketClient.findBuckets();
+```
+
+### Tasks
+
+The `TaskClient` supports:
+1. [creating tasks](#create)
+2. find tasks
+3. update task
+4. delete task
+
+```java
+TaskClient taskClient = platformService.getTaskClient();
+```
+
+#### Create
+The task can be created with `cron` or `every` expression that specify task repetition. 
+
+The required `Task` attributes are:
+- `name` - the description of the task
+- `flux` - the Flux script to run
+- `userID` - the ID of the user that owns this Task
+- `organizationID` - the ID of the organization that owns this Task
+
+##### Cron
+```java
+String flux = "from(bucket: \"telegraf\") |> last()";
+
+Task task = taskClient.createTaskCron("task name", flux, "0 2 * * *", "01", "01");
+...
+```
+
+##### Every
+```java
+String flux = "from(bucket: \"telegraf\") |> last()";
+
+Task task = taskClient.createTaskEvery("task name", flux, "0 2 * * *", "10m", "01");
+...
 ```
 
 ## Flux - Data Scripting Language

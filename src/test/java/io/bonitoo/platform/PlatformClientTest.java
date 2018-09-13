@@ -60,6 +60,11 @@ class PlatformClientTest extends AbstractPlatformClientTest {
     }
 
     @Test
+    void bucketClient() {
+        Assertions.assertThat(platformClient.getBucketClient()).isNotNull();
+    }
+
+    @Test
     void taskClient() {
         Assertions.assertThat(platformClient.getTaskClient()).isNotNull();
     }

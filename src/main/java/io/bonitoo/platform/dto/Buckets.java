@@ -22,24 +22,23 @@
  */
 package io.bonitoo.platform.dto;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author Jakub Bednar (bednar@github) (13/09/2018 08:50)
+ * The wrapper for "/v1/buckets" response.
+ *
+ * @author Jakub Bednar (bednar@github) (13/09/2018 11:32)
  */
-public abstract class AbstractHasLinks {
+public class Buckets extends AbstractHasLinks {
 
-    /**
-     * The URIs of resources.
-     */
-    private Map<String, String> links = new HashMap<>();
+    private List<Bucket> buckets = new ArrayList<>();
 
-    public Map<String, String> getLinks() {
-        return links;
+    public List<Bucket> getBuckets() {
+        return buckets;
     }
 
-    public void setLinks(final Map<String, String> links) {
-        this.links = links;
+    public void setBuckets(final List<Bucket> buckets) {
+        this.buckets = buckets;
     }
 }

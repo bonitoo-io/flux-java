@@ -47,20 +47,28 @@ public interface PlatformClient {
     UserClient getUserClient();
 
     /**
-     * Get client for Task API.
-     *
-     * @return the client for Task API
-     */
-    @Nonnull
-    TaskClient getTaskClient();
-
-    /**
      * Get client for Organization API.
      *
      * @return the client for Organization API
      */
     @Nonnull
     OrganizationClient getOrganizationClient();
+
+    /**
+     * Get client for Bucket API.
+     *
+     * @return the client for Bucket API
+     */
+    @Nonnull
+    BucketClient getBucketClient();
+
+    /**
+     * Get client for Task API.
+     *
+     * @return the client for Task API
+     */
+    @Nonnull
+    TaskClient getTaskClient();
 
     /**
      * @return the {@link HttpLoggingInterceptor.Level} that is used for logging requests and responses

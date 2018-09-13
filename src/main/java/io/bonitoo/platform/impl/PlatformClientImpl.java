@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
+import io.bonitoo.platform.BucketClient;
 import io.bonitoo.platform.OrganizationClient;
 import io.bonitoo.platform.PlatformClient;
 import io.bonitoo.platform.TaskClient;
@@ -51,6 +52,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
 
     private final UserClientImpl userClient;
     private final OrganizationClientImpl organizationClient;
+    private final BucketClientImpl bucketClient;
     private final TaskClientImpl taskClient;
 
     private final HttpLoggingInterceptor loggingInterceptor;
@@ -78,6 +80,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
 
         this.userClient = new UserClientImpl(platformService);
         this.organizationClient = new OrganizationClientImpl(platformService);
+        this.bucketClient = new BucketClientImpl(platformService);
         this.taskClient = new TaskClientImpl(platformService);
     }
 
@@ -91,6 +94,12 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     @Override
     public OrganizationClient getOrganizationClient() {
         return organizationClient;
+    }
+
+    @Nonnull
+    @Override
+    public BucketClient getBucketClient() {
+        return bucketClient;
     }
 
     @Nonnull
