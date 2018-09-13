@@ -87,72 +87,64 @@ public final class Task implements Serializable {
         return id;
     }
 
-    public Task setId(final String id) {
+    public void setId(final String id) {
         this.id = id;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public Task setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
-        return this;
     }
 
     public User getOwner() {
         return owner;
     }
 
-    public Task setOwner(final User owner) {
+    public void setOwner(final User owner) {
         this.owner = owner;
-        return this;
     }
 
     public String getOrganizationId() {
         return organizationId;
     }
 
-    public Task setOrganizationId(final String organizationId) {
+    public void setOrganizationId(final String organizationId) {
         this.organizationId = organizationId;
-        return this;
     }
 
     public TaskStatus getStatus() {
         return status;
     }
 
-    public Task setStatus(final TaskStatus status) {
+    public void setStatus(final TaskStatus status) {
         this.status = status;
-        return this;
     }
 
     public String getFlux() {
         return flux;
     }
 
-    public Task setFlux(final String flux) {
+    public void setFlux(final String flux) {
         this.flux = flux;
-        return this;
     }
 
     public String getEvery() {
         return every;
     }
 
-    public Task setEvery(final String every) {
+    public void setEvery(final String every) {
         this.every = every;
-        return this;
     }
 
     public String getCron() {
         return cron;
     }
 
-    public Task setCron(final String cron) {
+    public void setCron(final String cron) {
         this.cron = cron;
-        return this;
     }
 
     @Override

@@ -55,9 +55,8 @@ public final class Organizations {
         return orgs;
     }
 
-    public Organizations setOrgs(final List<Organization> orgs) {
+    public void setOrgs(final List<Organization> orgs) {
         this.orgs = orgs;
-        return this;
     }
 
     @Override

@@ -22,8 +22,6 @@
  */
 package io.bonitoo.platform.dto;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringJoiner;
 
 /**
@@ -31,41 +29,25 @@ import java.util.StringJoiner;
  *
  * @author Jakub Bednar (bednar@github) (05/09/2018 07:32)
  */
-public final class Organization {
+public final class Organization extends AbstractHasLinks {
 
     private String id;
     private String name;
-
-    /**
-     * The URIs of resources.
-     */
-    private Map<String, String> links = new HashMap<>();
 
     public String getId() {
         return id;
     }
 
-    public Organization setId(final String id) {
+    public void setId(final String id) {
         this.id = id;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public Organization setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
-        return this;
-    }
-
-    public Map<String, String> getLinks() {
-        return links;
-    }
-
-    public Organization setLinks(final Map<String, String> links) {
-        this.links = links;
-        return this;
     }
 
     @Override
@@ -73,7 +55,7 @@ public final class Organization {
         return new StringJoiner(", ", Organization.class.getSimpleName() + "[", "]")
                 .add("id='" + id + "'")
                 .add("name='" + name + "'")
-                .add("links=" + links)
+                .add("links=" + getLinks())
                 .toString();
     }
 }

@@ -39,18 +39,16 @@ public final class User implements Serializable {
         return id;
     }
 
-    public User setId(final String id) {
+    public void setId(final String id) {
         this.id = id;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public User setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
-        return this;
     }
 
     @Override
