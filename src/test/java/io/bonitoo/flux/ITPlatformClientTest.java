@@ -41,7 +41,6 @@ class ITPlatformClientTest {
     private static final Logger LOG = Logger.getLogger(ITPlatformClientTest.class.getName());
 
     private String platformURL;
-    private PlatformClient platformClient;
 
     @BeforeEach
     void setUp() {
@@ -51,8 +50,6 @@ class ITPlatformClientTest {
 
         platformURL = "http://" + platformIP + ":" + platformPort;
         LOG.log(Level.FINEST, "Platform URL: {0}", platformURL);
-
-        platformClient = PlatformClientFactory.connect(platformURL);
     }
 
     @Test
