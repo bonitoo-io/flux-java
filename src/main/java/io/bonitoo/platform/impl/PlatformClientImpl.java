@@ -33,6 +33,7 @@ import io.bonitoo.platform.OrganizationClient;
 import io.bonitoo.platform.PlatformClient;
 import io.bonitoo.platform.TaskClient;
 import io.bonitoo.platform.UserClient;
+import io.bonitoo.platform.dto.Health;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.options.PlatformOptions;
 
@@ -42,6 +43,7 @@ import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
@@ -49,6 +51,8 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
  * @author Jakub Bednar (bednar@github) (05/09/2018 11:17)
  */
 public final class PlatformClientImpl extends AbstractRestClient implements PlatformClient {
+
+    private final PlatformService platformService;
 
     private final UserClientImpl userClient;
     private final OrganizationClientImpl organizationClient;
@@ -76,7 +80,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
                 .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
                 .build();
 
-        PlatformService platformService = retrofit.create(PlatformService.class);
+        platformService = retrofit.create(PlatformService.class);
 
         this.userClient = new UserClientImpl(platformService);
         this.organizationClient = new OrganizationClientImpl(platformService);
@@ -106,6 +110,17 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     @Override
     public TaskClient getTaskClient() {
         return taskClient;
+    }
+
+    @Nonnull
+    @Override
+    public Health health() {
+
+        //TODO check correct impl over - https://github.com/influxdata/platform/blob/master/http/health.go
+
+        Call<Health> health = platformService.health();
+
+        return execute(health);
     }
 
     @Nonnull

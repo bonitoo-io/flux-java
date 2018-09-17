@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Jakub Bednar (bednar@github) (13/09/2018 11:32)
  */
-public class Buckets extends AbstractHasLinks {
+public final class Buckets extends AbstractHasLinks {
 
     private List<Bucket> buckets = new ArrayList<>();
 

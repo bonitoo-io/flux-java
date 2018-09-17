@@ -25,6 +25,7 @@ package io.bonitoo.platform;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.FluxClient;
+import io.bonitoo.platform.dto.Health;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -69,6 +70,14 @@ public interface PlatformClient {
      */
     @Nonnull
     TaskClient getTaskClient();
+
+    /**
+     * Check the status of Platform.
+     *
+     * @return {@link Boolean#TRUE} if server is healthy otherwise return {@link Boolean#FALSE}
+     */
+    @Nonnull
+    Health health();
 
     /**
      * @return the {@link HttpLoggingInterceptor.Level} that is used for logging requests and responses

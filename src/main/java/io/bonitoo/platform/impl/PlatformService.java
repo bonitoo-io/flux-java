@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 
 import io.bonitoo.platform.dto.Bucket;
 import io.bonitoo.platform.dto.Buckets;
+import io.bonitoo.platform.dto.Health;
 import io.bonitoo.platform.dto.Organization;
 import io.bonitoo.platform.dto.Organizations;
 import io.bonitoo.platform.dto.Task;
@@ -48,6 +49,13 @@ import retrofit2.http.Query;
  * @author Jakub Bednar (bednar@github) (05/09/2018 13:30)
  */
 interface PlatformService {
+
+    //
+    // Health
+    //
+    @GET("/healthz")
+    @Headers("Content-Type: application/json")
+    Call<Health> health();
 
     //
     // User
