@@ -105,8 +105,7 @@ interface PlatformService {
     @POST("/v1/buckets")
     @Nonnull
     @Headers("Content-Type: application/json")
-    Call<Bucket> createBucket(@Nonnull @Query("org") final String organizationName,
-                              @Nonnull @Body final RequestBody bucket);
+    Call<Bucket> createBucket(@Nonnull @Body final RequestBody bucket);
 
     @DELETE("/v1/buckets/{id}")
     Call<Void> deleteBucket(@Nonnull @Path("id") final String bucketID);

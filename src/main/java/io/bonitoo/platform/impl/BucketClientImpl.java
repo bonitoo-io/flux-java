@@ -124,9 +124,10 @@ final class BucketClientImpl extends AbstractRestClient implements BucketClient 
         Preconditions.checkNonEmptyString(name, "Bucket name");
         Preconditions.checkNonEmptyString(organizationName, "Organization name");
 
-        JSONObject json = createBucketJSON(name, retentionPeriod);
+        JSONObject json = createBucketJSON(name, retentionPeriod)
+                .put("organization", organizationName);
 
-        Call<Bucket> bucket = platformService.createBucket(organizationName, createBody(json));
+        Call<Bucket> bucket = platformService.createBucket(createBody(json));
 
         return execute(bucket);
     }

@@ -30,6 +30,7 @@
 
     <groupId>io.bonitoo.flux</groupId>
     <artifactId>flux-java</artifactId>
+    <!--TODO propagate version to API (FluxClient.getVersion())-->
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 

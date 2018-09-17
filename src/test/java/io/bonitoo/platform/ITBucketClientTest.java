@@ -122,20 +122,20 @@ class ITBucketClientTest extends AbstractITClientTest {
         bucketClient.createBucket(generateName("robot sensor"), organization2);
 
         List<Bucket> buckets = bucketClient.findBuckets();
-        Assertions.assertThat(buckets).hasSize(size + 3);
+        Assertions.assertThat(buckets).hasSize(size + 2);
     }
 
     @Test
     void findBucketsByOrganization() {
 
-        Assertions.assertThat(bucketClient.findBucketsByOrganization(organization)).hasSize(1);
+        Assertions.assertThat(bucketClient.findBucketsByOrganization(organization)).hasSize(0);
 
         bucketClient.createBucket(generateName("robot sensor"), organization);
 
         Organization organization2 = organizationClient.createOrganization(generateName("Second"));
         bucketClient.createBucket(generateName("robot sensor"), organization2);
 
-        Assertions.assertThat(bucketClient.findBucketsByOrganization(organization)).hasSize(2);
+        Assertions.assertThat(bucketClient.findBucketsByOrganization(organization)).hasSize(1);
     }
 
     @Test
