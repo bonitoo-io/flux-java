@@ -99,7 +99,7 @@ public final class Authorization extends AbstractHasLinks {
     public String toString() {
         return new StringJoiner(", ", Authorization.class.getSimpleName() + "[", "]")
                 .add("id='" + id + "'")
-                .add("token='" + token + "'")
+                .add("token='-'")
                 .add("userID='" + userID + "'")
                 .add("userName='" + userName + "'")
                 .add("status=" + status)

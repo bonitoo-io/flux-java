@@ -24,6 +24,8 @@ package io.bonitoo.platform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import io.bonitoo.platform.dto.Authorization;
 import io.bonitoo.platform.dto.Bucket;
@@ -43,6 +45,8 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JUnitPlatform.class)
 class ITAuthorizationClientTest extends AbstractITClientTest {
+
+    private static final Logger LOG = Logger.getLogger(ITAuthorizationClientTest.class.getName());
 
     private AuthorizationClient authorizationClient;
 
@@ -74,6 +78,8 @@ class ITAuthorizationClientTest extends AbstractITClientTest {
         permissions.add(writeOrganizations);
 
         Authorization authorization = authorizationClient.createAuthorization(user, permissions);
+
+        LOG.log(Level.INFO, "Created authorization: {0}", authorization);
 
         Assertions.assertThat(authorization).isNotNull();
         Assertions.assertThat(authorization.getId()).isNotBlank();
@@ -120,7 +126,7 @@ class ITAuthorizationClientTest extends AbstractITClientTest {
         Assertions.assertThat(authorization.getPermissions().get(1).getResource()).isEqualTo(taskResource);
         Assertions.assertThat(authorization.getPermissions().get(1).getAction()).isEqualTo("delete");
     }
-    
+
     @Test
     void createAuthorizationBucket() {
 
