@@ -131,6 +131,47 @@ List<Bucket> buckets = bucketClient.findBucketsByOrganization(organization);
 List<Bucket> buckets = bucketClient.findBuckets();
 ```
 
+### Authorization
+
+The `AuthorizationClient` supports:
+1. creating authorization
+2. find authorizations
+3. update authorization
+4. delete authorization
+
+```java
+AuthorizationClient authorizationClient = platformService.getAuthorizationClient();
+
+// Create a new authorization to create and update organizations, users
+User user = ...;
+
+Permission readUsers = new Permission();
+readUsers.setAction(Permission.READ_ACTION);
+readUsers.setResource(Permission.USER_RESOURCE);
+
+Permission writeOrganizations = new Permission();
+writeOrganizations.setAction(Permission.WRITE_ACTION);
+writeOrganizations.setResource(Permission.ORGANIZATION_RESOURCE);
+
+List<Permission> permissions = new ArrayList<>();
+permissions.add(readUsers);
+permissions.add(writeOrganizations);
+
+Authorization authorization = authorizationClient.createAuthorization(user, permissions);
+
+// Update Authorization status
+Authorization authorization = ...;
+authorization.setStatus(Status.INACTIVE);
+authorization = authorizationClient.updateAuthorizationStatus(authorization);
+
+// Delete a Authorization
+Authorization createdAuthorization = ...;
+authorizationClient.deleteAuthorization(createdAuthorization);
+
+// Find Authorization by User
+List<Authorization> authorizations = authorizationClient.findAuthorizationsByUser(user);
+```
+
 ### Tasks
 
 The `TaskClient` supports:

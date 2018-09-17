@@ -26,6 +26,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.platform.dto.Authorization;
+import io.bonitoo.platform.dto.Authorizations;
 import io.bonitoo.platform.dto.Bucket;
 import io.bonitoo.platform.dto.Buckets;
 import io.bonitoo.platform.dto.Health;
@@ -95,7 +97,7 @@ interface PlatformService {
 
     @PATCH("/v1/orgs/{id}")
     Call<Organization> updateOrganization(@Nonnull @Path("id") final String organizationID,
-                                  @Nonnull @Body final RequestBody organization);
+                                          @Nonnull @Body final RequestBody organization);
 
     @GET("/v1/orgs/{id}")
     @Nonnull
@@ -131,7 +133,6 @@ interface PlatformService {
     @Headers("Content-Type: application/json")
     Call<Buckets> findBuckets(@Nullable @Query("org") final String organizationName);
 
-
     //
     // Task
     //
@@ -157,4 +158,30 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<Task> findTaskByID(@Nonnull @Path("id") final String taskID);
+
+    //
+    // Authorization
+    //
+    @POST("/v1/authorizations")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Authorization> createAuthorization(@Nonnull @Body final RequestBody authorization);
+
+    @DELETE("/v1/authorizations/{id}")
+    Call<Void> deleteAuthorization(@Nonnull @Path("id") final String authorizationID);
+
+    @PATCH("/v1/authorizations/{id}")
+    Call<Authorization> updateAuthorization(@Nonnull @Path("id") final String authorizationID,
+                                            @Nonnull @Body final RequestBody authorization);
+
+    @GET("/v1/authorizations/")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Authorizations> findAuthorizations(@Nullable @Query("userID") final String userID,
+                                            @Nullable @Query("user") final String user);
+
+    @GET("/v1/authorizations/{id}")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Authorization> findAuthorization(@Nonnull @Path("id") final String authorizationID);
 }

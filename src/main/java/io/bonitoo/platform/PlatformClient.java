@@ -72,6 +72,14 @@ public interface PlatformClient {
     TaskClient getTaskClient();
 
     /**
+     * Get client for Authorization API.
+     *
+     * @return the client for Authorization API
+     */
+    @Nonnull
+    AuthorizationClient getAuthorizationClient();
+
+    /**
      * Check the status of Platform.
      *
      * @return {@link Boolean#TRUE} if server is healthy otherwise return {@link Boolean#FALSE}

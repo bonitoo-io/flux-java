@@ -68,4 +68,9 @@ class PlatformClientTest extends AbstractPlatformClientTest {
     void taskClient() {
         Assertions.assertThat(platformClient.getTaskClient()).isNotNull();
     }
+
+    @Test
+    void authorizationClient() {
+        Assertions.assertThat(platformClient.getAuthorizationClient()).isNotNull();
+    }
 }

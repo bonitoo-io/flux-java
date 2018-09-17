@@ -95,7 +95,6 @@ class ITOrganizationClientTest extends AbstractITClientTest {
         Assertions.assertThat(organizations).hasSize(size + 1);
     }
 
-
     @Test
     void deleteOrganization() {
 
