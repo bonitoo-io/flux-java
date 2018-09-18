@@ -35,6 +35,7 @@ import io.bonitoo.platform.dto.Organization;
 import io.bonitoo.platform.dto.Organizations;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.dto.User;
+import io.bonitoo.platform.dto.Users;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -81,7 +82,7 @@ interface PlatformService {
     @GET("/v1/users/")
     @Nonnull
     @Headers("Content-Type: application/json")
-    Call<List<User>> findUsers();
+    Call<Users> findUsers();
 
 
     //

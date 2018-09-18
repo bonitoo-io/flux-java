@@ -20,28 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.platform;
+package io.bonitoo.platform.dto;
 
-import io.bonitoo.platform.dto.Health;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author Jakub Bednar (bednar@github) (17/09/2018 08:39)
+ * The wrapper for "/v1/users" response.
+ *
+ * @author Jakub Bednar (bednar@github) (18/09/2018 07:41)
  */
-@RunWith(JUnitPlatform.class)
-class ITPlatformClientTest extends AbstractITClientTest {
+public final class Users extends AbstractHasLinks {
 
-    @Test
-    void health() {
+    private List<User> users = new ArrayList<>();
 
-        Health health = platformService.health();
+    public List<User> getUsers() {
+        return users;
+    }
 
-        Assertions.assertThat(health.getStatus()).isEqualTo("healthy");
-        Assertions.assertThat(health.isHealthy()).isTrue();
-        Assertions.assertThat(health.getMessage()).isEqualTo("howdy y'all");
+    public void setUsers(final List<User> users) {
+        this.users = users;
     }
 }

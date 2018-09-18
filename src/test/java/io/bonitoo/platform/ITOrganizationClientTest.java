@@ -23,6 +23,8 @@
 package io.bonitoo.platform;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import io.bonitoo.platform.dto.Organization;
 
@@ -37,6 +39,8 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JUnitPlatform.class)
 class ITOrganizationClientTest extends AbstractITClientTest {
+
+    private static final Logger LOG = Logger.getLogger(ITOrganizationClientTest.class.getName());
 
     private OrganizationClient organizationClient;
 
@@ -54,6 +58,8 @@ class ITOrganizationClientTest extends AbstractITClientTest {
         String organizationName = generateName("Constant Pro");
 
         Organization organization = organizationClient.createOrganization(organizationName);
+
+        LOG.log(Level.INFO, "Created organization: {0}", organization);
 
         Assertions.assertThat(organization).isNotNull();
         Assertions.assertThat(organization.getId()).isNotBlank();

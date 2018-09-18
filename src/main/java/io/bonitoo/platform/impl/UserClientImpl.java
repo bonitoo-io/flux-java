@@ -24,6 +24,8 @@ package io.bonitoo.platform.impl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -31,6 +33,7 @@ import io.bonitoo.AbstractRestClient;
 import io.bonitoo.Preconditions;
 import io.bonitoo.platform.UserClient;
 import io.bonitoo.platform.dto.User;
+import io.bonitoo.platform.dto.Users;
 
 import org.json.JSONObject;
 import retrofit2.Call;
@@ -39,6 +42,8 @@ import retrofit2.Call;
  * @author Jakub Bednar (bednar@github) (11/09/2018 10:16)
  */
 final class UserClientImpl extends AbstractRestClient implements UserClient {
+
+    private static final Logger LOG = Logger.getLogger(UserClientImpl.class.getName());
 
     private final PlatformService platformService;
 
@@ -60,9 +65,12 @@ final class UserClientImpl extends AbstractRestClient implements UserClient {
     @Override
     public List<User> findUsers() {
 
-        Call<List<User>> users = platformService.findUsers();
+        Call<Users> usersCall = platformService.findUsers();
 
-        return execute(users);
+        Users users = execute(usersCall);
+        LOG.log(Level.FINEST, "findUsers found: {0}", users);
+
+        return users.getUsers();
     }
 
     @Nonnull
