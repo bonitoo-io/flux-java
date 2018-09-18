@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -38,7 +37,8 @@ import io.bonitoo.platform.dto.Authorizations;
 import io.bonitoo.platform.dto.Permission;
 import io.bonitoo.platform.dto.User;
 
-import org.json.JSONArray;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import org.json.JSONObject;
 import retrofit2.Call;
 
@@ -50,9 +50,11 @@ final class AuthorizationClientImpl extends AbstractRestClient implements Author
     private static final Logger LOG = Logger.getLogger(AuthorizationClientImpl.class.getName());
 
     private final PlatformService platformService;
+    private final JsonAdapter<Authorization> adapter;
 
-    AuthorizationClientImpl(@Nonnull final PlatformService platformService) {
+    AuthorizationClientImpl(@Nonnull final PlatformService platformService, @Nonnull final Moshi moshi) {
         this.platformService = platformService;
+        this.adapter = moshi.adapter(Authorization.class);
     }
 
     @Nonnull
@@ -73,20 +75,15 @@ final class AuthorizationClientImpl extends AbstractRestClient implements Author
         Preconditions.checkNonEmptyString(userID, "UserID");
         Objects.requireNonNull(permissions, "Permissions are required");
 
+        Authorization authorization = new Authorization();
+        authorization.setUserID(userID);
+        authorization.setPermissions(permissions);
 
-        List<JSONObject> permissionCollection = permissions.stream()
-                .map(permission -> new JSONObject()
-                        .put("resource", permission.getResource())
-                        .put("action", permission.getAction()))
-                .collect(Collectors.toList());
+        String json = adapter.toJson(authorization);
 
-        JSONObject json = new JSONObject();
-        json.put("userID", userID);
-        json.put("permissions", new JSONArray(permissionCollection));
+        Call<Authorization> call = platformService.createAuthorization(createBody(json));
 
-        Call<Authorization> authorization = platformService.createAuthorization(createBody(json));
-
-        return execute(authorization);
+        return execute(call);
     }
 
     @Nonnull

@@ -32,6 +32,7 @@ import io.bonitoo.platform.AuthorizationClient;
 import io.bonitoo.platform.BucketClient;
 import io.bonitoo.platform.OrganizationClient;
 import io.bonitoo.platform.PlatformClient;
+import io.bonitoo.platform.SourceClient;
 import io.bonitoo.platform.TaskClient;
 import io.bonitoo.platform.UserClient;
 import io.bonitoo.platform.dto.Health;
@@ -60,6 +61,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     private final BucketClientImpl bucketClient;
     private final TaskClientImpl taskClient;
     private final AuthorizationClientImpl authorizationClient;
+    private final SourceClientImpl sourceClient;
 
     private final HttpLoggingInterceptor loggingInterceptor;
 
@@ -84,11 +86,12 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
 
         platformService = retrofit.create(PlatformService.class);
 
-        this.userClient = new UserClientImpl(platformService);
-        this.organizationClient = new OrganizationClientImpl(platformService);
-        this.bucketClient = new BucketClientImpl(platformService);
-        this.taskClient = new TaskClientImpl(platformService);
-        this.authorizationClient = new AuthorizationClientImpl(platformService);
+        this.userClient = new UserClientImpl(platformService, moshi);
+        this.organizationClient = new OrganizationClientImpl(platformService, moshi);
+        this.bucketClient = new BucketClientImpl(platformService, moshi);
+        this.taskClient = new TaskClientImpl(platformService, moshi);
+        this.authorizationClient = new AuthorizationClientImpl(platformService, moshi);
+        this.sourceClient = new SourceClientImpl(platformService, moshi);
     }
 
     @Nonnull
@@ -119,6 +122,12 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     @Override
     public AuthorizationClient getAuthorizationClient() {
         return authorizationClient;
+    }
+
+    @Nonnull
+    @Override
+    public SourceClient getSourceClient() {
+        return sourceClient;
     }
 
     @Nonnull

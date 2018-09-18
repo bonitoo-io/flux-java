@@ -26,13 +26,14 @@ import java.io.Serializable;
 import java.util.StringJoiner;
 
 import com.squareup.moshi.Json;
+import org.json.JSONObject;
 
 /**
  * Task is a task.
  *
  * @author Jakub Bednar (bednar@github) (05/09/2018 08:09)
  */
-public final class Task implements Serializable {
+public final class Task extends JSONObject implements Serializable {
 
     private String id;
 

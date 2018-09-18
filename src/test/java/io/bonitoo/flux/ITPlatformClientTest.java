@@ -26,6 +26,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import io.bonitoo.platform.PlatformClient;
+import io.bonitoo.platform.PlatformClientFactory;
+import io.bonitoo.platform.TaskClient;
+import io.bonitoo.platform.dto.Task;
+
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

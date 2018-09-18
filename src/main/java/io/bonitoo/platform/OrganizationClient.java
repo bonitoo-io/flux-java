@@ -37,23 +37,6 @@ import io.bonitoo.platform.dto.Organization;
 public interface OrganizationClient {
 
     /**
-     * Retrieve a organization.
-     *
-     * @param organizationID ID of organization to get
-     * @return organization details
-     */
-    @Nullable
-    Organization findOrganizationByID(@Nonnull final String organizationID);
-
-    /**
-     * List all organizations.
-     *
-     * @return List all organizations
-     */
-    @Nonnull
-    List<Organization> findOrganizations();
-
-    /**
      * Creates a new organization and sets {@link Organization#id} with the new identifier.
      *
      * @param name name of the organization
@@ -84,6 +67,23 @@ public interface OrganizationClient {
      * @param organizationID ID of organization to delete
      */
     void deleteOrganization(@Nonnull final String organizationID);
+
+    /**
+     * Retrieve a organization.
+     *
+     * @param organizationID ID of organization to get
+     * @return organization details
+     */
+    @Nullable
+    Organization findOrganizationByID(@Nonnull final String organizationID);
+
+    /**
+     * List all organizations.
+     *
+     * @return List all organizations
+     */
+    @Nonnull
+    List<Organization> findOrganizations();
 
     // TODO getUsers, addUser, deleteUser
 }

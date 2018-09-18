@@ -36,8 +36,10 @@ import io.bonitoo.flux.options.query.AbstractOption;
 import io.bonitoo.flux.options.query.TaskOption;
 import io.bonitoo.platform.TaskClient;
 import io.bonitoo.platform.dto.Task;
+import io.bonitoo.platform.dto.User;
 
-import org.json.JSONObject;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import retrofit2.Call;
 
 /**
@@ -46,9 +48,11 @@ import retrofit2.Call;
 final class TaskClientImpl extends AbstractRestClient implements TaskClient {
 
     private final PlatformService platformService;
+    private final JsonAdapter<Task> adapter;
 
-    TaskClientImpl(@Nonnull final PlatformService platformService) {
+    TaskClientImpl(@Nonnull final PlatformService platformService, @Nonnull final Moshi moshi) {
         this.platformService = platformService;
+        this.adapter = moshi.adapter(Task.class);
     }
 
     @Nullable
@@ -176,14 +180,16 @@ final class TaskClientImpl extends AbstractRestClient implements TaskClient {
 
         Objects.requireNonNull(task, "Task is required");
 
-        JSONObject jsonTaskBody = getJsonTaskBody(task.getName(), new Flux() {
+        Flux flux = new Flux() {
             @Override
             protected void appendActual(@Nonnull final FluxChain fluxChain) {
                 fluxChain.append(task.getFlux());
             }
-        }, task.getEvery(), task.getCron(), task.getOwner().getId(), task.getOrganizationId(), task.getStatus());
+        };
 
-        Call<Task> taskCall = platformService.updateTask(task.getId(), createBody(jsonTaskBody));
+        task.setFlux(getFluxQuery(flux, task));
+
+        Call<Task> taskCall = platformService.updateTask(task.getId(), createBody(adapter.toJson(task)));
 
         return execute(taskCall);
     }
@@ -218,48 +224,35 @@ final class TaskClientImpl extends AbstractRestClient implements TaskClient {
         Preconditions.checkNonEmptyString(userID, "User ID");
         Preconditions.checkNonEmptyString(organizationID, "Organization ID");
 
-        JSONObject body = getJsonTaskBody(name, flux, every, cron, userID, organizationID, Task.TaskStatus.ENABLED);
+        User owner = new User();
+        owner.setId(userID);
 
-        Call<Task> task = platformService.createTask(createBody(body));
+        Task task = new Task();
+        task.setName(name);
+        task.setOrganizationId(organizationID);
+        task.setOwner(owner);
+        task.setStatus(Task.TaskStatus.ENABLED);
+        task.setEvery(every);
+        task.setCron(cron);
+        task.setFlux(getFluxQuery(flux, task));
 
-        return execute(task);
+        Call<Task> call = platformService.createTask(createBody(adapter.toJson(task)));
+
+        return execute(call);
     }
 
     @Nonnull
-    private JSONObject getJsonTaskBody(@Nonnull final String name,
-                                       @Nonnull final Flux flux,
-                                       @Nullable final String every,
-                                       @Nullable final String cron,
-                                       @Nonnull final String userID,
-                                       @Nonnull final String organizationID,
-                                       @Nonnull final Task.TaskStatus status) {
-
-        Preconditions.checkNonEmptyString(name, "name of the task");
-        Objects.requireNonNull(flux, "Flux script to run");
-        Preconditions.checkNonEmptyString(userID, "User ID");
-        Preconditions.checkNonEmptyString(organizationID, "Organization ID");
-        Objects.requireNonNull(status, "Task.TaskStatus is required");
-
-        TaskOption.Builder taskOptionBuilder = TaskOption.builder(name);
-        if (cron != null) {
-            taskOptionBuilder.cron(cron);
-        } else if (every != null) {
-            taskOptionBuilder.every(every);
+    private String getFluxQuery(@Nonnull final Flux flux, final Task task) {
+        TaskOption.Builder taskOptionBuilder = TaskOption.builder(task.getName());
+        if (task.getCron() != null) {
+            taskOptionBuilder.cron(task.getCron());
+        } else if (task.getEvery() != null) {
+            taskOptionBuilder.every(task.getEvery());
         }
 
         List<AbstractOption> options = new ArrayList<>();
         options.add(taskOptionBuilder.build());
 
-        FluxChain fluxChain = new FluxChain().addOptions(options);
-
-        JSONObject user = new JSONObject()
-                .put("id", userID);
-
-        return new JSONObject()
-                .put("name", name)
-                .put("organizationId", organizationID)
-                .put("owner", user)
-                .put("status", status.name().toLowerCase())
-                .put("flux", flux.print(fluxChain));
+        return flux.print(new FluxChain().addOptions(options));
     }
 }

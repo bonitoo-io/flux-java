@@ -22,35 +22,23 @@
  */
 package io.bonitoo.platform.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * The health of Platform.
+ * The wrapper for "/v2/sources" response.
  *
- * @author Jakub Bednar (bednar@github) (17/09/2018 08:25)
+ * @author Jakub Bednar (bednar@github) (18/09/2018 08:48)
  */
-public final class Health {
+public final class Sources extends AbstractHasLinks {
 
-    public static final String HEALTHY_STATUS = "healthy";
+    private List<Source> sources = new ArrayList<>();
 
-    private String status;
-    private String message;
-
-    public String getStatus() {
-        return status;
+    public List<Source> getSources() {
+        return sources;
     }
 
-    public void setStatus(final String status) {
-        this.status = status;
-    }
-
-    public boolean isHealthy() {
-        return HEALTHY_STATUS.equals(status);
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(final String message) {
-        this.message = message;
+    public void setSources(final List<Source> sources) {
+        this.sources = sources;
     }
 }

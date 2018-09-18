@@ -35,7 +35,8 @@ import io.bonitoo.platform.OrganizationClient;
 import io.bonitoo.platform.dto.Organization;
 import io.bonitoo.platform.dto.Organizations;
 
-import org.json.JSONObject;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import retrofit2.Call;
 
 /**
@@ -46,9 +47,11 @@ final class OrganizationClientImpl extends AbstractRestClient implements Organiz
     private static final Logger LOG = Logger.getLogger(OrganizationClientImpl.class.getName());
 
     private final PlatformService platformService;
+    private final JsonAdapter<Organization> adapter;
 
-    OrganizationClientImpl(@Nonnull final PlatformService platformService) {
+    OrganizationClientImpl(@Nonnull final PlatformService platformService, @Nonnull final Moshi moshi) {
         this.platformService = platformService;
+        this.adapter = moshi.adapter(Organization.class);
     }
 
     @Nullable
@@ -80,11 +83,14 @@ final class OrganizationClientImpl extends AbstractRestClient implements Organiz
 
         Preconditions.checkNonEmptyString(name, "Organization name");
 
-        JSONObject json = createOrganizationJSON(name);
+        Organization organization = new Organization();
+        organization.setName(name);
 
-        Call<Organization> organization = platformService.createOrganization(createBody(json));
+        String json = adapter.toJson(organization);
 
-        return execute(organization);
+        Call<Organization> call = platformService.createOrganization(createBody(json));
+
+        return execute(call);
     }
 
     @Nonnull
@@ -93,7 +99,7 @@ final class OrganizationClientImpl extends AbstractRestClient implements Organiz
 
         Objects.requireNonNull(organization, "Organization is required");
 
-        JSONObject json = createOrganizationJSON(organization.getName());
+        String json = adapter.toJson(organization);
 
         Call<Organization> orgCall = platformService.updateOrganization(organization.getId(), createBody(json));
 
@@ -117,11 +123,4 @@ final class OrganizationClientImpl extends AbstractRestClient implements Organiz
         execute(call);
     }
 
-    @Nonnull
-    private JSONObject createOrganizationJSON(@Nonnull final String name) {
-
-        Preconditions.checkNonEmptyString(name, "Organization name");
-
-        return new JSONObject().put("name", name);
-    }
 }

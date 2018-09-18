@@ -40,6 +40,15 @@ PlatformClient platformClient = PlatformOptions.connect(options);
 platformClient.close();
 ```
 
+### Health
+
+Get the health of an Platform instance.
+```java
+Health health = platformService.health();
+
+boolean healthy = health.isHealthy();
+```
+
 ### Users
 
 The `UserClient` supports:
@@ -170,6 +179,57 @@ authorizationClient.deleteAuthorization(createdAuthorization);
 
 // Find Authorization by User
 List<Authorization> authorizations = authorizationClient.findAuthorizationsByUser(user);
+```
+
+### Source
+The `SourceClient` supports:
+1. creating source
+2. find sources
+3. update source
+4. delete source
+5. find sources buckets
+6. check sources health
+
+```java
+SourceClient sourceClient = platformService.getSourceClient();
+
+// Create a new source for local InfluxDB
+Source source = new Source();
+
+source.setOrganizationID("00");
+source.setDefaultSource(false);
+source.setName(generateName("Source"));
+source.setType(Source.SourceType.V1SourceType);
+source.setUrl("http://localhost:8086");
+source.setInsecureSkipVerify(true);
+source.setTelegraf("telegraf");
+source.setToken(UUID.randomUUID().toString());
+source.setUsername("admin");
+source.setPassword("password");
+source.setSharedSecret(UUID.randomUUID().toString());
+source.setMetaUrl("/usr/local/var/influxdb/meta");
+source.setDefaultRP("autogen");
+
+source = sourceClient.createSource(source);
+
+// Update Source
+source.setInsecureSkipVerify(false);
+source.setFluxURL("http://localhost:8082");
+sourceClient.updateSource(bucket);
+
+// Delete Source
+Source createdSource = ...;
+sourceClient.deleteSource(createdSource);
+
+// Find Sources
+List<Source> sources = sourceClient.findSources();
+
+// Find Sources Buckets
+List<Bucket> buckets = sourceClient.findBucketsBySource(source);
+
+// Check Sources Health
+Health health = sourceClient.health(source);
+boolean healthy = health.isHealthy();
 ```
 
 ### Tasks

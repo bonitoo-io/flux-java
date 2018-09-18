@@ -39,6 +39,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
  */
 public interface PlatformClient {
 
+    //TODO add to all clients createByPOJO
+
     /**
      * Get client for User API.
      *
@@ -80,9 +82,17 @@ public interface PlatformClient {
     AuthorizationClient getAuthorizationClient();
 
     /**
+     * Get client for Source API.
+     *
+     * @return the client for Source API
+     */
+    @Nonnull
+    SourceClient getSourceClient();
+
+    /**
      * Check the status of Platform.
      *
-     * @return {@link Boolean#TRUE} if server is healthy otherwise return {@link Boolean#FALSE}
+     * @return health of instance
      */
     @Nonnull
     Health health();

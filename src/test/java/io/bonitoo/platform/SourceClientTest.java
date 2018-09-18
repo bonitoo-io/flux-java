@@ -22,60 +22,49 @@
  */
 package io.bonitoo.platform;
 
-import okhttp3.logging.HttpLoggingInterceptor;
+import io.bonitoo.platform.dto.Health;
+
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
 /**
- * @author Jakub Bednar (bednar@github) (05/09/2018 14:00)
+ * @author Jakub Bednar (bednar@github) (18/09/2018 13:49)
  */
 @RunWith(JUnitPlatform.class)
-class PlatformClientTest extends AbstractPlatformClientTest {
+class SourceClientTest extends AbstractPlatformClientTest {
 
-    @Test
-    void defaultLogLevel() {
+    private SourceClient sourceClient;
 
-        Assertions.assertThat(platformClient.getLogLevel()).isEqualTo(HttpLoggingInterceptor.Level.NONE);
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+
+        sourceClient = platformClient.getSourceClient();
     }
 
     @Test
-    void logLevel() {
+    void healthSuccess() {
 
-        PlatformClient platformClient = this.platformClient.setLogLevel(HttpLoggingInterceptor.Level.HEADERS);
+        platformServer.enqueue(createResponse(""));
 
-        Assertions.assertThat(platformClient).isEqualTo(this.platformClient);
-        Assertions.assertThat(platformClient.getLogLevel()).isEqualTo(HttpLoggingInterceptor.Level.HEADERS);
+        Health health = sourceClient.health("01");
+
+        Assertions.assertThat(health).isNotNull();
+        Assertions.assertThat(health.isHealthy()).isTrue();
     }
 
     @Test
-    void userClient() {
-        Assertions.assertThat(platformClient.getUserClient()).isNotNull();
-    }
+    void healthFailure() {
 
-    @Test
-    void organizationClient() {
-        Assertions.assertThat(platformClient.getOrganizationClient()).isNotNull();
-    }
+        platformServer.enqueue(createErrorResponse("unreachable source"));
 
-    @Test
-    void bucketClient() {
-        Assertions.assertThat(platformClient.getBucketClient()).isNotNull();
-    }
+        Health health = sourceClient.health("01");
 
-    @Test
-    void taskClient() {
-        Assertions.assertThat(platformClient.getTaskClient()).isNotNull();
-    }
-
-    @Test
-    void authorizationClient() {
-        Assertions.assertThat(platformClient.getAuthorizationClient()).isNotNull();
-    }
-
-    @Test
-    void sourceClient() {
-        Assertions.assertThat(platformClient.getSourceClient()).isNotNull();
+        Assertions.assertThat(health).isNotNull();
+        Assertions.assertThat(health.isHealthy()).isFalse();
+        Assertions.assertThat(health.getMessage()).isEqualTo("unreachable source");
     }
 }

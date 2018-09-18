@@ -31,6 +31,8 @@ import io.bonitoo.platform.dto.Permission;
 import io.bonitoo.platform.dto.User;
 
 /**
+ * The client of the InfluxData Platform for Time Series that implement Authorization HTTP API endpoint.
+ *
  * @author Jakub Bednar (bednar@github) (17/09/2018 11:09)
  */
 public interface AuthorizationClient {
@@ -54,6 +56,30 @@ public interface AuthorizationClient {
      */
     @Nonnull
     Authorization createAuthorization(@Nonnull final String userID, @Nonnull final List<Permission> permissions);
+
+    /**
+     * Updates the status of the authorization. Useful for setting an authorization to inactive or active.
+     *
+     * @param authorization to update status
+     * @return updated authorization
+     */
+    @Nonnull
+    Authorization updateAuthorizationStatus(@Nonnull final Authorization authorization);
+
+    /**
+     * Delete a authorization.
+     *
+     * @param authorization authorization to delete
+     */
+    void deleteAuthorization(@Nonnull final Authorization authorization);
+
+    /**
+     * Delete a authorization.
+     *
+     * @param authorizationID ID of authorization to delete
+     */
+    void deleteAuthorization(@Nonnull final String authorizationID);
+
 
     /**
      * List all authorizations.
@@ -98,27 +124,4 @@ public interface AuthorizationClient {
      */
     @Nonnull
     List<Authorization> findAuthorizationsByUserName(@Nullable final String userName);
-
-    /**
-     * Updates the status of the authorization. Useful for setting an authorization to inactive or active.
-     *
-     * @param authorization to update status
-     * @return updated authorization
-     */
-    @Nonnull
-    Authorization updateAuthorizationStatus(@Nonnull final Authorization authorization);
-
-    /**
-     * Delete a authorization.
-     *
-     * @param authorization authorization to delete
-     */
-    void deleteAuthorization(@Nonnull final Authorization authorization);
-
-    /**
-     * Delete a authorization.
-     *
-     * @param authorizationID ID of authorization to delete
-     */
-    void deleteAuthorization(@Nonnull final String authorizationID);
 }

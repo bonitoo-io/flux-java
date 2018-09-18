@@ -36,7 +36,8 @@ import io.bonitoo.platform.dto.Bucket;
 import io.bonitoo.platform.dto.Buckets;
 import io.bonitoo.platform.dto.Organization;
 
-import org.json.JSONObject;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import retrofit2.Call;
 
 /**
@@ -47,9 +48,11 @@ final class BucketClientImpl extends AbstractRestClient implements BucketClient 
     private static final Logger LOG = Logger.getLogger(BucketClientImpl.class.getName());
 
     private final PlatformService platformService;
+    private final JsonAdapter<Bucket> adapter;
 
-    BucketClientImpl(@Nonnull final PlatformService platformService) {
+    BucketClientImpl(@Nonnull final PlatformService platformService, @Nonnull final Moshi moshi) {
         this.platformService = platformService;
+        this.adapter = moshi.adapter(Bucket.class);
     }
 
     @Nullable
@@ -124,12 +127,14 @@ final class BucketClientImpl extends AbstractRestClient implements BucketClient 
         Preconditions.checkNonEmptyString(name, "Bucket name");
         Preconditions.checkNonEmptyString(organizationName, "Organization name");
 
-        JSONObject json = createBucketJSON(name, retentionPeriod)
-                .put("organization", organizationName);
+        Bucket bucket = new Bucket();
+        bucket.setName(name);
+        bucket.setRetentionPeriod(retentionPeriod);
+        bucket.setOrganizationName(organizationName);
 
-        Call<Bucket> bucket = platformService.createBucket(createBody(json));
+        Call<Bucket> call = platformService.createBucket(createBody(adapter.toJson(bucket)));
 
-        return execute(bucket);
+        return execute(call);
     }
 
     @Nonnull
@@ -138,7 +143,7 @@ final class BucketClientImpl extends AbstractRestClient implements BucketClient 
 
         Objects.requireNonNull(bucket, "Bucket is required");
 
-        JSONObject json = createBucketJSON(bucket.getName(), bucket.getRetentionPeriod());
+        String json = adapter.toJson(bucket);
 
         Call<Bucket> bucketCall = platformService.updateBucket(bucket.getId(), createBody(json));
 
@@ -160,16 +165,5 @@ final class BucketClientImpl extends AbstractRestClient implements BucketClient 
 
         Call<Void> call = platformService.deleteBucket(bucketID);
         execute(call);
-    }
-
-    @Nonnull
-    private JSONObject createBucketJSON(@Nonnull final String name,
-                                        @Nullable final Long retentionPeriod) {
-
-        Preconditions.checkNonEmptyString(name, "Bucket name");
-
-        return new JSONObject()
-                .put("name", name)
-                .put("retentionPeriod", retentionPeriod);
     }
 }

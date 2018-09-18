@@ -38,54 +38,6 @@ import io.bonitoo.platform.dto.Task;
 public interface TaskClient {
 
     /**
-     * Retrieve an task.
-     *
-     * @param taskID ID of task to get
-     * @return task details
-     */
-    @Nullable
-    Task findTaskByID(@Nonnull final String taskID);
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @return A list of tasks
-     */
-    @Nonnull
-    List<Task> findTasks();
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @param userID filter tasks to a specific user id
-     * @return A list of tasks
-     */
-    @Nonnull
-    List<Task> findTasksByUserID(@Nullable final String userID);
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @param organizationID filter tasks to a specific organization id
-     * @return A list of tasks
-     */
-    @Nonnull
-    List<Task> findTasksByOrganizationID(@Nullable final String organizationID);
-
-    /**
-     * Lists tasks, limit 100.
-     *
-     * @param afterID        returns tasks after specified ID
-     * @param userID         filter tasks to a specific user id
-     * @param organizationID filter tasks to a specific organization id
-     * @return A list of tasks
-     */
-    @Nonnull
-    List<Task> findTasks(@Nullable final String afterID,
-                         @Nullable final String userID,
-                         @Nullable final String organizationID);
-
-    /**
      * Creates a new task with task repetition by cron.
      *
      * @param name           description of the task
@@ -175,6 +127,54 @@ public interface TaskClient {
      * @param taskID ID of task to delete
      */
     void deleteTask(@Nonnull final String taskID);
+
+    /**
+     * Retrieve an task.
+     *
+     * @param taskID ID of task to get
+     * @return task details
+     */
+    @Nullable
+    Task findTaskByID(@Nonnull final String taskID);
+
+    /**
+     * Lists tasks, limit 100.
+     *
+     * @return A list of tasks
+     */
+    @Nonnull
+    List<Task> findTasks();
+
+    /**
+     * Lists tasks, limit 100.
+     *
+     * @param userID filter tasks to a specific user id
+     * @return A list of tasks
+     */
+    @Nonnull
+    List<Task> findTasksByUserID(@Nullable final String userID);
+
+    /**
+     * Lists tasks, limit 100.
+     *
+     * @param organizationID filter tasks to a specific organization id
+     * @return A list of tasks
+     */
+    @Nonnull
+    List<Task> findTasksByOrganizationID(@Nullable final String organizationID);
+
+    /**
+     * Lists tasks, limit 100.
+     *
+     * @param afterID        returns tasks after specified ID
+     * @param userID         filter tasks to a specific user id
+     * @param organizationID filter tasks to a specific organization id
+     * @return A list of tasks
+     */
+    @Nonnull
+    List<Task> findTasks(@Nullable final String afterID,
+                         @Nullable final String userID,
+                         @Nullable final String organizationID);
 
     // TODO FindLogs, FindLogByID, FindRuns, FindRunByID, RetryRun
 }

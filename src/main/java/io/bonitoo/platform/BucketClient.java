@@ -38,41 +38,6 @@ import io.bonitoo.platform.dto.Organization;
 public interface BucketClient {
 
     /**
-     * Retrieve a bucket.
-     *
-     * @param bucketID ID of bucket to get
-     * @return bucket details
-     */
-    @Nullable
-    Bucket findBucketByID(@Nonnull final String bucketID);
-
-    /**
-     * List all buckets.
-     *
-     * @return List all buckets
-     */
-    @Nonnull
-    List<Bucket> findBuckets();
-
-    /**
-     * List all buckets for specified {@code organizationID}.
-     *
-     * @param organization filter buckets to a specific organization
-     * @return A list of buckets
-     */
-    @Nonnull
-    List<Bucket> findBucketsByOrganization(@Nonnull final Organization organization);
-
-    /**
-     * List all buckets for specified {@code organizationID}.
-     *
-     * @param organizationName filter buckets to a specific organization name
-     * @return A list of buckets
-     */
-    @Nonnull
-    List<Bucket> findBucketsByOrganizationName(@Nullable final String organizationName);
-
-    /**
      * Creates a new bucket and sets {@link Bucket#id} with the new identifier.
      *
      * @param name         name of the bucket
@@ -141,4 +106,39 @@ public interface BucketClient {
      * @param bucketID ID of bucket to delete
      */
     void deleteBucket(@Nonnull final String bucketID);
+
+    /**
+     * Retrieve a bucket.
+     *
+     * @param bucketID ID of bucket to get
+     * @return bucket details
+     */
+    @Nullable
+    Bucket findBucketByID(@Nonnull final String bucketID);
+
+    /**
+     * List all buckets.
+     *
+     * @return List all buckets
+     */
+    @Nonnull
+    List<Bucket> findBuckets();
+
+    /**
+     * List all buckets for specified {@code organizationID}.
+     *
+     * @param organization filter buckets to a specific organization
+     * @return A list of buckets
+     */
+    @Nonnull
+    List<Bucket> findBucketsByOrganization(@Nonnull final Organization organization);
+
+    /**
+     * List all buckets for specified {@code organizationID}.
+     *
+     * @param organizationName filter buckets to a specific organization name
+     * @return A list of buckets
+     */
+    @Nonnull
+    List<Bucket> findBucketsByOrganizationName(@Nullable final String organizationName);
 }

@@ -93,7 +93,6 @@ class ITUserClientTest extends AbstractITClientTest {
         Assertions.assertThat(users).hasSize(size + 1);
     }
 
-
     @Test
     void deleteUser() {
 
@@ -103,7 +102,7 @@ class ITUserClientTest extends AbstractITClientTest {
         User foundUser = userClient.findUserByID(createdUser.getId());
         Assertions.assertThat(foundUser).isNotNull();
 
-        // delete task
+        // delete user
         userClient.deleteUser(createdUser);
 
         foundUser = userClient.findUserByID(createdUser.getId());

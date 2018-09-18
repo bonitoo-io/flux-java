@@ -35,7 +35,8 @@ import io.bonitoo.platform.UserClient;
 import io.bonitoo.platform.dto.User;
 import io.bonitoo.platform.dto.Users;
 
-import org.json.JSONObject;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import retrofit2.Call;
 
 /**
@@ -46,9 +47,11 @@ final class UserClientImpl extends AbstractRestClient implements UserClient {
     private static final Logger LOG = Logger.getLogger(UserClientImpl.class.getName());
 
     private final PlatformService platformService;
+    private final JsonAdapter<User> adapter;
 
-    UserClientImpl(@Nonnull final PlatformService platformService) {
+    UserClientImpl(@Nonnull final PlatformService platformService, @Nonnull final Moshi moshi) {
         this.platformService = platformService;
+        this.adapter = moshi.adapter(User.class);
     }
 
     @Nullable
@@ -79,11 +82,13 @@ final class UserClientImpl extends AbstractRestClient implements UserClient {
 
         Preconditions.checkNonEmptyString(name, "User name");
 
-        JSONObject json = createUserJSON(name);
+        User user = new User();
+        user.setName(name);
+        String json = adapter.toJson(user);
 
-        Call<User> user = platformService.createUser(createBody(json));
+        Call<User> call = platformService.createUser(createBody(json));
 
-        return execute(user);
+        return execute(call);
     }
 
     @Nonnull
@@ -92,7 +97,7 @@ final class UserClientImpl extends AbstractRestClient implements UserClient {
 
         Objects.requireNonNull(user, "User is required");
 
-        JSONObject json = createUserJSON(user.getName());
+        String json = adapter.toJson(user);
 
         Call<User> userCall = platformService.updateUser(user.getId(), createBody(json));
 
@@ -114,13 +119,5 @@ final class UserClientImpl extends AbstractRestClient implements UserClient {
 
         Call<Void> call = platformService.deleteUser(userID);
         execute(call);
-    }
-
-    @Nonnull
-    private JSONObject createUserJSON(@Nonnull final String name) {
-
-        Preconditions.checkNonEmptyString(name, "User name");
-
-        return new JSONObject().put("name", name);
     }
 }

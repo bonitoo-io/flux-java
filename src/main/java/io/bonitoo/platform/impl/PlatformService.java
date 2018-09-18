@@ -33,11 +33,14 @@ import io.bonitoo.platform.dto.Buckets;
 import io.bonitoo.platform.dto.Health;
 import io.bonitoo.platform.dto.Organization;
 import io.bonitoo.platform.dto.Organizations;
+import io.bonitoo.platform.dto.Source;
+import io.bonitoo.platform.dto.Sources;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.dto.User;
 import io.bonitoo.platform.dto.Users;
 
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -185,4 +188,39 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<Authorization> findAuthorization(@Nonnull @Path("id") final String authorizationID);
+
+    //
+    // Source
+    //
+    @POST("/v2/sources")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Source> createSource(@Nonnull @Body final RequestBody source);
+
+    @DELETE("/v2/sources/{id}")
+    Call<Void> deleteSource(@Nonnull @Path("id") final String sourceID);
+
+    @PATCH("/v2/sources/{id}")
+    Call<Source> updateSource(@Nonnull @Path("id") final String sourceID,
+                              @Nonnull @Body final RequestBody source);
+
+    @GET("/v2/sources/{id}")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Source> findSource(@Nonnull @Path("id") final String sourceID);
+
+    @GET("/v2/sources")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<Sources> findSources();
+
+    @GET("/v2/sources/{id}/buckets")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<List<Bucket>> findSourceBuckets(@Nonnull @Path("id") final String sourceID);
+
+    @GET("/v2/sources/{id}/health")
+    @Nonnull
+    @Headers("Content-Type: application/json")
+    Call<ResponseBody> findSourceHealth(@Nonnull @Path("id") final String sourceID);
 }

@@ -37,23 +37,6 @@ import io.bonitoo.platform.dto.User;
 public interface UserClient {
 
     /**
-     * Retrieve a user.
-     *
-     * @param userID ID of user to get
-     * @return user details
-     */
-    @Nullable
-    User findUserByID(@Nonnull final String userID);
-
-    /**
-     * List all users.
-     *
-     * @return List all users
-     */
-    @Nonnull
-    List<User> findUsers();
-
-    /**
      * Creates a new user and sets {@link User#id} with the new identifier.
      *
      * @param name name of the user
@@ -84,4 +67,21 @@ public interface UserClient {
      * @param userID ID of user to delete
      */
     void deleteUser(@Nonnull final String userID);
+
+    /**
+     * Retrieve a user.
+     *
+     * @param userID ID of user to get
+     * @return user details
+     */
+    @Nullable
+    User findUserByID(@Nonnull final String userID);
+
+    /**
+     * List all users.
+     *
+     * @return List all users
+     */
+    @Nonnull
+    List<User> findUsers();
 }

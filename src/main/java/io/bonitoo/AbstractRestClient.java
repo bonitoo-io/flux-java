@@ -49,7 +49,16 @@ public abstract class AbstractRestClient {
 
         Objects.requireNonNull(json, "JSON is required");
 
-        return RequestBody.create(CONTENT_TYPE_JSON, json.toString());
+        String content = json.toString();
+        return createBody(content);
+    }
+
+    @Nonnull
+    protected RequestBody createBody(@Nonnull final String content) {
+
+        Preconditions.checkNonEmptyString(content, "");
+
+        return RequestBody.create(CONTENT_TYPE_JSON, content);
     }
 
     protected <T> T execute(@Nonnull final Call<T> call) throws InfluxException {
@@ -73,11 +82,10 @@ public abstract class AbstractRestClient {
                 //
                 if (nullError != null && nullError.equals(error)) {
 
-                    LOG.log(Level.FINEST, "Error is considered as null response: {0}", error);
+                    LOG.log(Level.WARNING, "Error is considered as null response: {0}", error);
 
                     return null;
                 }
-
 
                 throw new InfluxException(error);
             }

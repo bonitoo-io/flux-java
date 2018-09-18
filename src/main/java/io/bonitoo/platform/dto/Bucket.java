@@ -39,6 +39,12 @@ public final class Bucket extends AbstractHasLinks {
     @Json(name = "organization")
     private String organizationName;
 
+    /**
+     * For support V1 sources.
+     */
+    @Json(name = "rp")
+    private String retentionPolicyName;
+
     private Long retentionPeriod;
 
     public String getId() {
@@ -71,6 +77,14 @@ public final class Bucket extends AbstractHasLinks {
 
     public void setOrganizationName(final String organizationName) {
         this.organizationName = organizationName;
+    }
+
+    public String getRetentionPolicyName() {
+        return retentionPolicyName;
+    }
+
+    public void setRetentionPolicyName(final String retentionPolicyName) {
+        this.retentionPolicyName = retentionPolicyName;
     }
 
     public Long getRetentionPeriod() {
