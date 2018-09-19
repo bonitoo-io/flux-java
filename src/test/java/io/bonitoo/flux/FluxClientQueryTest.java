@@ -81,25 +81,35 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
     @Test
     void queryErrorSuccessResponse() {
 
-        String error = "error,reference\n" + "Failed to parse query,897";
+        String error =
+                "#datatype,string,string\n"
+                + "#group,true,true\n"
+                + "#default,,\n"
+                + ",error,reference\n"
+                + ",failed to create physical plan: invalid time bounds from procedure from: bounds contain zero time,897";
 
         fluxServer.enqueue(createResponse(error));
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
                 .isInstanceOf(InfluxException.class)
-                .hasMessage("Failed to parse query [reference: 897]");
+                .hasMessage("failed to create physical plan: invalid time bounds from procedure from: bounds contain zero time [reference: 897]");
     }
 
     @Test
     void queryErrorSuccessResponseWithoutReference() {
 
-        String error = "error,reference\n" + "Failed to parse query,";
+        String error =
+                "#datatype,string,string\n"
+                        + "#group,true,true\n"
+                        + "#default,,\n"
+                        + ",error,reference\n"
+                        + ",failed to create physical plan: invalid time bounds from procedure from: bounds contain zero time,";
 
         fluxServer.enqueue(createResponse(error));
 
         Assertions.assertThatThrownBy(() -> fluxClient.flux(Flux.from("flux_database")))
                 .isInstanceOf(InfluxException.class)
-                .hasMessage("Failed to parse query");
+                .hasMessage("failed to create physical plan: invalid time bounds from procedure from: bounds contain zero time");
     }
 
     @Test

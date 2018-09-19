@@ -220,6 +220,21 @@ class ITFluxClient extends AbstractITFluxClient {
     }
 
     @Test
+    void queryWithTime() {
+
+        Restrictions restriction = Restrictions
+                .and(Restrictions.measurement().equal("mem"), Restrictions.field().equal("free"));
+
+        Flux flux = Flux.from(DATABASE_NAME)
+                .range(Instant.EPOCH)
+                .filter(restriction);
+
+        List<FluxTable> fluxTables = fluxClient.flux(flux);
+
+        assertFluxResultWithTime(fluxTables);
+    }
+
+    @Test
     void queryDifferentSchemas() {
 
         Flux flux = Flux
@@ -377,6 +392,31 @@ class ITFluxClient extends AbstractITFluxClient {
 
         FluxTable table1 = tables.get(0);
         // Data types
+        Assertions.assertThat(table1.getColumns()).hasSize(9);
+        Assertions.assertThat(table1.getColumns().stream().map(FluxColumn::getDataType))
+                .containsExactlyInAnyOrder("string", "long", "dateTime:RFC3339", "dateTime:RFC3339", "long", "string", "string", "string", "string");
+
+        // Columns
+        Assertions.assertThat(table1.getColumns().stream().map(FluxColumn::getLabel))
+                .containsExactlyInAnyOrder("result", "table", "_start", "_stop", "_value", "_field", "_measurement", "host", "region");
+
+        // Records
+        Assertions.assertThat(table1.getRecords()).hasSize(1);
+
+        List<FluxRecord> records = new ArrayList<>();
+        records.add(table1.getRecords().get(0));
+        records.add(tables.get(1).getRecords().get(0));
+        assertFluxRecords(records);
+    }
+
+    private void assertFluxResultWithTime(@Nonnull final List<FluxTable> tables) {
+
+        Assertions.assertThat(tables).isNotNull();
+
+        Assertions.assertThat(tables).hasSize(2);
+
+        FluxTable table1 = tables.get(0);
+        // Data types
         Assertions.assertThat(table1.getColumns()).hasSize(10);
         Assertions.assertThat(table1.getColumns().stream().map(FluxColumn::getDataType))
                 .containsExactlyInAnyOrder("string", "long", "dateTime:RFC3339", "dateTime:RFC3339", "dateTime:RFC3339", "long", "string", "string", "string", "string");
@@ -386,12 +426,8 @@ class ITFluxClient extends AbstractITFluxClient {
                 .containsExactlyInAnyOrder("result", "table", "_start", "_stop", "_time", "_value", "_field", "_measurement", "host", "region");
 
         // Records
-        Assertions.assertThat(table1.getRecords()).hasSize(1);
-
-        List<FluxRecord> records = new ArrayList<>();
-        records.add(table1.getRecords().get(0));
-        records.add(tables.get(1).getRecords().get(0));
-        assertFluxRecords(records);
+        Assertions.assertThat(table1.getRecords()).hasSize(2);
+        Assertions.assertThat(tables.get(1).getRecords()).hasSize(2);
     }
 
     private void assertFluxRecords(@Nonnull final List<FluxRecord> records) {
@@ -405,7 +441,7 @@ class ITFluxClient extends AbstractITFluxClient {
 
         Assertions.assertThat(record1.getStart()).isEqualTo(Instant.EPOCH);
         Assertions.assertThat(record1.getStop()).isNotNull();
-        Assertions.assertThat(record1.getTime()).isEqualTo(Instant.ofEpochSecond(10));
+        Assertions.assertThat(record1.getTime()).isNull();
 
         Assertions.assertThat(record1.getValue()).isEqualTo(21L);
 
@@ -420,7 +456,7 @@ class ITFluxClient extends AbstractITFluxClient {
 
         Assertions.assertThat(record2.getStart()).isEqualTo(Instant.EPOCH);
         Assertions.assertThat(record2.getStop()).isNotNull();
-        Assertions.assertThat(record2.getTime()).isEqualTo(Instant.ofEpochSecond(10));
+        Assertions.assertThat(record2.getTime()).isNull();
 
         Assertions.assertThat(record2.getValue()).isEqualTo(42L);
 

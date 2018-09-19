@@ -177,18 +177,17 @@ class FluxCsvParser {
             //
             // Response has HTTP status ok, but response is error.
             //
-            if (1 == recordNumber && csvRecord.get(0).equals("error") && csvRecord.get(1).equals("reference")) {
+            if (4 == recordNumber && csvRecord.get(1).equals("error") && csvRecord.get(2).equals("reference")) {
                 parsingState = ParsingState.IN_ERROR;
                 continue;
-
             }
 
             //
             // Throw InfluxException with error response
             //
             if (ParsingState.IN_ERROR.equals(parsingState)) {
-                String error = csvRecord.get(0);
-                String reference = csvRecord.get(1);
+                String error = csvRecord.get(1);
+                String reference = csvRecord.get(2);
 
                 if (!reference.isEmpty()) {
                     error += String.format(" [reference: %s]", reference);
