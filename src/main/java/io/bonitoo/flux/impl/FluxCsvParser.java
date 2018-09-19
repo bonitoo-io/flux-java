@@ -68,6 +68,8 @@ class FluxCsvParser {
             .appendPattern("X")
             .toFormatter();
 
+    private static final int ERROR_RECORD_INDEX = 4;
+
     /**
      * Synchronously parse Flux CSV response to {@link FluxTable}s.
      *
@@ -177,7 +179,9 @@ class FluxCsvParser {
             //
             // Response has HTTP status ok, but response is error.
             //
-            if (4 == recordNumber && csvRecord.get(1).equals("error") && csvRecord.get(2).equals("reference")) {
+            if (ERROR_RECORD_INDEX == recordNumber && csvRecord.get(1).equals("error")
+                    && csvRecord.get(2).equals("reference")) {
+
                 parsingState = ParsingState.IN_ERROR;
                 continue;
             }
@@ -240,8 +244,8 @@ class FluxCsvParser {
                     tableIndex++;
                 }
 
-                FluxRecord r = parseRecord(tableIndex - 1, table, csvRecord);
-                consumer.addRecord(tableIndex - 1, r);
+                FluxRecord fluxRecord = parseRecord(tableIndex - 1, table, csvRecord);
+                consumer.addRecord(tableIndex - 1, fluxRecord);
             }
         }
     }
