@@ -615,7 +615,7 @@ public interface FluxClient {
     /**
      * Enable Gzip compress for http request body.
      *
-     * @return the FluxClientReactive instance to be able to use it in a fluent manner.
+     * @return the FluxClient instance to be able to use it in a fluent manner.
      */
     @Nonnull
     FluxClient enableGzip();
@@ -623,7 +623,7 @@ public interface FluxClient {
     /**
      * Disable Gzip compress for http request body.
      *
-     * @return the FluxClientReactive instance to be able to use it in a fluent manner.
+     * @return the FluxClient instance to be able to use it in a fluent manner.
      */
     @Nonnull
     FluxClient disableGzip();
@@ -653,7 +653,7 @@ public interface FluxClient {
      * Set the log level for the request and response information.
      *
      * @param logLevel the log level to set.
-     * @return the FluxClientReactive instance to be able to use it in a fluent manner.
+     * @return the FluxClient instance to be able to use it in a fluent manner.
      */
     @Nonnull
     FluxClient setLogLevel(@Nonnull final HttpLoggingInterceptor.Level logLevel);
@@ -661,7 +661,7 @@ public interface FluxClient {
     /**
      * Dispose all event listeners before shutdown.
      *
-     * @return the FluxClientReactive instance to be able to use it in a fluent manner.
+     * @return the FluxClient instance to be able to use it in a fluent manner.
      */
     @Nonnull
     FluxClient close();
