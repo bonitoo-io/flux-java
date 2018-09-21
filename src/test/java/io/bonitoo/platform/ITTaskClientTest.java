@@ -48,7 +48,7 @@ class ITTaskClientTest extends AbstractITClientTest {
 
         super.setUp();
 
-        taskClient = platformService.getTaskClient();
+        taskClient = platformService.createTaskClient();
     }
 
     @Test

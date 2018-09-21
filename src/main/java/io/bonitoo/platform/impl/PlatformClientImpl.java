@@ -24,10 +24,12 @@ package io.bonitoo.platform.impl;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
+import io.bonitoo.GzipRequestInterceptor;
 import io.bonitoo.platform.AuthorizationClient;
 import io.bonitoo.platform.BucketClient;
 import io.bonitoo.platform.OrganizationClient;
@@ -54,16 +56,13 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
  */
 public final class PlatformClientImpl extends AbstractRestClient implements PlatformClient {
 
+    static final Pattern WRITE_END_POINT = Pattern.compile(".*/write", Pattern.CASE_INSENSITIVE);
+
+    private final Moshi moshi;
     private final PlatformService platformService;
 
-    private final UserClientImpl userClient;
-    private final OrganizationClientImpl organizationClient;
-    private final BucketClientImpl bucketClient;
-    private final TaskClientImpl taskClient;
-    private final AuthorizationClientImpl authorizationClient;
-    private final SourceClientImpl sourceClient;
-
     private final HttpLoggingInterceptor loggingInterceptor;
+
 
     public PlatformClientImpl(@Nonnull final PlatformOptions options) {
         Objects.requireNonNull(options, "PlatformOptions are required");
@@ -71,12 +70,15 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
         this.loggingInterceptor = new HttpLoggingInterceptor();
         this.loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
 
+        GzipRequestInterceptor gzipRequestInterceptor = new GzipRequestInterceptor(WRITE_END_POINT);
+
         OkHttpClient okHttpClient = options.getOkHttpClient()
                 .addInterceptor(loggingInterceptor)
+                .addInterceptor(gzipRequestInterceptor)
                 .build();
 
 
-        Moshi moshi = new Moshi.Builder().add(new TaskAdapter()).build();
+        moshi = new Moshi.Builder().add(new TaskAdapter()).build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(options.getUrl())
@@ -85,49 +87,42 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
                 .build();
 
         platformService = retrofit.create(PlatformService.class);
-
-        this.userClient = new UserClientImpl(platformService, moshi);
-        this.organizationClient = new OrganizationClientImpl(platformService, moshi);
-        this.bucketClient = new BucketClientImpl(platformService, moshi);
-        this.taskClient = new TaskClientImpl(platformService, moshi);
-        this.authorizationClient = new AuthorizationClientImpl(platformService, moshi);
-        this.sourceClient = new SourceClientImpl(platformService, moshi);
     }
 
     @Nonnull
     @Override
-    public UserClient getUserClient() {
-        return userClient;
+    public UserClient createUserClient() {
+        return new UserClientImpl(platformService, moshi);
     }
 
     @Nonnull
     @Override
-    public OrganizationClient getOrganizationClient() {
-        return organizationClient;
+    public OrganizationClient createOrganizationClient() {
+        return new OrganizationClientImpl(platformService, moshi);
     }
 
     @Nonnull
     @Override
-    public BucketClient getBucketClient() {
-        return bucketClient;
+    public BucketClient createBucketClient() {
+        return new BucketClientImpl(platformService, moshi);
     }
 
     @Nonnull
     @Override
-    public TaskClient getTaskClient() {
-        return taskClient;
+    public TaskClient createTaskClient() {
+        return new TaskClientImpl(platformService, moshi);
     }
 
     @Nonnull
     @Override
-    public AuthorizationClient getAuthorizationClient() {
-        return authorizationClient;
+    public AuthorizationClient createAuthorizationClient() {
+        return new AuthorizationClientImpl(platformService, moshi);
     }
 
     @Nonnull
     @Override
-    public SourceClient getSourceClient() {
-        return sourceClient;
+    public SourceClient createSourceClient() {
+        return new SourceClientImpl(platformService, moshi);
     }
 
     @Nonnull

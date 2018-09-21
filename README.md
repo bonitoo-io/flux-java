@@ -44,7 +44,7 @@ platformClient.close();
 
 Get the health of an Platform instance.
 ```java
-Health health = platformService.health();
+Health health = platformClient.health();
 
 boolean healthy = health.isHealthy();
 ```
@@ -58,7 +58,7 @@ The `UserClient` supports:
 4. delete user
 
 ```java
-UserClient userClient = platformService.getTaskClient();
+UserClient userClient = platformClient.getTaskClient();
 
 // Creates a new user with name 'John Ryzen'
 User user = userClient.createUser("John Ryzen");
@@ -87,7 +87,7 @@ The `OrganizationClient` supports:
 4. delete organization
 
 ```java
-OrganizationClient organizationClient = platformService.getOrganizationClient();
+OrganizationClient organizationClient = platformClient.createOrganizationClient();
 
 // Creates a new organization with name 'TechnologiesRT'
 Organization organization = organizationClient.createOrganization("TechnologiesRT");
@@ -116,7 +116,7 @@ The `BucketClient` supports:
 4. delete bucket
 
 ```java
-BucketClient bucketClient = platformService.getBucketClient();
+BucketClient bucketClient = platformClient.createBucketClient();
 
 // Creates a new bucket with name 'robot-sensors' and retention 50_000
 Bucket bucket = bucketClient.createBucket("robot-sensors", 50_000L, organization);
@@ -149,7 +149,7 @@ The `AuthorizationClient` supports:
 4. delete authorization
 
 ```java
-AuthorizationClient authorizationClient = platformService.getAuthorizationClient();
+AuthorizationClient authorizationClient = platformClient.createAuthorizationClient();
 
 // Create a new authorization to create and update organizations, users
 User user = ...;
@@ -191,7 +191,7 @@ The `SourceClient` supports:
 6. check sources health
 
 ```java
-SourceClient sourceClient = platformService.getSourceClient();
+SourceClient sourceClient = platformClient.createSourceClient();
 
 // Create a new source for local InfluxDB
 Source source = new Source();
@@ -241,7 +241,7 @@ The `TaskClient` supports:
 4. delete task
 
 ```java
-TaskClient taskClient = platformService.getTaskClient();
+TaskClient taskClient = platformClient.createTaskClient();
 ```
 
 #### Create

@@ -44,7 +44,7 @@ class OrganizationClientTest extends AbstractPlatformClientTest {
     protected void setUp() {
         super.setUp();
 
-        organizationClient = platformClient.getOrganizationClient();
+        organizationClient = platformClient.createOrganizationClient();
     }
 
     @Test

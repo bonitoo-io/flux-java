@@ -47,7 +47,7 @@ class TaskClientTest extends AbstractPlatformClientTest {
     protected void setUp() {
         super.setUp();
 
-        taskClient = platformClient.getTaskClient();
+        taskClient = platformClient.createTaskClient();
     }
 
     @Test

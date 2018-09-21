@@ -44,50 +44,50 @@ public interface PlatformClient {
     /**
      * Get client for User API.
      *
-     * @return the client for User API
+     * @return the new client instance for User API
      */
     @Nonnull
-    UserClient getUserClient();
+    UserClient createUserClient();
 
     /**
      * Get client for Organization API.
      *
-     * @return the client for Organization API
+     * @return the new client instance for Organization API
      */
     @Nonnull
-    OrganizationClient getOrganizationClient();
+    OrganizationClient createOrganizationClient();
 
     /**
      * Get client for Bucket API.
      *
-     * @return the client for Bucket API
+     * @return the new client instance for Bucket API
      */
     @Nonnull
-    BucketClient getBucketClient();
+    BucketClient createBucketClient();
 
     /**
      * Get client for Task API.
      *
-     * @return the client for Task API
+     * @return the new client instance for Task API
      */
     @Nonnull
-    TaskClient getTaskClient();
+    TaskClient createTaskClient();
 
     /**
      * Get client for Authorization API.
      *
-     * @return the client for Authorization API
+     * @return the new client instance for Authorization API
      */
     @Nonnull
-    AuthorizationClient getAuthorizationClient();
+    AuthorizationClient createAuthorizationClient();
 
     /**
      * Get client for Source API.
      *
-     * @return the client for Source API
+     * @return the new client instance for Source API
      */
     @Nonnull
-    SourceClient getSourceClient();
+    SourceClient createSourceClient();
 
     /**
      * Check the status of Platform.

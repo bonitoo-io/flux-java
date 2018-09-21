@@ -20,51 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.platform;
-
-import io.bonitoo.platform.dto.Health;
+package io.bonitoo.platform.impl;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
+import static io.bonitoo.platform.impl.PlatformClientImpl.WRITE_END_POINT;
+
 /**
- * @author Jakub Bednar (bednar@github) (18/09/2018 13:49)
+ * @author Jakub Bednar (bednar@github) (21/09/2018 09:47)
  */
 @RunWith(JUnitPlatform.class)
-class SourceClientTest extends AbstractPlatformClientTest {
-
-    private SourceClient sourceClient;
-
-    @BeforeEach
-    protected void setUp() {
-        super.setUp();
-
-        sourceClient = platformClient.createSourceClient();
-    }
+class PlatformClientImplTest {
 
     @Test
-    void healthSuccess() {
+    void pattern() {
 
-        platformServer.enqueue(createResponse(""));
-
-        Health health = sourceClient.health("01");
-
-        Assertions.assertThat(health).isNotNull();
-        Assertions.assertThat(health.isHealthy()).isTrue();
-    }
-
-    @Test
-    void healthFailure() {
-
-        platformServer.enqueue(createErrorResponse("unreachable source"));
-
-        Health health = sourceClient.health("01");
-
-        Assertions.assertThat(health).isNotNull();
-        Assertions.assertThat(health.isHealthy()).isFalse();
-        Assertions.assertThat(health.getMessage()).isEqualTo("unreachable source");
+        Assertions.assertThat(WRITE_END_POINT.matcher("/write").matches()).isTrue();
+        Assertions.assertThat(WRITE_END_POINT.matcher("/Write").matches()).isTrue();
+        Assertions.assertThat(WRITE_END_POINT.matcher("/enterprise/write").matches()).isTrue();
+        Assertions.assertThat(WRITE_END_POINT.matcher("/query").matches()).isFalse();
+        Assertions.assertThat(WRITE_END_POINT.matcher("/enterprise/query").matches()).isFalse();
+        Assertions.assertThat(WRITE_END_POINT.matcher("/write/query").matches()).isFalse();
     }
 }

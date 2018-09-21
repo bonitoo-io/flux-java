@@ -49,8 +49,8 @@ class ITBucketClientTest extends AbstractITClientTest {
 
         super.setUp();
 
-        bucketClient = platformService.getBucketClient();
-        organizationClient = platformService.getOrganizationClient();
+        bucketClient = platformService.createBucketClient();
+        organizationClient = platformService.createOrganizationClient();
 
         organization = organizationClient.createOrganization(generateName("Org"));
     }

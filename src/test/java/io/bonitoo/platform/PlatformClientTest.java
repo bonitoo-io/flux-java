@@ -51,31 +51,31 @@ class PlatformClientTest extends AbstractPlatformClientTest {
 
     @Test
     void userClient() {
-        Assertions.assertThat(platformClient.getUserClient()).isNotNull();
+        Assertions.assertThat(platformClient.createUserClient()).isNotNull();
     }
 
     @Test
     void organizationClient() {
-        Assertions.assertThat(platformClient.getOrganizationClient()).isNotNull();
+        Assertions.assertThat(platformClient.createOrganizationClient()).isNotNull();
     }
 
     @Test
     void bucketClient() {
-        Assertions.assertThat(platformClient.getBucketClient()).isNotNull();
+        Assertions.assertThat(platformClient.createBucketClient()).isNotNull();
     }
 
     @Test
     void taskClient() {
-        Assertions.assertThat(platformClient.getTaskClient()).isNotNull();
+        Assertions.assertThat(platformClient.createTaskClient()).isNotNull();
     }
 
     @Test
     void authorizationClient() {
-        Assertions.assertThat(platformClient.getAuthorizationClient()).isNotNull();
+        Assertions.assertThat(platformClient.createAuthorizationClient()).isNotNull();
     }
 
     @Test
     void sourceClient() {
-        Assertions.assertThat(platformClient.getSourceClient()).isNotNull();
+        Assertions.assertThat(platformClient.createSourceClient()).isNotNull();
     }
 }

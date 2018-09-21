@@ -57,9 +57,9 @@ class ITAuthorizationClientTest extends AbstractITClientTest {
 
         super.setUp();
 
-        authorizationClient = platformService.getAuthorizationClient();
+        authorizationClient = platformService.createAuthorizationClient();
 
-        user = platformService.getUserClient().createUser(generateName("Auth User"));
+        user = platformService.createUserClient().createUser(generateName("Auth User"));
     }
 
     @Test
@@ -102,7 +102,7 @@ class ITAuthorizationClientTest extends AbstractITClientTest {
     @Test
     void createAuthorizationTask() {
 
-        Organization organization = platformService.getOrganizationClient().createOrganization(generateName("Auth Organization"));
+        Organization organization = platformService.createOrganizationClient().createOrganization(generateName("Auth Organization"));
 
         String taskResource = Permission.taskResource(organization.getId());
 
@@ -130,8 +130,8 @@ class ITAuthorizationClientTest extends AbstractITClientTest {
     @Test
     void createAuthorizationBucket() {
 
-        Organization organization = platformService.getOrganizationClient().createOrganization(generateName("Auth Organization"));
-        Bucket bucket = platformService.getBucketClient().createBucket(generateName("Auth Bucket"), organization);
+        Organization organization = platformService.createOrganizationClient().createOrganization(generateName("Auth Organization"));
+        Bucket bucket = platformService.createBucketClient().createBucket(generateName("Auth Bucket"), organization);
 
         String bucketResource = Permission.bucketResource(bucket.getId());
 

@@ -49,7 +49,7 @@ class ITOrganizationClientTest extends AbstractITClientTest {
 
         super.setUp();
 
-        organizationClient = platformService.getOrganizationClient();
+        organizationClient = platformService.createOrganizationClient();
     }
 
     @Test
