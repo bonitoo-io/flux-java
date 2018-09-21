@@ -37,9 +37,11 @@ import io.bonitoo.platform.PlatformClient;
 import io.bonitoo.platform.SourceClient;
 import io.bonitoo.platform.TaskClient;
 import io.bonitoo.platform.UserClient;
+import io.bonitoo.platform.WriteClient;
 import io.bonitoo.platform.dto.Health;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.options.PlatformOptions;
+import io.bonitoo.platform.options.WriteOptions;
 
 import com.squareup.moshi.FromJson;
 import com.squareup.moshi.JsonAdapter;
@@ -62,6 +64,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     private final PlatformService platformService;
 
     private final HttpLoggingInterceptor loggingInterceptor;
+    private final GzipRequestInterceptor gzipRequestInterceptor;
 
 
     public PlatformClientImpl(@Nonnull final PlatformOptions options) {
@@ -70,7 +73,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
         this.loggingInterceptor = new HttpLoggingInterceptor();
         this.loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
 
-        GzipRequestInterceptor gzipRequestInterceptor = new GzipRequestInterceptor(WRITE_END_POINT);
+        this.gzipRequestInterceptor = new GzipRequestInterceptor(WRITE_END_POINT);
 
         OkHttpClient okHttpClient = options.getOkHttpClient()
                 .addInterceptor(loggingInterceptor)
@@ -123,6 +126,21 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
     @Override
     public SourceClient createSourceClient() {
         return new SourceClientImpl(platformService, moshi);
+    }
+
+    @Nonnull
+    @Override
+    public WriteClient createWriteClient() {
+        return createWriteClient(WriteOptions.DEFAULTS);
+    }
+
+    @Nonnull
+    @Override
+    public WriteClient createWriteClient(@Nonnull final WriteOptions writeOptions) {
+
+        Objects.requireNonNull(writeOptions, "WriteOptions are required");
+
+        return new WriteClientImpl(writeOptions, platformService, gzipRequestInterceptor);
     }
 
     @Nonnull

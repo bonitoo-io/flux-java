@@ -27,12 +27,12 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.AbstractRestClient;
+import io.bonitoo.GzipRequestInterceptor;
 import io.bonitoo.Preconditions;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
 import io.bonitoo.flux.options.FluxConnectionOptions;
 import io.bonitoo.flux.options.FluxOptions;
-import io.bonitoo.flux.utils.GzipRequestInterceptor;
 
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;

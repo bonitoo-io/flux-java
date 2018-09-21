@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.FluxClient;
 import io.bonitoo.platform.dto.Health;
+import io.bonitoo.platform.options.WriteOptions;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -88,6 +89,23 @@ public interface PlatformClient {
      */
     @Nonnull
     SourceClient createSourceClient();
+
+    /**
+     * Get client for Write API.
+     *
+     * @return the new client instance for Write API
+     */
+    @Nonnull
+    WriteClient createWriteClient();
+
+    /**
+     * Get client for Write API.
+     *
+     * @param writeOptions configure write options
+     * @return the new client instance for Write API
+     */
+    @Nonnull
+    WriteClient createWriteClient(@Nonnull final WriteOptions writeOptions);
 
     /**
      * Check the status of Platform.

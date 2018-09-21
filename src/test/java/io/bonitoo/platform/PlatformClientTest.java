@@ -22,6 +22,8 @@
  */
 package io.bonitoo.platform;
 
+import io.bonitoo.platform.options.WriteOptions;
+
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -77,5 +79,11 @@ class PlatformClientTest extends AbstractPlatformClientTest {
     @Test
     void sourceClient() {
         Assertions.assertThat(platformClient.createSourceClient()).isNotNull();
+    }
+
+    @Test
+    void writeClient() {
+        Assertions.assertThat(platformClient.createWriteClient()).isNotNull();
+        Assertions.assertThat(platformClient.createWriteClient(WriteOptions.DEFAULTS)).isNotNull();
     }
 }

@@ -58,7 +58,7 @@ The `UserClient` supports:
 4. delete user
 
 ```java
-UserClient userClient = platformClient.getTaskClient();
+UserClient userClient = platformClient.createUserClient();
 
 // Creates a new user with name 'John Ryzen'
 User user = userClient.createUser("John Ryzen");
