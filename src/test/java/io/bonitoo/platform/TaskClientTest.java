@@ -25,6 +25,7 @@ package io.bonitoo.platform;
 import io.bonitoo.InfluxException;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.dto.User;
+import io.bonitoo.platform.impl.AbstractPlatformClientTest;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -81,7 +82,7 @@ class TaskClientTest extends AbstractPlatformClientTest {
         Task task = taskClient.createTaskCron("task name", "from(bucket: \"telegraf\") |> last()", "0 2 * * *", "10", "15");
         Assertions.assertThat(task).isNotNull();
 
-        JSONObject body = getRequestBody(platformServer);
+        JSONObject body = getRequestBodyAsJSON(platformServer);
 
         Assertions.assertThat(body.get("name")).isEqualTo("task name");
         Assertions.assertThat(body.get("organizationId")).isEqualTo("15");
@@ -97,7 +98,7 @@ class TaskClientTest extends AbstractPlatformClientTest {
 
         taskClient.createTaskEvery("task name", "from(bucket: \"telegraf\") |> last()", "10m", "10", "15");
 
-        JSONObject body = getRequestBody(platformServer);
+        JSONObject body = getRequestBodyAsJSON(platformServer);
 
         Assertions.assertThat(body.get("name")).isEqualTo("task name");
         Assertions.assertThat(body.get("organizationId")).isEqualTo("15");
@@ -220,7 +221,7 @@ class TaskClientTest extends AbstractPlatformClientTest {
 
         taskClient.updateTask(task);
 
-        JSONObject requestBody = getRequestBody(platformServer);
+        JSONObject requestBody = getRequestBodyAsJSON(platformServer);
         Assertions.assertThat(requestBody.getString("flux"))
                 .isEqualToIgnoringWhitespace("option task = {name: \"test task\", every: 1m} from(bucket:\\\"test\\\") |> range(start:-1h)");
         Assertions.assertThat(requestBody.getString("status")).isEqualTo("disabled");

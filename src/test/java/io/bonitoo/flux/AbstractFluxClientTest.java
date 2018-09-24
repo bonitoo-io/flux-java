@@ -90,6 +90,6 @@ public abstract class AbstractFluxClientTest extends AbstractTest {
 
     @Nullable
     String getObjectFromBody(@Nonnull final String key) {
-        return getRequestBody(fluxServer).get(key).toString();
+        return getRequestBodyAsJSON(fluxServer).get(key).toString();
     }
 }

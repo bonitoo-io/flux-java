@@ -89,7 +89,7 @@ public abstract class AbstractTest {
     }
 
     @Nonnull
-    protected JSONObject getRequestBody(@Nonnull final MockWebServer server) {
+    protected String getRequestBody(@Nonnull final MockWebServer server) {
 
         Assertions.assertThat(server).isNotNull();
 
@@ -100,7 +100,14 @@ public abstract class AbstractTest {
             Assertions.fail("Unexpected exception", e);
         }
         Assertions.assertThat(recordedRequest).isNotNull();
-        String body = recordedRequest.getBody().readUtf8();
+
+        return recordedRequest.getBody().readUtf8();
+    }
+
+    @Nonnull
+    protected JSONObject getRequestBodyAsJSON(@Nonnull final MockWebServer server) {
+
+        String body = getRequestBody(server);
 
         return new JSONObject(body);
     }

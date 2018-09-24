@@ -51,6 +51,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
@@ -87,6 +88,7 @@ public final class PlatformClientImpl extends AbstractRestClient implements Plat
                 .baseUrl(options.getUrl())
                 .client(okHttpClient)
                 .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
         platformService = retrofit.create(PlatformService.class);

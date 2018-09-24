@@ -39,12 +39,14 @@ import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.dto.User;
 import io.bonitoo.platform.dto.Users;
 
+import io.reactivex.Completable;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -223,4 +225,12 @@ interface PlatformService {
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<ResponseBody> findSourceHealth(@Nonnull @Path("id") final String sourceID);
+
+    @POST("/v2/write")
+    @Nonnull
+    Completable writePoints(@Query("org") final String org,
+                            @Query("bucket") final String bucket,
+                            @Query("precision") final String precision,
+                            @Header("Authorization") final String token,
+                            @Body final RequestBody points);
 }

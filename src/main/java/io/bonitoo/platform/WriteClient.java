@@ -43,8 +43,23 @@ public interface WriteClient {
      * @param bucket       specifies the destination bucket name for writes
      * @param organization specifies the destination organization name for writes
      * @param token        the token used to authorize write to bucket
+     * @param records      specifies the records in InfluxDB Line Protocol
+     */
+    void write(@Nonnull final String bucket,
+               @Nonnull final String organization,
+               @Nonnull final String token,
+               @Nonnull final List<String> records);
+
+    /**
+     * Write time-series data into InfluxDB.
+     *
+     * @param bucket       specifies the destination bucket name for writes
+     * @param organization specifies the destination organization name for writes
+     * @param token        the token used to authorize write to bucket
      * @param precision    specifies the precision for the unix timestamps within the body line-protocol.
-     *                     Available values : ns, us, u, ms, s. Default value : ns.
+     *                     Available values : {@link TimeUnit#NANOSECONDS}, {@link TimeUnit#MICROSECONDS},
+     *                     {@link TimeUnit#MILLISECONDS}, {@link TimeUnit#SECONDS}.
+     *                     Default value : {@link TimeUnit#NANOSECONDS}.
      * @param records      specifies the records in InfluxDB Line Protocol
      */
     void write(@Nonnull final String bucket,
@@ -59,8 +74,24 @@ public interface WriteClient {
      * @param bucket       specifies the destination bucket name for writes
      * @param organization specifies the destination organization name for writes
      * @param token        the token used to authorize write to bucket
+     * @param records      specifies the records in InfluxDB Line Protocol
+     */
+    void write(@Nonnull final String bucket,
+               @Nonnull final String organization,
+               @Nonnull final String token,
+               @Nullable final String records);
+
+
+    /**
+     * Write time-series data into InfluxDB.
+     *
+     * @param bucket       specifies the destination bucket name for writes
+     * @param organization specifies the destination organization name for writes
+     * @param token        the token used to authorize write to bucket
      * @param precision    specifies the precision for the unix timestamps within the body line-protocol.
-     *                     Available values : ns, us, u, ms, s. Default value : ns.
+     *                     Available values : {@link TimeUnit#NANOSECONDS}, {@link TimeUnit#MICROSECONDS},
+     *                     {@link TimeUnit#MILLISECONDS}, {@link TimeUnit#SECONDS}.
+     *                     Default value : {@link TimeUnit#NANOSECONDS}.
      * @param records      specifies the records in InfluxDB Line Protocol
      */
     void write(@Nonnull final String bucket,
@@ -91,4 +122,12 @@ public interface WriteClient {
      * @return true if gzip is enabled.
      */
     boolean isGzipEnabled();
+
+    /**
+     * Close threads for asynchronous batch writing.
+     *
+     * @return the {@link WriteClient} instance to be able to use it in a fluent manner.
+     */
+    @Nonnull
+    WriteClient close();
 }

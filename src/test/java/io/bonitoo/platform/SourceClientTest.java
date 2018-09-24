@@ -23,6 +23,7 @@
 package io.bonitoo.platform;
 
 import io.bonitoo.platform.dto.Health;
+import io.bonitoo.platform.impl.AbstractPlatformClientTest;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

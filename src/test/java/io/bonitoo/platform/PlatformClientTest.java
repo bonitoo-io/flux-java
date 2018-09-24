@@ -22,6 +22,7 @@
  */
 package io.bonitoo.platform;
 
+import io.bonitoo.platform.impl.AbstractPlatformClientTest;
 import io.bonitoo.platform.options.WriteOptions;
 
 import okhttp3.logging.HttpLoggingInterceptor;

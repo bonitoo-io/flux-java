@@ -25,6 +25,7 @@ package io.bonitoo.platform;
 import java.util.List;
 
 import io.bonitoo.platform.dto.Organization;
+import io.bonitoo.platform.impl.AbstractPlatformClientTest;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

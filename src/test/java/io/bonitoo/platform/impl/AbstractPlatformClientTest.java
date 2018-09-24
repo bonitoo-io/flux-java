@@ -20,26 +20,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.bonitoo.platform;
+package io.bonitoo.platform.impl;
 
 import java.io.IOException;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.AbstractTest;
+import io.bonitoo.GzipRequestInterceptor;
+import io.bonitoo.platform.PlatformClient;
+import io.bonitoo.platform.PlatformClientFactory;
+import io.bonitoo.platform.WriteClient;
 import io.bonitoo.platform.options.PlatformOptions;
+import io.bonitoo.platform.options.WriteOptions;
 
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 /**
  * @author Jakub Bednar (bednar@github) (05/09/2018 12:29)
  */
 public class AbstractPlatformClientTest extends AbstractTest {
 
-    MockWebServer platformServer;
-    PlatformClient platformClient;
+    protected MockWebServer platformServer;
+    protected PlatformClient platformClient;
 
     @BeforeEach
     protected void setUp() {
@@ -66,5 +75,24 @@ public class AbstractPlatformClientTest extends AbstractTest {
     @Nonnull
     protected MockResponse createResponse(final String data) {
         return createResponse(data, "application/json", false);
+    }
+
+    @Nonnull
+    protected WriteClient createWriteClient(@Nonnull final WriteOptions writeOptions,
+                                            @Nonnull final GzipRequestInterceptor interceptor,
+                                            @Nonnull final Scheduler batchScheduler,
+                                            @Nonnull final Scheduler jitterScheduler,
+                                            @Nonnull final Scheduler retryScheduler) {
+
+        Optional<Object> o = ReflectionUtils.readFieldValue(PlatformClientImpl.class, "platformService",
+                (PlatformClientImpl) platformClient);
+
+        return new WriteClientImpl(writeOptions,
+                (PlatformService) o.get(),
+                interceptor,
+                Schedulers.trampoline(),
+                batchScheduler,
+                jitterScheduler,
+                retryScheduler);
     }
 }

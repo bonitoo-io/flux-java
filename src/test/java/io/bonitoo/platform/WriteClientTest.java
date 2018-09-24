@@ -22,7 +22,19 @@
  */
 package io.bonitoo.platform;
 
+import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
+
+import io.bonitoo.GzipRequestInterceptor;
+import io.bonitoo.platform.impl.AbstractPlatformClientTest;
+import io.bonitoo.platform.options.WriteOptions;
+
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.schedulers.TestScheduler;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
@@ -35,16 +47,28 @@ import org.junit.runner.RunWith;
 class WriteClientTest extends AbstractPlatformClientTest {
 
     private WriteClient writeClient;
+    private TestScheduler batchScheduler;
+    private TestScheduler jitterScheduler;
 
     @BeforeEach
     protected void setUp() {
         super.setUp();
 
-        writeClient = platformClient.createWriteClient();
+        batchScheduler = new TestScheduler();
+        jitterScheduler = new TestScheduler();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (writeClient != null) {
+            writeClient.close();
+        }
     }
 
     @Test
     void gzip() {
+
+        writeClient = createWriteClient();
 
         Assertions.assertThat(writeClient.isGzipEnabled()).isFalse();
 
@@ -55,5 +79,229 @@ class WriteClientTest extends AbstractPlatformClientTest {
         // Disable GZIP
         writeClient.disableGzip();
         Assertions.assertThat(writeClient.isGzipEnabled()).isFalse();
+    }
+
+    @Test
+    void requestParameters() throws InterruptedException {
+
+        platformServer.enqueue(createResponse("{}"));
+
+        writeClient = createWriteClient(WriteOptions.DISABLED_BATCHING);
+
+        writeClient.write("b1", "org1", "token1",
+                "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1");
+
+        RecordedRequest request = platformServer.takeRequest(10L, TimeUnit.SECONDS);
+
+        // token
+        Assertions.assertThat(request.getHeader("Authorization")).isEqualTo("Token token1");
+        // organization
+        Assertions.assertThat(request.getRequestUrl().queryParameter("org")).isEqualTo("org1");
+        // bucket
+        Assertions.assertThat(request.getRequestUrl().queryParameter("bucket")).isEqualTo("b1");
+        // precision
+        Assertions.assertThat(request.getRequestUrl().queryParameter("precision")).isEqualTo("ns");
+    }
+
+    @Test
+    void emptyRequest() {
+
+        writeClient = createWriteClient(WriteOptions.DISABLED_BATCHING);
+        writeClient.write("b1", "org1", "token1", Lists.emptyList());
+        writeClient.write("b1", "org1", "token1", (String) null);
+        writeClient.write("b1", "org1", "token1", "");
+
+        Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(0);
+    }
+
+    @Test
+    void precision() throws InterruptedException {
+
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+
+        writeClient = createWriteClient(WriteOptions.DISABLED_BATCHING);
+
+        String record1 = "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1";
+        writeClient.write("b1", "org1", "token1", TimeUnit.NANOSECONDS, record1);
+
+        String record2 = "h2o_feet,location=coyote_creek level\\ description=\"feet 2\",water_level=2.0 2";
+        writeClient.write("b1", "org1", "token1", TimeUnit.MICROSECONDS, record2);
+
+        String record3 = "h2o_feet,location=coyote_creek level\\ description=\"feet 3\",water_level=3.0 3";
+        writeClient.write("b1", "org1", "token1", TimeUnit.MILLISECONDS, record3);
+
+        String record4 = "h2o_feet,location=coyote_creek level\\ description=\"feet 4\",water_level=4.0 4";
+        writeClient.write("b1", "org1", "token1", TimeUnit.SECONDS, record4);
+
+        RecordedRequest request1 = platformServer.takeRequest(10L, TimeUnit.SECONDS);
+        Assertions.assertThat(request1.getRequestUrl().queryParameter("precision")).isEqualTo("ns");
+
+        RecordedRequest request2 = platformServer.takeRequest(10L, TimeUnit.SECONDS);
+        Assertions.assertThat(request2.getRequestUrl().queryParameter("precision")).isEqualTo("us");
+
+        RecordedRequest request3 = platformServer.takeRequest(10L, TimeUnit.SECONDS);
+        Assertions.assertThat(request3.getRequestUrl().queryParameter("precision")).isEqualTo("ms");
+
+        RecordedRequest request4 = platformServer.takeRequest(10L, TimeUnit.SECONDS);
+        Assertions.assertThat(request4.getRequestUrl().queryParameter("precision")).isEqualTo("s");
+
+        Assertions.assertThatThrownBy(() ->
+                writeClient.write("b1", "org1", "token1", TimeUnit.MINUTES, record1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Precision must be one of:[NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
+
+        Assertions.assertThatThrownBy(() ->
+                writeClient.write("b1", "org1", "token1", TimeUnit.HOURS, record1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Precision must be one of:[NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
+
+        Assertions.assertThatThrownBy(() ->
+                writeClient.write("b1", "org1", "token1", TimeUnit.DAYS, record1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Precision must be one of:[NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
+    }
+
+    @Test
+    void batching() {
+
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+
+        writeClient = createWriteClient(WriteOptions.builder().batchSize(2).build());
+
+        String record1 = "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1";
+        String record2 = "h2o_feet,location=coyote_creek level\\ description=\"feet 2\",water_level=2.0 2";
+        String record3 = "h2o_feet,location=coyote_creek level\\ description=\"feet 3\",water_level=3.0 3";
+        String record4 = "h2o_feet,location=coyote_creek level\\ description=\"feet 4\",water_level=4.0 4";
+
+        writeClient.write("b1", "org1", "token1", record1);
+        writeClient.write("b1", "org1", "token1", record2);
+        writeClient.write("b1", "org1", "token1", record3);
+        writeClient.write("b1", "org1", "token1", record4);
+
+        String body1 = getRequestBody(platformServer);
+        Assertions.assertThat(body1).isEqualTo(record1 + "\n" + record2);
+
+        String body2 = getRequestBody(platformServer);
+        Assertions.assertThat(body2).isEqualTo(record3 + "\n" + record4);
+    }
+
+    @Test
+    void batchingDisabled() {
+
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+
+        writeClient = createWriteClient(WriteOptions.DISABLED_BATCHING);
+
+        String record1 = "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1";
+        String record2 = "h2o_feet,location=coyote_creek level\\ description=\"feet 2\",water_level=2.0 2";
+        String record3 = "h2o_feet,location=coyote_creek level\\ description=\"feet 3\",water_level=3.0 3";
+        String record4 = "h2o_feet,location=coyote_creek level\\ description=\"feet 4\",water_level=4.0 4";
+
+        writeClient.write("b1", "org1", "token1", record1);
+        writeClient.write("b1", "org1", "token1", record2);
+        writeClient.write("b1", "org1", "token1", record3);
+        writeClient.write("b1", "org1", "token1", record4);
+
+        String body1 = getRequestBody(platformServer);
+        Assertions.assertThat(body1).isEqualTo(record1);
+
+        String body2 = getRequestBody(platformServer);
+        Assertions.assertThat(body2).isEqualTo(record2);
+
+        String body3 = getRequestBody(platformServer);
+        Assertions.assertThat(body3).isEqualTo(record3);
+
+        String body4 = getRequestBody(platformServer);
+        Assertions.assertThat(body4).isEqualTo(record4);
+    }
+
+    @Test
+    void flushByDuration() {
+
+        platformServer.enqueue(createResponse("{}"));
+
+        WriteOptions writeOptions = WriteOptions.disabled()
+                .batchSize(10)
+                .flushInterval(1_000_000)
+                .writeScheduler(Schedulers.trampoline())
+                .build();
+
+        writeClient = createWriteClient(writeOptions);
+
+        writeClient.write("b1", "org1", "token1",
+                "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1");
+
+        Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(0);
+
+        batchScheduler.advanceTimeBy(1_000, TimeUnit.SECONDS);
+
+        Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(1);
+    }
+
+    @Test
+    void jitterInterval() {
+
+        platformServer.enqueue(createResponse("{}"));
+
+        // after 5 batchSize or 10 seconds + 5 seconds jitter interval
+        WriteOptions writeOptions = WriteOptions.disabled()
+                .batchSize(5)
+                .flushInterval(10_000)
+                .jitterInterval(5_000)
+                .writeScheduler(Schedulers.trampoline())
+                .build();
+
+        writeClient = createWriteClient(writeOptions);
+
+        writeClient.write("b1", "org1", "token1",
+                "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1");
+
+        // move time to feature by 10 seconds - flush interval elapsed
+        batchScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+
+        // without call remote api
+        Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(0);
+
+        // move time to feature by 5 seconds - jitter interval elapsed
+        jitterScheduler.advanceTimeBy(6, TimeUnit.SECONDS);
+
+        // was call remote API
+        Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(1);
+    }
+
+    @Test
+    void flushBeforeClose() throws InterruptedException {
+
+        platformServer.enqueue(createResponse("{}"));
+
+        writeClient = createWriteClient();
+
+        writeClient.write("b1", "org1", "token1",
+                "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1");
+
+        Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(0);
+
+        writeClient.close();
+
+        Thread.sleep(1_000);
+
+        Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(1);
+    }
+
+    @Nonnull
+    private WriteClient createWriteClient() {
+        return createWriteClient(WriteOptions.DEFAULTS);
+    }
+
+    @Nonnull
+    private WriteClient createWriteClient(WriteOptions writeClient) {
+        return createWriteClient(writeClient, new GzipRequestInterceptor(), batchScheduler, jitterScheduler, new TestScheduler());
     }
 }
