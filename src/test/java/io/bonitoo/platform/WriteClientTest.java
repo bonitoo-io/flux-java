@@ -152,17 +152,17 @@ class WriteClientTest extends AbstractPlatformClientTest {
         Assertions.assertThatThrownBy(() ->
                 writeClient.write("b1", "org1", "token1", TimeUnit.MINUTES, record1))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Precision must be one of:[NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
+                .hasMessage("Precision must be one of: [NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
 
         Assertions.assertThatThrownBy(() ->
                 writeClient.write("b1", "org1", "token1", TimeUnit.HOURS, record1))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Precision must be one of:[NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
+                .hasMessage("Precision must be one of: [NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
 
         Assertions.assertThatThrownBy(() ->
                 writeClient.write("b1", "org1", "token1", TimeUnit.DAYS, record1))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Precision must be one of:[NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
+                .hasMessage("Precision must be one of: [NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS]");
     }
 
     @Test

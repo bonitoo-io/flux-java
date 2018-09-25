@@ -33,7 +33,6 @@ import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
 import io.bonitoo.GzipRequestInterceptor;
-import io.bonitoo.InfluxException;
 import io.bonitoo.Preconditions;
 import io.bonitoo.flux.events.UnhandledErrorEvent;
 import io.bonitoo.platform.WriteClient;
@@ -50,7 +49,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.RequestBody;
-import org.reactivestreams.Publisher;
 import retrofit2.HttpException;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -133,13 +131,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                                 return String.join("\n", lineProtocol, writeData.lineProtocol);
                             });
 
-                    return Single.just(grouped.getKey())
-                            .zipWith(reduce, (writeKey, lineProtocol) -> {
-                                WriteData writeData = new WriteData();
-                                writeData.writeKey = writeKey;
-                                writeData.lineProtocol = lineProtocol;
-                                return writeData;
-                            });
+                    return Single.just(grouped.getKey()).zipWith(reduce, WriteData::new);
                 })
                 //
                 // Jitter interval
@@ -158,9 +150,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
 
                     publish(new UnhandledErrorEvent(throwable));
                 });
-
     }
-
 
     @Override
     public void write(@Nonnull final String bucket,
@@ -207,16 +197,15 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         Objects.requireNonNull(precision, "TimeUnit.precision is required");
 
         if (!ALLOWED_PRECISION.contains(precision)) {
-            throw new IllegalArgumentException("Precision must be one of:" + ALLOWED_PRECISION);
+            throw new IllegalArgumentException("Precision must be one of: " + ALLOWED_PRECISION);
         }
 
         if (record == null || record.isEmpty()) {
             return;
         }
 
-        WriteData writeData = new WriteData();
-        writeData.writeKey = new WriteKey(bucket, organization, token, precision);
-        writeData.lineProtocol = record;
+        WriteKey writeKey = new WriteKey(bucket, organization, token, precision);
+        WriteData writeData = new WriteData(writeKey, record);
         processor.onNext(writeData);
     }
 
@@ -292,58 +281,6 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         LOG.info("Event: " + event);
     }
 
-    /**
-     * The retry handler that tries to retry a write if it failed previously and
-     * the reason of the failure is not permanent.
-     *
-     * @param retryScheduler for scheduling retry write
-     * @param writeOptions   options for write to Platform
-     * @return the retry handler
-     */
-    @Nonnull
-    private Function<Flowable<Throwable>, Publisher<?>> retryHandler(@Nonnull final Scheduler retryScheduler,
-                                                                     @Nonnull final WriteOptions writeOptions) {
-
-        Objects.requireNonNull(writeOptions, "WriteOptions are required");
-        Objects.requireNonNull(retryScheduler, "RetryScheduler is required");
-
-        return errors -> errors.flatMap(throwable -> {
-
-            if (throwable instanceof HttpException) {
-
-                InfluxException influxDBException = InfluxException.fromCause(throwable);
-
-                //
-                // Partial Write => skip retry
-                //
-                if (influxDBException.getMessage().startsWith("partial write")) {
-                    publish("WritePartialEvent");
-
-                    return Flowable.error(throwable);
-                }
-
-                publish("WriteErrorEvent");
-
-                //
-                // Retry request
-                //
-                //TODO retry
-                if (false) {
-
-                    int retryInterval = writeOptions.getRetryInterval() + jitterDelay();
-
-                    return Flowable.just("notify").delay(retryInterval, TimeUnit.MILLISECONDS, retryScheduler);
-                }
-            }
-
-            //
-            // This type of throwable is not able to retry
-            //
-            return Flowable.error(throwable);
-        });
-    }
-
-
     @Nonnull
     private String toPrecisionParameter(@Nonnull final TimeUnit precision) {
 
@@ -357,16 +294,23 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             case SECONDS:
                 return "s";
             default:
-                throw new IllegalArgumentException("Precision must be one of:" + ALLOWED_PRECISION);
+                throw new IllegalArgumentException("Precision must be one of: " + ALLOWED_PRECISION);
         }
     }
 
-    private class WriteData {
+    private final class WriteData {
+
         private WriteKey writeKey;
         private String lineProtocol;
+
+        private WriteData(@Nonnull final WriteKey writeKey, @Nonnull final String lineProtocol) {
+            this.writeKey = writeKey;
+            this.lineProtocol = lineProtocol;
+        }
     }
 
-    private class WriteKey {
+    private final class WriteKey {
+
         private String bucket;
         private String organization;
         private String token;
@@ -408,7 +352,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
 
         private final Scheduler retryScheduler;
 
-        ToWritePointsCompletable(@Nonnull final Scheduler retryScheduler) {
+        private ToWritePointsCompletable(@Nonnull final Scheduler retryScheduler) {
             this.retryScheduler = retryScheduler;
         }
 
@@ -428,11 +372,62 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             String token = "Token " + writeData.writeKey.token;
 
             return platformService
-                    .writePoints(organization, bucket, precision, token, requestBody)
+                    .writePoints(organization, bucket, precision, token, requestBody);
                     //
                     // Retry strategy
                     //
-                    .retryWhen(WriteClientImpl.this.retryHandler(retryScheduler, writeOptions));
+//                    .retryWhen(WriteClientImpl.this.retryHandler(retryScheduler, writeOptions));
         }
     }
+
+//    TODO implement retry?
+//    /**
+//     * The retry handler that tries to retry a write if it failed previously and
+//     * the reason of the failure is not permanent.
+//     *
+//     * @param retryScheduler for scheduling retry write
+//     * @param writeOptions   options for write to Platform
+//     * @return the retry handler
+//     */
+//    @Nonnull
+//    private Function<Flowable<Throwable>, Publisher<?>> retryHandler(@Nonnull final Scheduler retryScheduler,
+//                                                                     @Nonnull final WriteOptions writeOptions) {
+//
+//        Objects.requireNonNull(writeOptions, "WriteOptions are required");
+//        Objects.requireNonNull(retryScheduler, "RetryScheduler is required");
+//
+//        return errors -> errors.flatMap(throwable -> {
+//
+//            if (throwable instanceof HttpException) {
+//
+//                InfluxException influxException = InfluxException.fromCause(throwable);
+//
+//                //
+//                // Partial Write => skip retry
+//                //
+//                if (influxException.getMessage().startsWith("partial write")) {
+//                    publish("WritePartialEvent");
+//
+//                    return Flowable.error(throwable);
+//                }
+//
+//                publish("WriteErrorEvent");
+//
+//                //
+//                // Retry request
+//                //
+//                if (influxException.isRetryWorth()) {
+//
+//                    int retryInterval = writeOptions.getRetryInterval() + jitterDelay();
+//
+//                    return Flowable.just("notify").delay(retryInterval, TimeUnit.MILLISECONDS, retryScheduler);
+//                }
+//            }
+//
+//            //
+//            // This type of throwable is not able to retry
+//            //
+//            return Flowable.error(throwable);
+//        });
+//    }
 }
