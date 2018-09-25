@@ -28,7 +28,6 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -44,6 +43,9 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableTransformer;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.flowables.GroupedFlowable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
@@ -82,13 +84,13 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                 Schedulers.trampoline());
     }
 
-    protected WriteClientImpl(@Nonnull final WriteOptions writeOptions,
-                              @Nonnull final PlatformService platformService,
-                              @Nonnull final GzipRequestInterceptor interceptor,
-                              @Nonnull final Scheduler processorScheduler,
-                              @Nonnull final Scheduler batchScheduler,
-                              @Nonnull final Scheduler jitterScheduler,
-                              @Nonnull final Scheduler retryScheduler) {
+    WriteClientImpl(@Nonnull final WriteOptions writeOptions,
+                    @Nonnull final PlatformService platformService,
+                    @Nonnull final GzipRequestInterceptor interceptor,
+                    @Nonnull final Scheduler processorScheduler,
+                    @Nonnull final Scheduler batchScheduler,
+                    @Nonnull final Scheduler jitterScheduler,
+                    @Nonnull final Scheduler retryScheduler) {
 
         this.platformService = platformService;
         this.interceptor = interceptor;
@@ -115,10 +117,39 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                 //
                 // Jitter interval
                 //
-                .compose(jitter(jitterScheduler))
                 .doOnError(throwable -> publish(new UnhandledErrorEvent(throwable)))
+                //
+                // Group by key - same bucket, same org
+                //
+                .concatMap(it -> it.groupBy(writeData -> writeData.writeKey))
+                //
+                // Create Write Point = bucket, org, ... + data
+                //
+                .concatMapSingle((Function<GroupedFlowable<WriteKey, WriteData>, SingleSource<WriteData>>) grouped -> {
+
+                    //
+                    // Create Line Protocol
+                    //
+                    Single<String> reduce = grouped
+                            .reduce("", (lineProtocol, writeData) -> {
+                                if (lineProtocol.isEmpty()) {
+                                    return writeData.lineProtocol;
+                                }
+                                return String.join("\n", lineProtocol, writeData.lineProtocol);
+                            });
+
+                    return Single.just(grouped.getKey())
+                            .zipWith(reduce, (writeKey, lineProtocol) -> {
+                                WriteData writeData = new WriteData();
+                                writeData.writeKey = writeKey;
+                                writeData.lineProtocol = lineProtocol;
+                                return writeData;
+                            });
+                })
+                .compose(jitter(jitterScheduler))
                 .subscribe(new WritePointsConsumer(retryScheduler));
     }
+
 
     @Override
     public void write(@Nonnull final String bucket,
@@ -139,16 +170,16 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
 
         Objects.requireNonNull(records, "records are required");
 
-        write(bucket, organization, token, precision, String.join("\n", records));
+        records.forEach(record -> write(bucket, organization, token, precision, record));
     }
 
     @Override
     public void write(@Nonnull final String bucket,
                       @Nonnull final String organization,
                       @Nonnull final String token,
-                      @Nullable final String records) {
+                      @Nullable final String record) {
 
-        write(bucket, organization, token, WRITE_PRECISION, records);
+        write(bucket, organization, token, WRITE_PRECISION, record);
     }
 
     @Override
@@ -156,7 +187,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                       @Nonnull final String organization,
                       @Nonnull final String token,
                       @Nonnull final TimeUnit precision,
-                      @Nullable final String records) {
+                      @Nullable final String record) {
 
 
         Preconditions.checkNonEmptyString(bucket, "bucket");
@@ -168,13 +199,13 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             throw new IllegalArgumentException("Precision must be one of:" + ALLOWED_PRECISION);
         }
 
-        if (records == null || records.isEmpty()) {
+        if (record == null || record.isEmpty()) {
             return;
         }
 
         WriteData writeData = new WriteData();
         writeData.writeKey = new WriteKey(bucket, organization, token, precision);
-        writeData.lineProtocol = records;
+        writeData.lineProtocol = record;
         processor.onNext(writeData);
     }
 
@@ -209,7 +240,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
     }
 
     @Nonnull
-    private FlowableTransformer<Flowable<WriteData>, Flowable<WriteData>> jitter(
+    private FlowableTransformer<WriteData, WriteData> jitter(
             @Nonnull final Scheduler scheduler) {
 
         Objects.requireNonNull(scheduler, "Jitter scheduler is required");
@@ -226,7 +257,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             //
             // Add jitter => dynamic delay
             //
-            return source.delay((Function<Flowable<WriteData>, Flowable<Long>>) pointFlowable -> {
+            return source.delay((Function<WriteData, Flowable<Long>>) pointFlowable -> {
 
                 int delay = jitterDelay();
 
@@ -250,7 +281,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         LOG.info("Event: " + event);
     }
 
-    private final class WritePointsConsumer implements Consumer<Flowable<WriteData>> {
+    private final class WritePointsConsumer implements Consumer<WriteData> {
 
         private final Scheduler retryScheduler;
 
@@ -262,33 +293,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         }
 
         @Override
-        public void accept(final Flowable<WriteData> flowablePoints) {
-
-            flowablePoints
-                    //
-                    // Group by key - same bucket, same org
-                    //
-                    .groupBy(writeData -> writeData.writeKey)
-                    .subscribeOn(writeOptions.getWriteScheduler())
-                    .subscribe(group -> {
-
-                        WriteKey writeKey = group.getKey();
-                        group
-                                .toList()
-                                .filter(dataPoints -> !dataPoints.isEmpty())
-                                .subscribe(
-                                        dataPoints -> writeDataPoints(writeKey, dataPoints),
-                                        throwable -> publish(new UnhandledErrorEvent(throwable)));
-                    }, throwable -> publish(new UnhandledErrorEvent(throwable)));
-
-        }
-
-        private void writeDataPoints(@Nonnull final WriteKey writeKey,
-                                     @Nonnull final List<WriteData> dataPoints) {
-
-            Objects.requireNonNull(writeOptions, "WriteOptions are required");
-            Objects.requireNonNull(dataPoints, "DatePoints are required");
-
+        public void accept(final WriteData writeData) {
 
             //
             // Fail action
@@ -307,16 +312,11 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             // Data => InfluxDB Line Protocol
             //
 
-            String body = dataPoints.stream()
-                    .map(data -> data.lineProtocol)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining("\n"));
-
-            if (body.isEmpty()) {
+            if (writeData.lineProtocol.isEmpty()) {
 
                 String message = "The points {0} are parsed to empty request body => skip call InfluxDB server.";
 
-                LOG.log(Level.FINE, message, dataPoints);
+                LOG.log(Level.FINE, message, writeData);
 
                 return;
             }
@@ -324,13 +324,17 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             //
             // InfluxDB Line Protocol => to Request Body
             //
-            RequestBody requestBody = createBody(body);
+            RequestBody requestBody = createBody(writeData.lineProtocol);
 
             //
             // Parameters
-            Completable completable = platformService.writePoints(
-                    writeKey.organization, writeKey.bucket, toPrecisionParameter(writeKey.precision),
-                    "Token " + writeKey.token, requestBody)
+            String organization = writeData.writeKey.organization;
+            String bucket = writeData.writeKey.bucket;
+            String precision = toPrecisionParameter(writeData.writeKey.precision);
+            String token = "Token " + writeData.writeKey.token;
+
+            Completable completable = platformService
+                    .writePoints(organization, bucket, precision, token, requestBody)
                     //
                     // Retry strategy
                     //
@@ -338,6 +342,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
 
 
             completable.subscribe(() -> publish("Success"), fail);
+
         }
     }
 

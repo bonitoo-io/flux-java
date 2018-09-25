@@ -39,6 +39,7 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.platform.commons.util.ReflectionUtils;
 
@@ -84,11 +85,15 @@ public class AbstractPlatformClientTest extends AbstractTest {
                                             @Nonnull final Scheduler jitterScheduler,
                                             @Nonnull final Scheduler retryScheduler) {
 
-        Optional<Object> o = ReflectionUtils.readFieldValue(PlatformClientImpl.class, "platformService",
+        Optional<Object> platformService = ReflectionUtils.readFieldValue(PlatformClientImpl.class, "platformService",
                 (PlatformClientImpl) platformClient);
 
+        if (!platformService.isPresent()) {
+            Assertions.fail();
+        }
+
         return new WriteClientImpl(writeOptions,
-                (PlatformService) o.get(),
+                (PlatformService) platformService.get(),
                 interceptor,
                 Schedulers.trampoline(),
                 batchScheduler,

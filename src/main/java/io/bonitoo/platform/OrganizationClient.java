@@ -85,5 +85,5 @@ public interface OrganizationClient {
     @Nonnull
     List<Organization> findOrganizations();
 
-    // TODO getUsers, addUser, deleteUser
+    // TODO getMembers, addMember, deleteMember
 }

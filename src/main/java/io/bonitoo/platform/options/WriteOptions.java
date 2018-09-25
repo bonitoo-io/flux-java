@@ -177,7 +177,7 @@ public final class WriteOptions {
      */
     @Nonnull
     public static WriteOptions.Builder disabled() {
-        return WriteOptions.builder().batchSize(1).writeScheduler(Schedulers.io());
+        return WriteOptions.builder().batchSize(1).writeScheduler(Schedulers.single());
     }
 
     /**

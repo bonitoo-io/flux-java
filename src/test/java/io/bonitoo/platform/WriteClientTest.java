@@ -22,6 +22,7 @@
  */
 package io.bonitoo.platform;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
@@ -208,6 +209,37 @@ class WriteClientTest extends AbstractPlatformClientTest {
         writeClient.write("b1", "org1", "token1", record2);
         writeClient.write("b1", "org1", "token1", record3);
         writeClient.write("b1", "org1", "token1", record4);
+
+        String body1 = getRequestBody(platformServer);
+        Assertions.assertThat(body1).isEqualTo(record1);
+
+        String body2 = getRequestBody(platformServer);
+        Assertions.assertThat(body2).isEqualTo(record2);
+
+        String body3 = getRequestBody(platformServer);
+        Assertions.assertThat(body3).isEqualTo(record3);
+
+        String body4 = getRequestBody(platformServer);
+        Assertions.assertThat(body4).isEqualTo(record4);
+    }
+
+    @Test
+    void listAsMoreBatchUnits() {
+
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+        platformServer.enqueue(createResponse("{}"));
+
+        writeClient = createWriteClient(WriteOptions.DISABLED_BATCHING);
+
+        String record1 = "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1";
+        String record2 = "h2o_feet,location=coyote_creek level\\ description=\"feet 2\",water_level=2.0 2";
+        String record3 = "h2o_feet,location=coyote_creek level\\ description=\"feet 3\",water_level=3.0 3";
+        String record4 = "h2o_feet,location=coyote_creek level\\ description=\"feet 4\",water_level=4.0 4";
+
+        List<String> records = Lists.list(record1, record2, record3, record4);
+        writeClient.write("b1", "org1", "token1", records);
 
         String body1 = getRequestBody(platformServer);
         Assertions.assertThat(body1).isEqualTo(record1);

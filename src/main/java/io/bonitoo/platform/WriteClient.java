@@ -74,12 +74,13 @@ public interface WriteClient {
      * @param bucket       specifies the destination bucket name for writes
      * @param organization specifies the destination organization name for writes
      * @param token        the token used to authorize write to bucket
-     * @param records      specifies the records in InfluxDB Line Protocol
+     * @param record       specifies the record in InfluxDB Line Protocol.
+     *                     The {@code record} is considered as one batch unit.
      */
     void write(@Nonnull final String bucket,
                @Nonnull final String organization,
                @Nonnull final String token,
-               @Nullable final String records);
+               @Nullable final String record);
 
 
     /**
@@ -92,13 +93,14 @@ public interface WriteClient {
      *                     Available values : {@link TimeUnit#NANOSECONDS}, {@link TimeUnit#MICROSECONDS},
      *                     {@link TimeUnit#MILLISECONDS}, {@link TimeUnit#SECONDS}.
      *                     Default value : {@link TimeUnit#NANOSECONDS}.
-     * @param records      specifies the records in InfluxDB Line Protocol
+     * @param record       specifies the record in InfluxDB Line Protocol.
+     *                     The {@code record} is considered as one batch unit.
      */
     void write(@Nonnull final String bucket,
                @Nonnull final String organization,
                @Nonnull final String token,
                @Nonnull final TimeUnit precision,
-               @Nullable final String records);
+               @Nullable final String record);
 
     /**
      * Enable Gzip compress for http request body.
