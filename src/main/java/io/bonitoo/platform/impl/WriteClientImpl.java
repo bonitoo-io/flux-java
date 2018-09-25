@@ -348,7 +348,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         }
     }
 
-    private class ToWritePointsCompletable implements Function<WriteData, CompletableSource> {
+    private final class ToWritePointsCompletable implements Function<WriteData, CompletableSource> {
 
         private final Scheduler retryScheduler;
 
