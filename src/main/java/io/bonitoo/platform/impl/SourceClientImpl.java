@@ -30,8 +30,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
-import io.bonitoo.InfluxException;
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.InfluxException;
+import io.bonitoo.core.Preconditions;
 import io.bonitoo.platform.SourceClient;
 import io.bonitoo.platform.dto.Bucket;
 import io.bonitoo.platform.dto.Health;

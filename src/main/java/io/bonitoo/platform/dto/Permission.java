@@ -25,7 +25,7 @@ package io.bonitoo.platform.dto;
 import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.Preconditions;
 
 /**
  * Permission defines an action and a resource.

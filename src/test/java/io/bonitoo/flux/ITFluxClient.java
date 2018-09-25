@@ -32,14 +32,14 @@ import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.InfluxException;
+import io.bonitoo.core.InfluxException;
 import io.bonitoo.flux.dto.FluxColumn;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
-import io.bonitoo.flux.operators.restriction.Restrictions;
-import io.bonitoo.flux.options.FluxConnectionOptions;
-import io.bonitoo.flux.options.FluxDialect;
-import io.bonitoo.flux.options.FluxOptions;
+import io.bonitoo.flux.operator.restriction.Restrictions;
+import io.bonitoo.flux.option.FluxConnectionOptions;
+import io.bonitoo.flux.option.FluxDialect;
+import io.bonitoo.flux.option.FluxOptions;
 
 import okhttp3.ResponseBody;
 import okio.BufferedSource;

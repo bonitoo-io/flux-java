@@ -29,6 +29,9 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.core.InfluxException;
+import io.bonitoo.core.Preconditions;
+
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import org.json.JSONObject;

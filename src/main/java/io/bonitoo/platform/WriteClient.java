@@ -27,6 +27,10 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.bonitoo.core.event.AbstractInfluxEvent;
+
+import io.reactivex.Observable;
+
 /**
  * Write time-series data into InfluxDB.
  * <p>
@@ -40,8 +44,8 @@ public interface WriteClient {
     /**
      * Write time-series data into InfluxDB.
      *
-     * @param bucket       specifies the destination bucket name for writes
-     * @param organization specifies the destination organization name for writes
+     * @param bucket       specifies the destination bucket ID for writes
+     * @param organization specifies the destination organization ID for writes
      * @param token        the token used to authorize write to bucket
      * @param records      specifies the records in InfluxDB Line Protocol
      */
@@ -53,8 +57,8 @@ public interface WriteClient {
     /**
      * Write time-series data into InfluxDB.
      *
-     * @param bucket       specifies the destination bucket name for writes
-     * @param organization specifies the destination organization name for writes
+     * @param bucket       specifies the destination bucket ID for writes
+     * @param organization specifies the destination organization ID for writes
      * @param token        the token used to authorize write to bucket
      * @param precision    specifies the precision for the unix timestamps within the body line-protocol.
      *                     Available values : {@link TimeUnit#NANOSECONDS}, {@link TimeUnit#MICROSECONDS},
@@ -71,8 +75,8 @@ public interface WriteClient {
     /**
      * Write time-series data into InfluxDB.
      *
-     * @param bucket       specifies the destination bucket name for writes
-     * @param organization specifies the destination organization name for writes
+     * @param bucket       specifies the destination bucket ID for writes
+     * @param organization specifies the destination organization ID for writes
      * @param token        the token used to authorize write to bucket
      * @param record       specifies the record in InfluxDB Line Protocol.
      *                     The {@code record} is considered as one batch unit.
@@ -86,8 +90,8 @@ public interface WriteClient {
     /**
      * Write time-series data into InfluxDB.
      *
-     * @param bucket       specifies the destination bucket name for writes
-     * @param organization specifies the destination organization name for writes
+     * @param bucket       specifies the destination bucket ID for writes
+     * @param organization specifies the destination organization ID for writes
      * @param token        the token used to authorize write to bucket
      * @param precision    specifies the precision for the unix timestamps within the body line-protocol.
      *                     Available values : {@link TimeUnit#NANOSECONDS}, {@link TimeUnit#MICROSECONDS},
@@ -101,6 +105,19 @@ public interface WriteClient {
                @Nonnull final String token,
                @Nonnull final TimeUnit precision,
                @Nullable final String record);
+
+    /**
+     * Listen the events produced by {@link WriteClient}.
+     * <p>
+     * The {@link WriteClient} produces: {@link io.bonitoo.platform.event.WriteSuccessEvent},
+     * {@link io.bonitoo.platform.event.BackpressureEvent} and {@link io.bonitoo.core.event.UnhandledErrorEvent}.
+     *
+     * @param eventType type of event to listen
+     * @param <T>       type of event to listen
+     * @return lister for {@code eventType} events
+     */
+    @Nonnull
+    <T extends AbstractInfluxEvent> Observable<T> listenEvents(@Nonnull final Class<T> eventType);
 
     /**
      * Enable Gzip compress for http request body.

@@ -26,10 +26,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.bonitoo.flux.options.query.AbstractOption;
-import io.bonitoo.flux.options.query.LocationOption;
-import io.bonitoo.flux.options.query.NowOption;
-import io.bonitoo.flux.options.query.TaskOption;
+import io.bonitoo.flux.option.query.AbstractOption;
+import io.bonitoo.flux.option.query.LocationOption;
+import io.bonitoo.flux.option.query.NowOption;
+import io.bonitoo.flux.option.query.TaskOption;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

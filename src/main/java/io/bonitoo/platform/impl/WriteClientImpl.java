@@ -32,15 +32,20 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
-import io.bonitoo.GzipRequestInterceptor;
-import io.bonitoo.Preconditions;
-import io.bonitoo.flux.events.UnhandledErrorEvent;
+import io.bonitoo.core.GzipRequestInterceptor;
+import io.bonitoo.core.InfluxException;
+import io.bonitoo.core.Preconditions;
+import io.bonitoo.core.event.AbstractInfluxEvent;
+import io.bonitoo.core.event.UnhandledErrorEvent;
 import io.bonitoo.platform.WriteClient;
-import io.bonitoo.platform.options.WriteOptions;
+import io.bonitoo.platform.event.BackpressureEvent;
+import io.bonitoo.platform.event.WriteSuccessEvent;
+import io.bonitoo.platform.option.WriteOptions;
 
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableTransformer;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -48,8 +53,8 @@ import io.reactivex.flowables.GroupedFlowable;
 import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import okhttp3.RequestBody;
-import retrofit2.HttpException;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
@@ -68,7 +73,8 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
     private final GzipRequestInterceptor interceptor;
     private final WriteOptions writeOptions;
 
-    private final PublishProcessor<WriteData> processor;
+    private final PublishProcessor<BatchWrite> processor;
+    private final PublishSubject<AbstractInfluxEvent> eventPublisher;
 
     WriteClientImpl(@Nonnull final WriteOptions writeOptions,
                     @Nonnull final PlatformService platformService,
@@ -93,6 +99,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         this.interceptor = interceptor;
         this.writeOptions = writeOptions;
 
+        this.eventPublisher = PublishSubject.create();
         this.processor = PublishProcessor.create();
         this.processor
                 //
@@ -100,7 +107,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                 //
                 .onBackpressureBuffer(
                         writeOptions.getBufferLimit(),
-                        () -> publish("BackpressureEvent"),
+                        () -> publish(new BackpressureEvent()),
                         writeOptions.getBackpressureStrategy())
                 .observeOn(processorScheduler)
                 //
@@ -114,25 +121,26 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                 //
                 // Group by key - same bucket, same org
                 //
-                .concatMap(it -> it.groupBy(writeData -> writeData.writeKey))
+                .concatMap(it -> it.groupBy(batchWrite -> batchWrite.batchWriteOptions))
                 //
                 // Create Write Point = bucket, org, ... + data
                 //
-                .concatMapSingle((Function<GroupedFlowable<WriteKey, WriteData>, SingleSource<WriteData>>) grouped -> {
+                .concatMapSingle((Function<GroupedFlowable<BatchWriteOptions, BatchWrite>, SingleSource<BatchWrite>>)
+                        grouped -> {
 
-                    //
-                    // Create Line Protocol
-                    //
-                    Single<String> reduce = grouped
-                            .reduce("", (lineProtocol, writeData) -> {
-                                if (lineProtocol.isEmpty()) {
-                                    return writeData.lineProtocol;
-                                }
-                                return String.join("\n", lineProtocol, writeData.lineProtocol);
-                            });
+                            //
+                            // Create Line Protocol
+                            //
+                            Single<String> reduce = grouped
+                                    .reduce("", (lineProtocol, batchWrite) -> {
+                                        if (lineProtocol.isEmpty()) {
+                                            return batchWrite.lineProtocol;
+                                        }
+                                        return String.join("\n", lineProtocol, batchWrite.lineProtocol);
+                                    });
 
-                    return Single.just(grouped.getKey()).zipWith(reduce, WriteData::new);
-                })
+                            return Single.just(grouped.getKey()).zipWith(reduce, BatchWrite::new);
+                        })
                 //
                 // Jitter interval
                 //
@@ -141,15 +149,11 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                 // To WritePoints "request creator"
                 //
                 .concatMapCompletable(new ToWritePointsCompletable(retryScheduler))
-                .subscribe(() -> publish("Success"), throwable -> {
-
-                    // HttpException is handled in retryHandler
-                    if (throwable instanceof HttpException) {
-                        return;
-                    }
-
-                    publish(new UnhandledErrorEvent(throwable));
-                });
+                //
+                // Publish Error event
+                //
+                .doOnError(throwable -> publish(new UnhandledErrorEvent(InfluxException.fromCause(throwable))))
+                .subscribe();
     }
 
     @Override
@@ -204,9 +208,18 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             return;
         }
 
-        WriteKey writeKey = new WriteKey(bucket, organization, token, precision);
-        WriteData writeData = new WriteData(writeKey, record);
-        processor.onNext(writeData);
+        BatchWriteOptions batchWriteOptions = new BatchWriteOptions(bucket, organization, token, precision);
+        BatchWrite batchWrite = new BatchWrite(batchWriteOptions, record);
+        processor.onNext(batchWrite);
+    }
+
+    @Nonnull
+    @Override
+    public <T extends AbstractInfluxEvent> Observable<T> listenEvents(@Nonnull final Class<T> eventType) {
+
+        Objects.requireNonNull(eventType, "EventType is required");
+
+        return eventPublisher.ofType(eventType);
     }
 
     @Nonnull
@@ -232,16 +245,16 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
     @Override
     public WriteClient close() {
 
-        LOG.log(Level.INFO, "Flushing any cached metrics before shutdown.");
+        LOG.log(Level.INFO, "Flushing any cached BatchWrites before shutdown.");
 
         processor.onComplete();
+        eventPublisher.onComplete();
 
         return this;
     }
 
     @Nonnull
-    private FlowableTransformer<WriteData, WriteData> jitter(
-            @Nonnull final Scheduler scheduler) {
+    private FlowableTransformer<BatchWrite, BatchWrite> jitter(@Nonnull final Scheduler scheduler) {
 
         Objects.requireNonNull(scheduler, "Jitter scheduler is required");
 
@@ -257,7 +270,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             //
             // Add jitter => dynamic delay
             //
-            return source.delay((Function<WriteData, Flowable<Long>>) pointFlowable -> {
+            return source.delay((Function<BatchWrite, Flowable<Long>>) pointFlowable -> {
 
                 int delay = jitterDelay();
 
@@ -273,12 +286,12 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         return (int) (Math.random() * writeOptions.getJitterInterval());
     }
 
-    private void publish(@Nonnull final Object event) {
+    private <T extends AbstractInfluxEvent> void publish(@Nonnull final T event) {
 
         Objects.requireNonNull(event, "Event is required");
 
-        //TODO are the events necessary?
-        LOG.info("Event: " + event);
+        event.logEvent();
+        eventPublisher.onNext(event);
     }
 
     @Nonnull
@@ -298,28 +311,43 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         }
     }
 
-    private final class WriteData {
+    /**
+     * The Batch Write.
+     */
+    private final class BatchWrite {
 
-        private WriteKey writeKey;
+        private BatchWriteOptions batchWriteOptions;
         private String lineProtocol;
 
-        private WriteData(@Nonnull final WriteKey writeKey, @Nonnull final String lineProtocol) {
-            this.writeKey = writeKey;
+        private BatchWrite(@Nonnull final BatchWriteOptions batchWriteOptions, @Nonnull final String lineProtocol) {
+
+            Objects.requireNonNull(batchWriteOptions, "BatchWriteOptions is required");
+            Preconditions.checkNonEmptyString(lineProtocol, "lineProtocol");
+
+            this.batchWriteOptions = batchWriteOptions;
             this.lineProtocol = lineProtocol;
         }
     }
 
-    private final class WriteKey {
+    /**
+     * The options to apply to a @{@link BatchWrite}.
+     */
+    private final class BatchWriteOptions {
 
         private String bucket;
         private String organization;
         private String token;
         private TimeUnit precision;
 
-        WriteKey(@Nonnull final String bucket,
-                 @Nonnull final String organization,
-                 @Nonnull final String token,
-                 @Nonnull final TimeUnit precision) {
+        private BatchWriteOptions(@Nonnull final String bucket,
+                                  @Nonnull final String organization,
+                                  @Nonnull final String token,
+                                  @Nonnull final TimeUnit precision) {
+
+            Preconditions.checkNonEmptyString(bucket, "bucket");
+            Preconditions.checkNonEmptyString(organization, "organization");
+            Preconditions.checkNonEmptyString(token, "token");
+            Objects.requireNonNull(precision, "TimeUnit.precision is required");
 
             this.bucket = bucket;
             this.organization = organization;
@@ -332,14 +360,14 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof WriteKey)) {
+            if (!(o instanceof BatchWriteOptions)) {
                 return false;
             }
-            WriteKey writeKey = (WriteKey) o;
-            return Objects.equals(bucket, writeKey.bucket)
-                    && Objects.equals(organization, writeKey.organization)
-                    && Objects.equals(token, writeKey.token)
-                    && precision == writeKey.precision;
+            BatchWriteOptions batchWriteOptions = (BatchWriteOptions) o;
+            return Objects.equals(bucket, batchWriteOptions.bucket)
+                    && Objects.equals(organization, batchWriteOptions.organization)
+                    && Objects.equals(token, batchWriteOptions.token)
+                    && precision == batchWriteOptions.precision;
         }
 
         @Override
@@ -348,7 +376,7 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         }
     }
 
-    private final class ToWritePointsCompletable implements Function<WriteData, CompletableSource> {
+    private final class ToWritePointsCompletable implements Function<BatchWrite, CompletableSource> {
 
         private final Scheduler retryScheduler;
 
@@ -357,30 +385,38 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         }
 
         @Override
-        public CompletableSource apply(final WriteData writeData) {
+        public CompletableSource apply(final BatchWrite batchWrite) {
 
             //
             // InfluxDB Line Protocol => to Request Body
             //
-            RequestBody requestBody = createBody(writeData.lineProtocol);
+            RequestBody requestBody = createBody(batchWrite.lineProtocol);
 
             //
             // Parameters
-            String organization = writeData.writeKey.organization;
-            String bucket = writeData.writeKey.bucket;
-            String precision = WriteClientImpl.this.toPrecisionParameter(writeData.writeKey.precision);
-            String token = "Token " + writeData.writeKey.token;
+            String organization = batchWrite.batchWriteOptions.organization;
+            String bucket = batchWrite.batchWriteOptions.bucket;
+            String precision = WriteClientImpl.this.toPrecisionParameter(batchWrite.batchWriteOptions.precision);
+            String token = "Token " + batchWrite.batchWriteOptions.token;
 
             return platformService
-                    .writePoints(organization, bucket, precision, token, requestBody);
-                    //
-                    // Retry strategy
-                    //
-//                    .retryWhen(WriteClientImpl.this.retryHandler(retryScheduler, writeOptions));
+                    .writePoints(organization, bucket, precision, token, requestBody)
+                    .doOnComplete(() -> publish(toSuccessEvent(batchWrite)));
+        }
+
+        @Nonnull
+        private WriteSuccessEvent toSuccessEvent(@Nonnull final BatchWrite batchWrite) {
+
+            return new WriteSuccessEvent(
+                    batchWrite.batchWriteOptions.organization,
+                    batchWrite.batchWriteOptions.bucket,
+                    batchWrite.batchWriteOptions.precision,
+                    batchWrite.batchWriteOptions.token,
+                    batchWrite.lineProtocol);
         }
     }
 
-//    TODO implement retry?
+//    TODO implement retry, delete retry scheduler?
 //    /**
 //     * The retry handler that tries to retry a write if it failed previously and
 //     * the reason of the failure is not permanent.

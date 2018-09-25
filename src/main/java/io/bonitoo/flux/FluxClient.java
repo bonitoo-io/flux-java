@@ -28,10 +28,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.core.event.AbstractInfluxEvent;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
-import io.bonitoo.flux.events.AbstractFluxEvent;
-import io.bonitoo.flux.options.FluxOptions;
+import io.bonitoo.flux.option.FluxOptions;
 
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -601,8 +601,8 @@ public interface FluxClient {
      * @param <T>       type of event to listen
      * @param listener  listener to consume events
      */
-    <T extends AbstractFluxEvent> void subscribeEvents(@Nonnull final Class<T> eventType,
-                                                       @Nonnull final Consumer<T> listener);
+    <T extends AbstractInfluxEvent> void subscribeEvents(@Nonnull final Class<T> eventType,
+                                                         @Nonnull final Consumer<T> listener);
 
     /**
      * Listen the events produced by {@link FluxClient}.
@@ -610,7 +610,7 @@ public interface FluxClient {
      * @param <T>      type of event to listen
      * @param listener listener to unsubscribe to events
      */
-    <T extends AbstractFluxEvent> void unsubscribeEvents(@Nonnull final Consumer<T> listener);
+    <T extends AbstractInfluxEvent> void unsubscribeEvents(@Nonnull final Consumer<T> listener);
 
     /**
      * Enable Gzip compress for http request body.

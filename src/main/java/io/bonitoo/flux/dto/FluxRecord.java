@@ -30,7 +30,7 @@ import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.Preconditions;
 
 /**
  * A record is a tuple of values. Each record in the table represents a single point in the series.

@@ -26,7 +26,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.impl.FluxClientImpl;
-import io.bonitoo.flux.options.FluxConnectionOptions;
+import io.bonitoo.flux.option.FluxConnectionOptions;
 
 /**
  * The Factory that create a instance of a Flux client.

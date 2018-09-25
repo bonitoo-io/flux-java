@@ -24,9 +24,9 @@ package io.bonitoo.flux.custom;
 
 import javax.annotation.Nonnull;
 
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.Preconditions;
 import io.bonitoo.flux.Flux;
-import io.bonitoo.flux.operators.AbstractParametrizedFlux;
+import io.bonitoo.flux.operator.AbstractParametrizedFlux;
 
 /**
  * The custom function.

@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 
 import io.bonitoo.flux.FluxClient;
 import io.bonitoo.platform.dto.Health;
-import io.bonitoo.platform.options.WriteOptions;
+import io.bonitoo.platform.option.WriteOptions;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 

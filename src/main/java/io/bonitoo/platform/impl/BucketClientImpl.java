@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.Preconditions;
 import io.bonitoo.platform.BucketClient;
 import io.bonitoo.platform.dto.Bucket;
 import io.bonitoo.platform.dto.Buckets;

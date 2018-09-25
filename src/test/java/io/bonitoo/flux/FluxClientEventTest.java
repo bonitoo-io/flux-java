@@ -25,13 +25,13 @@ package io.bonitoo.flux;
 import java.time.Instant;
 import java.util.function.Consumer;
 
-import io.bonitoo.InfluxException;
-import io.bonitoo.flux.events.FluxErrorEvent;
-import io.bonitoo.flux.events.FluxSuccessEvent;
-import io.bonitoo.flux.events.UnhandledErrorEvent;
+import io.bonitoo.core.InfluxException;
+import io.bonitoo.core.event.UnhandledErrorEvent;
+import io.bonitoo.flux.event.FluxErrorEvent;
+import io.bonitoo.flux.event.FluxSuccessEvent;
 import io.bonitoo.flux.impl.FluxResultMapperException;
-import io.bonitoo.flux.options.FluxOptions;
-import io.bonitoo.flux.options.query.NowOption;
+import io.bonitoo.flux.option.FluxOptions;
+import io.bonitoo.flux.option.query.NowOption;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

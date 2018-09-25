@@ -38,18 +38,18 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.bonitoo.InfluxException;
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.InfluxException;
+import io.bonitoo.core.Preconditions;
+import io.bonitoo.core.event.AbstractInfluxEvent;
+import io.bonitoo.core.event.UnhandledErrorEvent;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxClient;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
-import io.bonitoo.flux.events.AbstractFluxEvent;
-import io.bonitoo.flux.events.FluxErrorEvent;
-import io.bonitoo.flux.events.FluxSuccessEvent;
-import io.bonitoo.flux.events.UnhandledErrorEvent;
-import io.bonitoo.flux.options.FluxConnectionOptions;
-import io.bonitoo.flux.options.FluxOptions;
+import io.bonitoo.flux.event.FluxErrorEvent;
+import io.bonitoo.flux.event.FluxSuccessEvent;
+import io.bonitoo.flux.option.FluxConnectionOptions;
+import io.bonitoo.flux.option.FluxOptions;
 
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -601,8 +601,8 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public <T extends AbstractFluxEvent> void subscribeEvents(@Nonnull final Class<T> eventType,
-                                                              @Nonnull final Consumer<T> listener) {
+    public <T extends AbstractInfluxEvent> void subscribeEvents(@Nonnull final Class<T> eventType,
+                                                                @Nonnull final Consumer<T> listener) {
 
         Objects.requireNonNull(eventType, "Event type is required");
         Objects.requireNonNull(listener, "Consumer is required");
@@ -617,7 +617,7 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
     }
 
     @Override
-    public <T extends AbstractFluxEvent> void unsubscribeEvents(@Nonnull final Consumer<T> listener) {
+    public <T extends AbstractInfluxEvent> void unsubscribeEvents(@Nonnull final Consumer<T> listener) {
 
         Objects.requireNonNull(listener, "Consumer is required");
 
@@ -874,13 +874,13 @@ public class FluxClientImpl extends AbstractFluxClient<FluxService> implements F
 
     private void propagateError(@Nonnull final Consumer<? super Throwable> onError,
                                 @Nonnull final Throwable throwable,
-                                @Nonnull final AbstractFluxEvent errorEvent) {
+                                @Nonnull final AbstractInfluxEvent errorEvent) {
 
         onError.accept(throwable);
         publish(errorEvent);
     }
 
-    private void publish(@Nonnull final AbstractFluxEvent event) {
+    private void publish(@Nonnull final AbstractInfluxEvent event) {
 
         Objects.requireNonNull(event, "Event is required");
 

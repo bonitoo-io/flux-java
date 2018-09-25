@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.bonitoo.InfluxException;
+import io.bonitoo.core.InfluxException;
 import io.bonitoo.flux.dto.FluxColumn;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;

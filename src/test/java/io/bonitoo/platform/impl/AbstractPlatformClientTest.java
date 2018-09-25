@@ -27,12 +27,12 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.AbstractTest;
-import io.bonitoo.GzipRequestInterceptor;
+import io.bonitoo.core.GzipRequestInterceptor;
 import io.bonitoo.platform.PlatformClient;
 import io.bonitoo.platform.PlatformClientFactory;
 import io.bonitoo.platform.WriteClient;
-import io.bonitoo.platform.options.PlatformOptions;
-import io.bonitoo.platform.options.WriteOptions;
+import io.bonitoo.platform.option.PlatformOptions;
+import io.bonitoo.platform.option.WriteOptions;
 
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;

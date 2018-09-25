@@ -29,11 +29,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.Preconditions;
 import io.bonitoo.flux.Flux;
 import io.bonitoo.flux.FluxChain;
-import io.bonitoo.flux.options.query.AbstractOption;
-import io.bonitoo.flux.options.query.TaskOption;
+import io.bonitoo.flux.option.query.AbstractOption;
+import io.bonitoo.flux.option.query.TaskOption;
 import io.bonitoo.platform.TaskClient;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.dto.User;

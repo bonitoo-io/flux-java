@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractRestClient;
-import io.bonitoo.Preconditions;
+import io.bonitoo.core.Preconditions;
 import io.bonitoo.platform.AuthorizationClient;
 import io.bonitoo.platform.dto.Authorization;
 import io.bonitoo.platform.dto.Authorizations;

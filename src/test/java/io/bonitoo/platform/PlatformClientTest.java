@@ -23,7 +23,7 @@
 package io.bonitoo.platform;
 
 import io.bonitoo.platform.impl.AbstractPlatformClientTest;
-import io.bonitoo.platform.options.WriteOptions;
+import io.bonitoo.platform.option.WriteOptions;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.assertj.core.api.Assertions;

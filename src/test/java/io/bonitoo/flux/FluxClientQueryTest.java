@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.InfluxException;
+import io.bonitoo.core.InfluxException;
 import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.dto.FluxTable;
-import io.bonitoo.flux.events.FluxErrorEvent;
+import io.bonitoo.flux.event.FluxErrorEvent;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

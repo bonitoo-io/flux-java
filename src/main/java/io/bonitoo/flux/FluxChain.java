@@ -31,12 +31,12 @@ import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import io.bonitoo.flux.options.query.AbstractOption;
-import io.bonitoo.flux.options.query.NowOption;
-import io.bonitoo.flux.options.query.TaskOption;
+import io.bonitoo.flux.option.query.AbstractOption;
+import io.bonitoo.flux.option.query.NowOption;
+import io.bonitoo.flux.option.query.TaskOption;
 
 /**
- * The utility for chaining Flux operators {@link io.bonitoo.flux.operators}.
+ * The utility for chaining Flux operators {@link io.bonitoo.flux.operator}.
  *
  * @author Jakub Bednar (bednar@github) (22/06/2018 11:14)
  */

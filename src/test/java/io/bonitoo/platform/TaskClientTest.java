@@ -22,7 +22,7 @@
  */
 package io.bonitoo.platform;
 
-import io.bonitoo.InfluxException;
+import io.bonitoo.core.InfluxException;
 import io.bonitoo.platform.dto.Task;
 import io.bonitoo.platform.dto.User;
 import io.bonitoo.platform.impl.AbstractPlatformClientTest;

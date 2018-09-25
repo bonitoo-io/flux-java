@@ -26,7 +26,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import io.bonitoo.platform.impl.PlatformClientImpl;
-import io.bonitoo.platform.options.PlatformOptions;
+import io.bonitoo.platform.option.PlatformOptions;
 
 /**
  * The Factory that create a instance of a Platform client.

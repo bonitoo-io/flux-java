@@ -26,12 +26,19 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
-import io.bonitoo.GzipRequestInterceptor;
+import io.bonitoo.core.GzipRequestInterceptor;
+import io.bonitoo.core.InfluxException;
+import io.bonitoo.core.event.UnhandledErrorEvent;
+import io.bonitoo.platform.event.BackpressureEvent;
+import io.bonitoo.platform.event.WriteSuccessEvent;
 import io.bonitoo.platform.impl.AbstractPlatformClientTest;
-import io.bonitoo.platform.options.WriteOptions;
+import io.bonitoo.platform.option.WriteOptions;
 
+import io.reactivex.Flowable;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.schedulers.TestScheduler;
+import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
@@ -309,7 +316,7 @@ class WriteClientTest extends AbstractPlatformClientTest {
     }
 
     @Test
-    void flushBeforeClose() throws InterruptedException {
+    void flushBeforeClose() {
 
         platformServer.enqueue(createResponse("{}"));
 
@@ -322,9 +329,94 @@ class WriteClientTest extends AbstractPlatformClientTest {
 
         writeClient.close();
 
-        Thread.sleep(1_000);
+        // wait for request
+        getRequestBody(platformServer);
 
         Assertions.assertThat(platformServer.getRequestCount()).isEqualTo(1);
+    }
+
+    @Test
+    void eventWriteSuccessEvent() {
+
+        platformServer.enqueue(createResponse("{}"));
+
+        writeClient = createWriteClient(WriteOptions.DISABLED_BATCHING);
+        TestObserver<WriteSuccessEvent> listener = writeClient.listenEvents(WriteSuccessEvent.class).test();
+
+        writeClient.write("b1", "org1", "token1",
+                "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1");
+
+        // wait for request
+        getRequestBody(platformServer);
+
+        listener
+                .assertValue(event -> {
+
+                    Assertions.assertThat(event).isNotNull();
+                    Assertions.assertThat(event.getBucket()).isEqualTo("b1");
+                    Assertions.assertThat(event.getOrganization()).isEqualTo("org1");
+                    Assertions.assertThat(event.getToken()).isEqualTo("token1");
+                    Assertions.assertThat(event.getLineProtocol()).isEqualTo("h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1");
+
+                    return true;
+                })
+                .assertSubscribed()
+                .assertNotComplete();
+    }
+
+    @Test
+    void eventUnhandledErrorEvent() {
+
+        platformServer.enqueue(createErrorResponse("Failed to find bucket"));
+
+        writeClient = createWriteClient(WriteOptions.DISABLED_BATCHING);
+        TestObserver<UnhandledErrorEvent> listener = writeClient.listenEvents(UnhandledErrorEvent.class).test();
+
+        writeClient.write("b1", "org1", "token1",
+                "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1");
+
+        // wait for request
+        getRequestBody(platformServer);
+
+        listener
+                .assertValue(event -> {
+
+                    Assertions.assertThat(event).isNotNull();
+                    Assertions.assertThat(event.getThrowable()).isNotNull();
+                    Assertions.assertThat(event.getThrowable())
+                            .isInstanceOf(InfluxException.class)
+                            .hasMessage("Failed to find bucket");
+
+                    return true;
+                })
+                .assertSubscribed()
+                .assertNotComplete();
+    }
+
+    @Test
+    void eventBackpressureEvent() {
+
+        platformServer.enqueue(new MockResponse().setBodyDelay(1, TimeUnit.SECONDS));
+
+        writeClient = platformClient.createWriteClient(WriteOptions.builder().bufferLimit(1).build());
+
+        TestObserver<BackpressureEvent> listener = writeClient
+                .listenEvents(BackpressureEvent.class)
+                .test();
+
+        Flowable
+                .range(0, 1005)
+                .map(index -> String.format("h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 %s", index))
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(record -> writeClient.write("b1", "org1", "token1", record));
+
+        listener
+                .awaitCount(1)
+                .assertValueAt(0, event -> {
+                    Assertions.assertThat(event).isNotNull();
+                    return true;
+                });
+
     }
 
     @Nonnull
@@ -333,7 +425,7 @@ class WriteClientTest extends AbstractPlatformClientTest {
     }
 
     @Nonnull
-    private WriteClient createWriteClient(WriteOptions writeClient) {
-        return createWriteClient(writeClient, new GzipRequestInterceptor(), batchScheduler, jitterScheduler, new TestScheduler());
+    private WriteClient createWriteClient(WriteOptions writeOptions) {
+        return createWriteClient(writeOptions, new GzipRequestInterceptor(), batchScheduler, jitterScheduler, new TestScheduler());
     }
 }

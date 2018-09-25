@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 
 import io.bonitoo.AbstractTest;
 import io.bonitoo.flux.impl.FluxClientImpl;
-import io.bonitoo.flux.options.FluxConnectionOptions;
+import io.bonitoo.flux.option.FluxConnectionOptions;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
