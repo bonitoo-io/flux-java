@@ -39,14 +39,13 @@ import io.bonitoo.flux.events.UnhandledErrorEvent;
 import io.bonitoo.platform.WriteClient;
 import io.bonitoo.platform.options.WriteOptions;
 
-import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableTransformer;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.flowables.GroupedFlowable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
@@ -115,10 +114,6 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                         writeOptions.getBatchSize(),
                         true)
                 //
-                // Jitter interval
-                //
-                .doOnError(throwable -> publish(new UnhandledErrorEvent(throwable)))
-                //
                 // Group by key - same bucket, same org
                 //
                 .concatMap(it -> it.groupBy(writeData -> writeData.writeKey))
@@ -146,8 +141,24 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
                                 return writeData;
                             });
                 })
+                //
+                // Jitter interval
+                //
                 .compose(jitter(jitterScheduler))
-                .subscribe(new WritePointsConsumer(retryScheduler));
+                //
+                // To WritePoints "request creator"
+                //
+                .concatMapCompletable(new ToWritePointsCompletable(retryScheduler))
+                .subscribe(() -> publish("Success"), throwable -> {
+
+                    // HttpException is handled in retryHandler
+                    if (throwable instanceof HttpException) {
+                        return;
+                    }
+
+                    publish(new UnhandledErrorEvent(throwable));
+                });
+
     }
 
 
@@ -281,71 +292,6 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         LOG.info("Event: " + event);
     }
 
-    private final class WritePointsConsumer implements Consumer<WriteData> {
-
-        private final Scheduler retryScheduler;
-
-        private WritePointsConsumer(@Nonnull final Scheduler retryScheduler) {
-
-            Objects.requireNonNull(retryScheduler, "RetryScheduler is required");
-
-            this.retryScheduler = retryScheduler;
-        }
-
-        @Override
-        public void accept(final WriteData writeData) {
-
-            //
-            // Fail action
-            //
-            Consumer<Throwable> fail = throwable -> {
-
-                // HttpException is handled in retryHandler
-                if (throwable instanceof HttpException) {
-                    return;
-                }
-
-                publish(new UnhandledErrorEvent(throwable));
-            };
-
-            //
-            // Data => InfluxDB Line Protocol
-            //
-
-            if (writeData.lineProtocol.isEmpty()) {
-
-                String message = "The points {0} are parsed to empty request body => skip call InfluxDB server.";
-
-                LOG.log(Level.FINE, message, writeData);
-
-                return;
-            }
-
-            //
-            // InfluxDB Line Protocol => to Request Body
-            //
-            RequestBody requestBody = createBody(writeData.lineProtocol);
-
-            //
-            // Parameters
-            String organization = writeData.writeKey.organization;
-            String bucket = writeData.writeKey.bucket;
-            String precision = toPrecisionParameter(writeData.writeKey.precision);
-            String token = "Token " + writeData.writeKey.token;
-
-            Completable completable = platformService
-                    .writePoints(organization, bucket, precision, token, requestBody)
-                    //
-                    // Retry strategy
-                    //
-                    .retryWhen(retryHandler(retryScheduler, writeOptions));
-
-
-            completable.subscribe(() -> publish("Success"), fail);
-
-        }
-    }
-
     /**
      * The retry handler that tries to retry a write if it failed previously and
      * the reason of the failure is not permanent.
@@ -455,6 +401,38 @@ final class WriteClientImpl extends AbstractRestClient implements WriteClient {
         @Override
         public int hashCode() {
             return Objects.hash(bucket, organization, token, precision);
+        }
+    }
+
+    private class ToWritePointsCompletable implements Function<WriteData, CompletableSource> {
+
+        private final Scheduler retryScheduler;
+
+        ToWritePointsCompletable(@Nonnull final Scheduler retryScheduler) {
+            this.retryScheduler = retryScheduler;
+        }
+
+        @Override
+        public CompletableSource apply(final WriteData writeData) {
+
+            //
+            // InfluxDB Line Protocol => to Request Body
+            //
+            RequestBody requestBody = createBody(writeData.lineProtocol);
+
+            //
+            // Parameters
+            String organization = writeData.writeKey.organization;
+            String bucket = writeData.writeKey.bucket;
+            String precision = WriteClientImpl.this.toPrecisionParameter(writeData.writeKey.precision);
+            String token = "Token " + writeData.writeKey.token;
+
+            return platformService
+                    .writePoints(organization, bucket, precision, token, requestBody)
+                    //
+                    // Retry strategy
+                    //
+                    .retryWhen(WriteClientImpl.this.retryHandler(retryScheduler, writeOptions));
         }
     }
 }
