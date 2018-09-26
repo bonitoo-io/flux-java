@@ -35,6 +35,8 @@ import org.json.JSONObject;
 /**
  * Dialect is an object defining the options to use when encoding the response.
  *
+ * TODO use Bean model + Moshi to serialize
+ *
  * @author Jakub Bednar (bednar@github) (22/08/2018 09:17)
  * @since 1.0.0
  */

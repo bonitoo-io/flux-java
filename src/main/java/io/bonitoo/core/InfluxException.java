@@ -59,6 +59,9 @@ public class InfluxException extends RuntimeException {
 
             String errorHeader = getErrorMessage(response);
 
+            //TODO by code 500 create UnauthorizedException, NotFound,...
+            //TODO X-Influx-Reference
+
             if (errorHeader != null && !errorHeader.isEmpty()) {
                 return new InfluxException(errorHeader, cause);
             }
