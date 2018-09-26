@@ -75,7 +75,7 @@ public final class Task extends JSONObject implements Serializable {
     private String flux;
 
     /**
-     * A simple task repetition schedule; parsed from Flux.
+     * A simple task repetition schedule (duration type); parsed from Flux.
      */
     private String every;
 

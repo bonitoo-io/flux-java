@@ -118,12 +118,12 @@ The `BucketClient` supports:
 ```java
 BucketClient bucketClient = platformClient.createBucketClient();
 
-// Creates a new bucket with name 'robot-sensors' and retention 50_000
-Bucket bucket = bucketClient.createBucket("robot-sensors", 50_000L, organization);
+// Creates a new bucket with name 'robot-sensors' and retention one hour
+Bucket bucket = bucketClient.createBucket("robot-sensors", "1h", organization);
 
 // Update a bucket
 bucket.setName("robots-sensors-speed");
-bucket.setRetentionPeriod(10_000L);
+bucket.setRetentionPeriod("2h30m");
 bucketClient.updateBucket(bucket);
 
 // Delete a bucket
@@ -267,6 +267,118 @@ String flux = "from(bucket: \"telegraf\") |> last()";
 
 Task task = taskClient.createTaskEvery("task name", flux, "0 2 * * *", "10m", "01");
 ...
+```
+
+### Write
+
+The `WriteClient` supports:
+1. writing data points in [InfluxDB Line Protocol](https://bit.ly/2QL99fu)
+2. use batching for writes
+3. use client backpressure strategy
+4. produces events that allow user to be notified and react to this events
+    - `WriteSuccessEvent` - published when arrived the success response from Platform server
+    - `BackpressureEvent` - published when is **client** backpressure applied
+    - `UnhandledErrorEvent` - published when occurs a unhandled exception
+5. use GZIP compression for data
+
+#### Writing data
+
+```java
+WriteClient writeClient = platformClient.createWriteClient();
+
+String record = "h2o_feet,location=coyote_creek level\\ description=\"feet 1\",water_level=1.0 1";
+writeClient.write("b1", "org1", "token1", record);
+
+writeClient.close();
+```
+
+#### Batching
+The writes are processed in batches which are configurable by `WriteOptions`.
+
+- `batchSize` - the number of data point to collect in batch
+- `flushInterval` - the number of milliseconds before the batch is written 
+- `jitterInterval` - the number of milliseconds to increase the batch flush interval by a random amount (see documentation above)
+- `retryInterval` - the number of milliseconds to retry unsuccessful write
+- `bufferLimit` - the maximum number of unwritten stored points
+- `writeScheduler` - the scheduler which is used for write data points (by overriding default settings can be disabled batching)
+- `backpressureStrategy` - the strategy to deal with buffer overflow
+
+```java
+WriteOptions writeOptions = WriteOptions.builder()
+    .batchSize(5_000)
+    .flushInterval(10_000)
+    .jitterInterval(5_000)
+    .retryInterval(5_000)
+    .bufferLimit(100_000)
+    .backpressureStrategy(BackpressureOverflowStrategy.ERROR)
+    .build();
+
+// Write client
+WriteClient writeClient = platformClient.createWriteClient(writeOptions);
+
+...
+
+writeClient.close();
+```
+
+#### Backpressure
+The backpressure presents the problem of what to do with a growing backlog of unconsumed data points. 
+The key feature of backpressure is to provide the capability to avoid consuming the unexpected amount of system resources.  
+This situation is not common and can be caused by several problems: generating too much measurements in short interval,
+long term unavailability of the InfluxDB server, network issues. 
+
+The size of backlog is configured by 
+`WriteOptions.bufferLimit` and backpressure strategy by `WriteOptions.backpressureStrategy`.
+
+##### Strategy how react to backlog overflows
+- `DROP_OLDEST` - Drop the oldest data points from the backlog 
+- `DROP_LATEST` - Drop the latest data points from the backlog  
+- `ERROR` - Signal a exception
+- `BLOCK` - (not implemented yet) Wait specified time for space in buffer to become available
+  - `timeout` - how long to wait before giving up
+  - `unit` - TimeUnit of the timeout
+
+If is used the strategy `DROP_OLDEST` or `DROP_LATEST` there is a possibility to react on backpressure event and slowdown the producing new measurements:
+
+```java
+WriteClient writeClient = platformClient.createWriteClient(writeOptions);
+writeClient.listenEvents(BackpressureEvent.class).subscribe(event -> {
+    
+    // slowdown producers
+    ...
+});
+```
+
+#### Handle the Events
+
+##### Handle the Success write
+```java
+WriteClient writeClient = platformClient.createWriteClient();
+writeClient.listenEvents(WriteSuccessEvent.class).subscribe(event -> {
+
+    String data = event.getLineProtocol();
+
+    // handle success
+    ...
+});
+```
+##### Handle the Error Write
+```java
+WriteClient writeClient = platformClient.createWriteClient();
+writeClient.listenEvents(UnhandledErrorEvent.class).subscribe(event -> {
+            
+    Throwable exception = event.getThrowable();
+
+    // handle error
+    ...
+});
+```
+
+#### Gzip's support
+`WriteClient` doesn't enable gzip compress for http request body by default. If you want to enable gzip to reduce transfer data's size, you can call:
+```java
+WriteClient writeClient = platformClient.createWriteClient();
+writeClient.enableGzip();
 ```
 
 ## Flux - Data Scripting Language

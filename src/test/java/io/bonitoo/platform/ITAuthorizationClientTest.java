@@ -131,7 +131,7 @@ class ITAuthorizationClientTest extends AbstractITClientTest {
     void createAuthorizationBucket() {
 
         Organization organization = platformService.createOrganizationClient().createOrganization(generateName("Auth Organization"));
-        Bucket bucket = platformService.createBucketClient().createBucket(generateName("Auth Bucket"), organization);
+        Bucket bucket = platformService.createBucketClient().createBucket(generateName("Auth Bucket"), "1h", organization);
 
         String bucketResource = Permission.bucketResource(bucket.getId());
 

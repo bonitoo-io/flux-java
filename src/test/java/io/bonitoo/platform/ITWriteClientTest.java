@@ -61,7 +61,7 @@ class ITWriteClientTest extends AbstractITClientTest {
 
         User user = platformService.createUserClient().createUser(generateName("Write User"));
         organization = platformService.createOrganizationClient().createOrganization(generateName("Write Organization"));
-        bucket = platformService.createBucketClient().createBucket(generateName("Write Bucket"), organization);
+        bucket = platformService.createBucketClient().createBucket(generateName("Write Bucket"), "1h", organization);
 
         String bucketResource = Permission.bucketResource(bucket.getId());
 

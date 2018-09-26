@@ -179,6 +179,7 @@ final class TaskClientImpl extends AbstractRestClient implements TaskClient {
     public Task updateTask(@Nonnull final Task task) {
 
         Objects.requireNonNull(task, "Task is required");
+        Preconditions.checkDurationNotRequired(task.getEvery(), "Task.every");
 
         Flux flux = new Flux() {
             @Override
@@ -223,6 +224,7 @@ final class TaskClientImpl extends AbstractRestClient implements TaskClient {
         Objects.requireNonNull(flux, "Flux script to run");
         Preconditions.checkNonEmptyString(userID, "User ID");
         Preconditions.checkNonEmptyString(organizationID, "Organization ID");
+        Preconditions.checkDurationNotRequired(every, "Task.every");
 
         User owner = new User();
         owner.setId(userID);

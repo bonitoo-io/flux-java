@@ -36,6 +36,8 @@ public final class Preconditions {
     private static final Pattern DURATION_PATTERN = Pattern.compile("([-+]?)([0-9]+(\\.[0-9]*)?[a-z]+)+",
             Pattern.CASE_INSENSITIVE);
 
+    private static final String DURATION_MESSAGE = "Expecting a duration string for %s. But got: %s";
+
     private Preconditions() {
     }
 
@@ -79,7 +81,24 @@ public final class Preconditions {
      */
     public static String checkDuration(final String string, final String name) throws IllegalArgumentException {
         if (string == null || string.isEmpty() || !DURATION_PATTERN.matcher(string).matches()) {
-            throw new IllegalArgumentException("Expecting a duration string for " + name + ". But got: " + string);
+            throw new IllegalArgumentException(String.format(DURATION_MESSAGE, name, string));
+        }
+
+        return string;
+    }
+
+    /**
+     * Enforces that the string is duration literal. Empty or null strings are valid.
+     *
+     * @param string the string to test
+     * @param name   variable name for reporting
+     * @return {@code string}
+     * @throws IllegalArgumentException if the string is not duration literal
+     */
+    public static String checkDurationNotRequired(final String string, final String name)
+            throws IllegalArgumentException {
+        if (string != null && !string.isEmpty() && !DURATION_PATTERN.matcher(string).matches()) {
+            throw new IllegalArgumentException(String.format(DURATION_MESSAGE, name, string));
         }
 
         return string;

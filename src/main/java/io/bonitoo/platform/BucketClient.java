@@ -40,27 +40,6 @@ public interface BucketClient {
     /**
      * Creates a new bucket and sets {@link Bucket#id} with the new identifier.
      *
-     * @param name         name of the bucket
-     * @param organization owner of bucket
-     * @return Bucket created
-     */
-    @Nonnull
-    Bucket createBucket(@Nonnull final String name, @Nonnull final Organization organization);
-
-
-    /**
-     * Creates a new bucket and sets {@link Bucket#id} with the new identifier.
-     *
-     * @param name             name of the bucket
-     * @param organizationName owner of bucket
-     * @return Bucket created
-     */
-    @Nonnull
-    Bucket createBucket(@Nonnull final String name, @Nonnull final String organizationName);
-
-    /**
-     * Creates a new bucket and sets {@link Bucket#id} with the new identifier.
-     *
      * @param name            name of the bucket
      * @param retentionPeriod bucket retention period
      * @param organization    owner of bucket
@@ -68,7 +47,7 @@ public interface BucketClient {
      */
     @Nonnull
     Bucket createBucket(@Nonnull final String name,
-                        @Nullable final Long retentionPeriod,
+                        @Nonnull final String retentionPeriod,
                         @Nonnull final Organization organization);
 
     /**
@@ -81,8 +60,17 @@ public interface BucketClient {
      */
     @Nonnull
     Bucket createBucket(@Nonnull final String name,
-                        @Nullable final Long retentionPeriod,
+                        @Nonnull final String retentionPeriod,
                         @Nonnull final String organizationName);
+
+    /**
+     * Creates a new bucket and sets {@link Bucket#id} with the new identifier.
+     *
+     * @param bucket bucket to create
+     * @return Bucket created
+     */
+    @Nonnull
+    Bucket createBucket(@Nonnull Bucket bucket);
 
     /**
      * Update a bucket name and retention.

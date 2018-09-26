@@ -108,6 +108,14 @@ class TaskClientTest extends AbstractPlatformClientTest {
     }
 
     @Test
+    void createTaskEveryNotDuration() {
+
+        Assertions.assertThatThrownBy(() -> taskClient.createTaskEvery("task name", "from(bucket: \"telegraf\") |> last()", "not_every", "10", "15"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a duration string for Task.every. But got: not_every");
+    }
+
+    @Test
     void createTaskResponse() {
 
         String data = "{\n"
@@ -225,6 +233,17 @@ class TaskClientTest extends AbstractPlatformClientTest {
         Assertions.assertThat(requestBody.getString("flux"))
                 .isEqualToIgnoringWhitespace("option task = {name: \"test task\", every: 1m} from(bucket:\\\"test\\\") |> range(start:-1h)");
         Assertions.assertThat(requestBody.getString("status")).isEqualTo("disabled");
+    }
+
+    @Test
+    void updateTaskEveryIsNotDuration() {
+
+        Task task = new Task();
+        task.setEvery("z");
+
+        Assertions.assertThatThrownBy(() -> taskClient.updateTask(task))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a duration string for Task.every. But got: z");
     }
 
     @Test

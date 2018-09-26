@@ -45,7 +45,10 @@ public final class Bucket extends AbstractHasLinks {
     @Json(name = "rp")
     private String retentionPolicyName;
 
-    private Long retentionPeriod;
+    /**
+     * The retention period in duration (1m, 24h15).
+     */
+    private String retentionPeriod;
 
     public String getId() {
         return id;
@@ -87,11 +90,11 @@ public final class Bucket extends AbstractHasLinks {
         this.retentionPolicyName = retentionPolicyName;
     }
 
-    public Long getRetentionPeriod() {
+    public String getRetentionPeriod() {
         return retentionPeriod;
     }
 
-    public void setRetentionPeriod(final Long retentionPeriod) {
+    public void setRetentionPeriod(final String retentionPeriod) {
         this.retentionPeriod = retentionPeriod;
     }
 }

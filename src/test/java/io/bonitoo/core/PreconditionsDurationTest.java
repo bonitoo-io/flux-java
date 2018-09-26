@@ -60,11 +60,20 @@ class PreconditionsDurationTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Expecting a duration string for duration. But got: ");
     }
+
     @Test
     void literalNotDuration() {
 
         Assertions.assertThatThrownBy(() -> Preconditions.checkDuration("x", "duration"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Expecting a duration string for duration. But got: x");
+    }
+
+    @Test
+    void notRequiredValid() {
+
+        Preconditions.checkDurationNotRequired(null, "duration");
+        Preconditions.checkDurationNotRequired("", "duration");
+        Preconditions.checkDurationNotRequired("1s", "duration");
     }
 }

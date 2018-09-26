@@ -60,29 +60,27 @@ class ITBucketClientTest extends AbstractITClientTest {
 
         String bucketName = generateName("robot sensor");
 
-        Bucket bucket = bucketClient.createBucket(bucketName, organization);
+        Bucket bucket = bucketClient.createBucket(bucketName, "1h", organization);
 
         Assertions.assertThat(bucket).isNotNull();
         Assertions.assertThat(bucket.getId()).isNotBlank();
         Assertions.assertThat(bucket.getName()).isEqualTo(bucketName);
         Assertions.assertThat(bucket.getOrganizationID()).isEqualTo(organization.getId());
         Assertions.assertThat(bucket.getOrganizationName()).isEqualTo(organization.getName());
-        Assertions.assertThat(bucket.getRetentionPeriod()).isEqualTo(0);
+        Assertions.assertThat(bucket.getRetentionPeriod()).isEqualTo("1h");
         Assertions.assertThat(bucket.getLinks()).hasSize(2);
         Assertions.assertThat(bucket.getLinks()).hasEntrySatisfying("org", value -> Assertions.assertThat(value).isEqualTo("/v1/orgs/" + organization.getId()));
         Assertions.assertThat(bucket.getLinks()).hasEntrySatisfying("self", value -> Assertions.assertThat(value).isEqualTo("/v1/buckets/" + bucket.getId()));
     }
 
     @Test
-    void createBucketWithRetentionPolicy() {
+    void createBucketRetentionPolicyIsNotDuration() {
 
         String bucketName = generateName("robot sensor");
 
-        Bucket bucket = bucketClient.createBucket(bucketName, 10_000L, organization);
-
-        Assertions.assertThat(bucket).isNotNull();
-        Assertions.assertThat(bucket.getRetentionPeriod()).isEqualTo(10_000L);
-        
+        Assertions.assertThatThrownBy(() -> bucketClient.createBucket(bucketName, "x", organization))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a duration string for Bucket.retentionPeriod. But got: x");
     }
 
     @Test
@@ -90,7 +88,7 @@ class ITBucketClientTest extends AbstractITClientTest {
 
         String bucketName = generateName("robot sensor");
 
-        Bucket bucket = bucketClient.createBucket(bucketName, organization);
+        Bucket bucket = bucketClient.createBucket(bucketName, "1h", organization);
 
         Bucket bucketByID = bucketClient.findBucketByID(bucket.getId());
 
@@ -116,10 +114,10 @@ class ITBucketClientTest extends AbstractITClientTest {
 
         int size = bucketClient.findBuckets().size();
 
-        bucketClient.createBucket(generateName("robot sensor"), organization);
+        bucketClient.createBucket(generateName("robot sensor"), "1h", organization);
 
         Organization organization2 = organizationClient.createOrganization(generateName("Second"));
-        bucketClient.createBucket(generateName("robot sensor"), organization2);
+        bucketClient.createBucket(generateName("robot sensor"), "1h", organization2);
 
         List<Bucket> buckets = bucketClient.findBuckets();
         Assertions.assertThat(buckets).hasSize(size + 2);
@@ -130,10 +128,10 @@ class ITBucketClientTest extends AbstractITClientTest {
 
         Assertions.assertThat(bucketClient.findBucketsByOrganization(organization)).hasSize(0);
 
-        bucketClient.createBucket(generateName("robot sensor"), organization);
+        bucketClient.createBucket(generateName("robot sensor"), "1h", organization);
 
         Organization organization2 = organizationClient.createOrganization(generateName("Second"));
-        bucketClient.createBucket(generateName("robot sensor"), organization2);
+        bucketClient.createBucket(generateName("robot sensor"), "1h", organization2);
 
         Assertions.assertThat(bucketClient.findBucketsByOrganization(organization)).hasSize(1);
     }
@@ -141,7 +139,7 @@ class ITBucketClientTest extends AbstractITClientTest {
     @Test
     void deleteBucket() {
 
-        Bucket createBucket = bucketClient.createBucket(generateName("robot sensor"), organization);
+        Bucket createBucket = bucketClient.createBucket(generateName("robot sensor"), "1h", organization);
         Assertions.assertThat(createBucket).isNotNull();
 
         Bucket foundBucket = bucketClient.findBucketByID(createBucket.getId());
@@ -157,15 +155,28 @@ class ITBucketClientTest extends AbstractITClientTest {
     @Test
     void updateOrganization() {
 
-        Bucket createBucket = bucketClient.createBucket(generateName("robot sensor"), organization);
+        Bucket createBucket = bucketClient.createBucket(generateName("robot sensor"), "1h", organization);
         createBucket.setName("Therm sensor 2000");
-        createBucket.setRetentionPeriod(5_000L);
+        createBucket.setRetentionPeriod("1h");
 
         Bucket updatedBucket = bucketClient.updateBucket(createBucket);
 
         Assertions.assertThat(updatedBucket).isNotNull();
         Assertions.assertThat(updatedBucket.getId()).isEqualTo(createBucket.getId());
         Assertions.assertThat(updatedBucket.getName()).isEqualTo("Therm sensor 2000");
-        Assertions.assertThat(updatedBucket.getRetentionPeriod()).isEqualTo(5_000L);
+        Assertions.assertThat(updatedBucket.getRetentionPeriod()).isEqualTo("1h");
+    }
+
+    @Test
+    void updateOrganizationRetentionPeriodIsNotDuration() {
+
+        Bucket createBucket = bucketClient.createBucket(generateName("robot sensor"), "1h", organization);
+        createBucket.setName("Therm sensor 2000");
+        createBucket.setRetentionPeriod("x");
+
+        Assertions.assertThatThrownBy(() -> bucketClient.updateBucket(createBucket))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Expecting a duration string for Bucket.retentionPeriod. But got: x");
+
     }
 }
