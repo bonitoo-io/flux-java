@@ -324,16 +324,13 @@ class ITFluxClient extends AbstractITFluxClient {
         fluxClient.close();
     }
 
-    // TODO ping
     @Test
-    @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void ping() {
 
         Assertions.assertThat(fluxClient.ping()).isTrue();
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "FLUX_DISABLE", matches = "true")
     void pingGZIP() {
 
         fluxClient.enableGzip();
