@@ -396,7 +396,7 @@ The `FluxClientFactory` creates the instance of a Flux client and can be configu
 ```java
 // Connection configuration
 FluxConnectionOptions options = FluxConnectionOptions.builder()
-    .url("http://localhost:8093")
+    .url("http://localhost:8086")
     .orgID("0")
     .build();
 

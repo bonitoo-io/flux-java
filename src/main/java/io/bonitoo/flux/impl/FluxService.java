@@ -41,7 +41,7 @@ import retrofit2.http.Streaming;
 interface FluxService {
 
     @Streaming
-    @POST("/query")
+    @POST("/v2/query")
     @Nonnull
     @Headers("Content-Type: application/json")
     Call<ResponseBody> query(@Nonnull @Query(value = "organization", encoded = true) String orgID,

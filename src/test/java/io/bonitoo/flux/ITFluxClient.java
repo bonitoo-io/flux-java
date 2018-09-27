@@ -376,7 +376,7 @@ class ITFluxClient extends AbstractITFluxClient {
 
         // delimiter
         line = bufferedSource.readUtf8Line();
-        Assertions.assertThat(line).startsWith("!");
+        Assertions.assertThat(line).isEqualTo("#group!false!false!true!true!false!false!true!true!true");
 
         // quoteChar
         line = bufferedSource.readUtf8Line();
