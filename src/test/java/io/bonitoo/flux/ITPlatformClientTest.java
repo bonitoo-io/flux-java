@@ -64,7 +64,7 @@ class ITPlatformClientTest {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
 
         Request request = new Request.Builder()
-                .url(platformURL + "/v1/tasks")
+                .url(platformURL + "/api/v2/tasks")
                 .addHeader("accept", "application/json")
                 .build();
 

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The wrapper for "/v1/buckets" response.
+ * The wrapper for "/api/v2/buckets" response.
  *
  * @author Jakub Bednar (bednar@github) (13/09/2018 11:32)
  */

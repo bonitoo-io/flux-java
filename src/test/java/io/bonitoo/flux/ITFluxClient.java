@@ -63,6 +63,7 @@ class ITFluxClient extends AbstractITFluxClient {
 
     @BeforeEach
     void prepareDate() {
+        
         Point point1 = Point.measurement("mem")
                 .tag("host", "A").tag("region", "west")
                 .addField("free", 10)

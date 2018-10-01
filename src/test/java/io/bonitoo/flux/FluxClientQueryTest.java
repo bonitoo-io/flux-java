@@ -196,7 +196,7 @@ class FluxClientQueryTest extends AbstractFluxClientTest {
         fluxClient.flux(Flux.from("flux_database"), (cancellable, result) -> {
 
             Assertions.fail("Unreachable");
-        }, FluxClient.EMPTY_ON_COMPLETE, throwable -> countDownLatch.countDown());
+        }, FluxClientFactory.EMPTY_ON_COMPLETE, throwable -> countDownLatch.countDown());
 
         waitToCallback();
     }

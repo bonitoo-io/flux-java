@@ -62,7 +62,7 @@ class FluxCsvParserTest {
 
         // curl -i -XPOST --data-urlencode 'q=from(bucket: "ubuntu_test") |> last()
         // |> map(fn: (r) => ({value1: r._value, _value2:r._value * r._value, value_str: "test"}))'
-        // --data-urlencode "orgName=0" http://localhost:8093/v1/query
+        // --data-urlencode "orgName=0" http://localhost:8093/api/v2/query
 
         String data = "#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,string,string,string,string,long,long,string\n"
                 + "#group,false,false,true,true,true,true,true,true,false,false,false\n"

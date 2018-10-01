@@ -95,8 +95,8 @@ class ITAuthorizationClientTest extends AbstractITClientTest {
         Assertions.assertThat(authorization.getPermissions().get(1).getAction()).isEqualTo("write");
 
         Assertions.assertThat(authorization.getLinks()).hasSize(2);
-        Assertions.assertThat(authorization.getLinks()).hasEntrySatisfying("self", value -> Assertions.assertThat(value).isEqualTo("/v1/authorizations/" + authorization.getId()));
-        Assertions.assertThat(authorization.getLinks()).hasEntrySatisfying("user", value -> Assertions.assertThat(value).isEqualTo("/v1/users/" + user.getId()));
+        Assertions.assertThat(authorization.getLinks()).hasEntrySatisfying("self", value -> Assertions.assertThat(value).isEqualTo("/api/v2/authorizations/" + authorization.getId()));
+        Assertions.assertThat(authorization.getLinks()).hasEntrySatisfying("user", value -> Assertions.assertThat(value).isEqualTo("/api/v2/users/" + user.getId()));
     }
 
     @Test

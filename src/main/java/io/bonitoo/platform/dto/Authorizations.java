@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * The wrapper for "/v1/authorizations" response.
+ * The wrapper for "/api/v2/authorizations" response.
  *
  * @author Jakub Bednar (bednar@github) (17/09/2018 11:43)
  */

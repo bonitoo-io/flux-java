@@ -23,8 +23,13 @@
 package io.bonitoo.flux;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
+import io.bonitoo.flux.dto.FluxRecord;
 import io.bonitoo.flux.impl.FluxClientImpl;
 import io.bonitoo.flux.option.FluxConnectionOptions;
 
@@ -35,6 +40,19 @@ import io.bonitoo.flux.option.FluxConnectionOptions;
  * @since 1.0.0
  */
 public final class FluxClientFactory {
+
+    private static final Logger LOG = Logger.getLogger(FluxClientFactory.class.getName());
+
+    public static final BiConsumer<FluxClient.Cancellable, FluxRecord> EMPTY_ON_NEXT =
+            (cancellable, fluxRecord) -> LOG.finest("Finished query");
+
+    public static final Runnable EMPTY_ON_COMPLETE = () -> LOG.log(Level.FINEST, "successfully end of stream");
+
+    public static final Consumer<? super Throwable> EMPTY_ON_ERROR = (Consumer<Throwable>) throwable -> {
+        Thread currentThread = Thread.currentThread();
+        Thread.UncaughtExceptionHandler handler = currentThread.getUncaughtExceptionHandler();
+        handler.uncaughtException(currentThread, throwable);
+    };
 
     private FluxClientFactory() {
     }

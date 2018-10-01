@@ -69,8 +69,8 @@ class ITBucketClientTest extends AbstractITClientTest {
         Assertions.assertThat(bucket.getOrganizationName()).isEqualTo(organization.getName());
         Assertions.assertThat(bucket.getRetentionPeriod()).isEqualTo("1h");
         Assertions.assertThat(bucket.getLinks()).hasSize(2);
-        Assertions.assertThat(bucket.getLinks()).hasEntrySatisfying("org", value -> Assertions.assertThat(value).isEqualTo("/v1/orgs/" + organization.getId()));
-        Assertions.assertThat(bucket.getLinks()).hasEntrySatisfying("self", value -> Assertions.assertThat(value).isEqualTo("/v1/buckets/" + bucket.getId()));
+        Assertions.assertThat(bucket.getLinks()).hasEntrySatisfying("org", value -> Assertions.assertThat(value).isEqualTo("/api/v2/orgs/" + organization.getId()));
+        Assertions.assertThat(bucket.getLinks()).hasEntrySatisfying("self", value -> Assertions.assertThat(value).isEqualTo("/api/v2/buckets/" + bucket.getId()));
     }
 
     @Test

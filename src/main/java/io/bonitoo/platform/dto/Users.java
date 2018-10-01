@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The wrapper for "/v1/users" response.
+ * The wrapper for "/api/v2/users" response.
  *
  * @author Jakub Bednar (bednar@github) (18/09/2018 07:41)
  */

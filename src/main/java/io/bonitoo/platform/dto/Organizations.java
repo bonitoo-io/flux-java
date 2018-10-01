@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * The wrapper for "/v1/orgs" response.
+ * The wrapper for "/api/v2/orgs" response.
  *
  * @author Jakub Bednar (bednar@github) (12/09/2018 10:12)
  */

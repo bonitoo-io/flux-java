@@ -58,6 +58,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static io.bonitoo.flux.FluxClientFactory.EMPTY_ON_COMPLETE;
+import static io.bonitoo.flux.FluxClientFactory.EMPTY_ON_ERROR;
+import static io.bonitoo.flux.FluxClientFactory.EMPTY_ON_NEXT;
+
 /**
  * @author Jakub Bednar (bednar@github) (30/07/2018 13:56)
  */
